@@ -2,11 +2,13 @@ import {vec3, vec4, mat4} from 'gl-matrix';
 import Drawable from '../rendering/gl/Drawable';
 import {gl} from '../globals';
 
-class Prism extends Drawable {
+class Plant extends Drawable {
     indices: Uint32Array;
     positions: Float32Array;
     normals: Float32Array;
     stagedIndices: Array<number>;
+    stagedPositions: Array<number>;
+    stagedNormals: Array<number>;
 
     constructor(center: vec3) {
         super(); // Call the constructor of the super class. This is required.
@@ -15,6 +17,8 @@ class Prism extends Drawable {
         // indices/positions/normals prior to putting them in
         // fixed Uint32Arrays/Float32Arrays.
         this.stagedIndices = [];
+        this.stagedPositions = [];
+        this.stagedNormals = [];
     }
 
 
@@ -124,8 +128,8 @@ class Prism extends Drawable {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
         gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
 
-        console.log(`Created cube`);
+        console.log(`Created Plant`);
     }
 };
 
-export default Prism;
+export default Plant;
