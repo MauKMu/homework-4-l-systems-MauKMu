@@ -4,6 +4,7 @@ import * as DAT from 'dat-gui';
 import Icosphere from './geometry/Icosphere';
 import Square from './geometry/Square';
 import Cube from './geometry/Cube';
+import Prism from './geometry/Prism';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
@@ -39,6 +40,7 @@ const controls = {
 let icosphere: Icosphere;
 let square: Square;
 let cube: Cube;
+let prism: Prism;
 
 let renderer: OpenGLRenderer;
 
@@ -49,6 +51,8 @@ function loadScene() {
   square.create();
   cube = new Cube(vec3.fromValues(1.5, 0, 0));
   cube.create();
+  prism = new Prism(vec3.fromValues(0, 0, 0));
+  prism.create();
 }
 
 function toggleAnimXZ() {
@@ -170,9 +174,10 @@ function main() {
     renderer.setPlumeBias(controls.plumeBias / 100);
     renderer.setEdgeClarity(controls.edgeClarity / 100);
     renderer.render(camera, shaders[controls.shader], [
-      icosphere,
+      // icosphere,
       // square,
-      // cube,
+      //cube,
+      prism,
     ]);
     stats.end();
 

@@ -131,7 +131,7 @@ class OpenGLRenderer {
     prog.setSpeed(this.shaderSpeed);
 
     for (let drawable of drawables) {
-      prog.setModelMatrix(mat4.fromTranslation(mat4.create(), drawable.center));
+      //prog.setModelMatrix(mat4.fromTranslation(mat4.create(), drawable.center));
       prog.draw(drawable);
     }
   }
