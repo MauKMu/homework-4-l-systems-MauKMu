@@ -24,7 +24,7 @@ const controls = {
   tesselations: 6,
   'Load Scene': loadScene, // A function pointer, essentially
   geometryColor: [200, 10, 10],
-  shader: ShaderEnum.PLANET,
+  shader: ShaderEnum.LAMBERT,
   shaderSpeed: 1,
   'Toggle tilting': toggleAnimXZ,
   'Toggle squishing': toggleAnimY,
