@@ -10,6 +10,10 @@ import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 
+import Turtle from './l-system/Turtle';
+import {LSymbol, ExpansionRule} from './l-system/LSymbol';
+import LSystem from './l-system/LSystem';
+
 enum ShaderEnum {
     LAMBERT = 1,
     CUSTOM,
@@ -64,6 +68,18 @@ function toggleAnimY() {
 }
 
 function main() {
+    let lsys = new LSystem();
+    console.log(lsys.alphabet);
+    /*
+    let f = function (y: number) {
+        console.log("x+1: " + (y + 1));
+        this.stringRepra = "bbb";
+    };
+    let s = new LSymbol("aaa", f);
+    console.log(s.stringRepr);
+    s.action(1);
+    console.log(s.stringRepr);
+    */
   // Initial display for framerate
   const stats = Stats();
   stats.setMode(0);

@@ -216,7 +216,13 @@ class Plant extends Drawable {
 
 
     create() {
-        this.addPrism(mat4.create(), 8);
+        this.addPrism(mat4.create(), 12);
+        let trans = mat4.create();
+        //mat4.fromRotation(trans, PI * 0.25, vec3.fromValues(0, 0, 1));
+        mat4.translate(trans, trans, vec3.fromValues(0, PRISM_HEIGHT, 0));
+        mat4.rotateY(trans, trans, PI * 0.5);
+        mat4.rotateZ(trans, trans, PI * 0.25);
+        this.addPrism(trans, 12);
 
         this.indices = new Uint32Array(this.stagedIndices);
         this.positions = new Float32Array(this.stagedPositions);
