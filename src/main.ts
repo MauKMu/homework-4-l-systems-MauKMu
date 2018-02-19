@@ -5,6 +5,7 @@ import Icosphere from './geometry/Icosphere';
 import Square from './geometry/Square';
 import Cube from './geometry/Cube';
 import Plant from './geometry/Plant';
+import { PRISM_HEIGHT } from './geometry/Plant';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
@@ -67,9 +68,43 @@ function toggleAnimY() {
   renderer.toggleAnimY();
 }
 
-function main() {
+function blah() {
+    // define alphabet
+    let F = new LSymbol("F", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        lsys.addPrismAtTurtle(turtle);
+        turtle.moveForward(PRISM_HEIGHT);
+    });
+    let push = new LSymbol("[", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        let copy = turtle.makeDeepCopy();
+        copy.depth++;
+        lsys.turtleStack.push(copy);
+    });
+    let pop = new LSymbol("]", function (lsys: LSystem) {
+        lsys.turtleStack.pop();
+    });
+    // set expansion rules
     let lsys = new LSystem();
     console.log(lsys.alphabet);
+    lsys.setAxiom([lsys.alphabet[0], lsys.alphabet[1], lsys.alphabet[2]]);
+    console.log(lsys.axiom.toString());
+    lsys.axiom.expand();
+    console.log(lsys.axiom.toString());
+    lsys.axiom.expand();
+    console.log(lsys.axiom.toString());
+
+    F.action(lsys);
+    let turtle = lsys.getTopTurtle();
+    turtle.orientation = vec3.fromValues(0.7071, 0.7071, 0);
+    F.action(lsys);
+    turtle.orientation = vec3.fromValues(1, 0, 0);
+    F.action(lsys);
+    plant = lsys.plant;
+    plant.create();
+}
+
+function main() {
     /*
     let f = function (y: number) {
         console.log("x+1: " + (y + 1));
@@ -117,6 +152,7 @@ function main() {
 
   // Initial call to load scene
   loadScene();
+  blah();
 
   const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
 

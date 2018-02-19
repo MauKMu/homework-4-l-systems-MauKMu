@@ -6,7 +6,7 @@ import {gl} from '../globals';
 const PI = 3.14159265;
 const TWO_PI = 6.283185307;
 
-const PRISM_HEIGHT = 3;
+export const PRISM_HEIGHT = 3;
 
 // helper function for copying values of a vec4 into an array
 function copyVec4ToArray(arr: Array<number>, startIdx: number, vec: vec4) {
@@ -64,11 +64,6 @@ class Plant extends Drawable {
     // the prism will extend in the +Y direction from the base.
     addPrism(transform: mat4, sides: number) {
         // set up =============================================
-        /*
-        let idxBase = this.stagedIndices.length;
-        let posBase = this.stagedPositions.length;
-        let norBase = this.stagedNormals.length;
-        */
 
         let idxStart = this.stagedPositions.length / 4;
 
@@ -216,6 +211,7 @@ class Plant extends Drawable {
 
 
     create() {
+        /*
         this.addPrism(mat4.create(), 12);
         let trans = mat4.create();
         //mat4.fromRotation(trans, PI * 0.25, vec3.fromValues(0, 0, 1));
@@ -223,6 +219,7 @@ class Plant extends Drawable {
         mat4.rotateY(trans, trans, PI * 0.5);
         mat4.rotateZ(trans, trans, PI * 0.25);
         this.addPrism(trans, 12);
+        */
 
         this.indices = new Uint32Array(this.stagedIndices);
         this.positions = new Float32Array(this.stagedPositions);

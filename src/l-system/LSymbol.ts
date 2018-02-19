@@ -1,6 +1,7 @@
 import {vec3, mat4} from 'gl-matrix';
-import Turtle from 'Turtle';
-import Plant from '../geometry/Plant';
+//import Turtle from 'Turtle';
+//import Plant from '../geometry/Plant';
+import LSystem from 'LSystem';
 
 export class ExpansionRule {
     weight: number;
@@ -14,11 +15,11 @@ export class ExpansionRule {
 
 export class LSymbol {
     stringRepr: string;
-    action: (t: Turtle, p: Plant) => void;
+    action: (lsys: LSystem) => void;
     expansionRules: Array<ExpansionRule>;
     normalizedWeights: Array<number>;
 
-    constructor(stringRepr: string, action: (t: Turtle, p: Plant) => void) {
+    constructor(stringRepr: string, action: (lsys: LSystem) => void) {
         this.stringRepr = stringRepr;
         this.action = action;
         this.expansionRules = [];

@@ -1,78 +1,77 @@
 import {vec3, mat4} from 'gl-matrix';
-import Turtle from 'Turtle';
-import Plant from '../geometry/Plant';
 import {LSymbol, ExpansionRule} from './LSymbol';
 
+// Node of the linked list (LString)
+class LStringNode {
+    sym: LSymbol; // symbol is reserved...
+    next: LStringNode;
 
-export class LString {
-    stringRepr: string;
-    action: (t: Turtle, p: Plant) => void;
-    expansionRules: Array<ExpansionRule>;
-    normalizedWeights: Array<number>;
+    constructor(sym: LSymbol, next: LStringNode) {
+        this.sym = sym;
+        this.next = next;
+    }
+}
 
-    constructor(stringRepr: string, action: (t: Turtle, p: Plant) => void) {
-        this.stringRepr = stringRepr;
-        this.action = action;
-        this.expansionRules = [];
-        this.normalizedWeights = [];
+// Linked list of LSymbols
+class LString {
+    head: LStringNode;
+
+    // constructs list from array
+    constructor(arr: Array<LSymbol>) {
+        this.fromArray(arr);
     }
 
-    // rules should be an array of tuples
-    // each tuple is of the form (weight, symbol)
-    // the higher a given weight, the higher the chance the symbol will be chosen
-    setExpansionRules(rules: Array<ExpansionRule>) {
-        this.expansionRules = rules.slice(0);
-        this.updateWeights();
-    }
-
-    updateWeights() {
-        this.normalizedWeights = [];
-        if (this.expansionRules.length == 0) {
+    fromArray(arr: Array<LSymbol>) {
+        if (arr.length == 0) {
+            this.head = null;
             return;
         }
-        if (this.expansionRules.length == 1) {
-            this.normalizedWeights[0] = 1.0;
-            return;
-        }
+        // initialize head
+        this.head = new LStringNode(arr[0], null);
 
-        let totalSum = 0.0;
-        for (let i = 0; i < this.expansionRules.length; i++) {
-            totalSum += this.expansionRules[i].weight;
-        }
-        if (totalSum == 0.0) {
-            return;
-        }
-
-        let accWeight = 0.0;
-        for (let i = 0; i < this.expansionRules.length; i++) {
-            accWeight += this.expansionRules[i].weight / totalSum;
-            this.normalizedWeights[i] = accWeight;
+        // add following elements
+        let node = this.head;
+        for (let i = 1; i < arr.length; i++) {
+            let nextNode = new LStringNode(arr[i], null);
+            node.next = nextNode;
+            node = nextNode;
         }
     }
 
-    canExpand(): boolean {
-        return (this.expansionRules.length > 0);
+    toString(): string {
+        let arr = Array<string>();
+        let node = this.head;
+        while (node != null) {
+            arr.push(node.sym.stringRepr);
+            node = node.next;
+        }
+        return arr.join("");
     }
 
-    // p should be in [0, 1]
-    expand(p: number): Array<LSymbol> {
-        if (this.expansionRules.length == 0) {
-            return [this];
-        }
-        if (this.expansionRules.length == 1) {
-            return this.expansionRules[0].symbols;
-        }
+    expand() {
+        let node = this.head;
+        while (node != null) {
+            let nextNode = node.next;
 
-        let lastIdx = this.expansionRules.length - 1;
-        for (let i = 0; i < lastIdx; i++) {
-            if (p < this.normalizedWeights[i]) {
-                return this.expansionRules[i].symbols;
+            if (node.sym.canExpand()) {
+                // expand!
+                let p = Math.random();
+                let arr = node.sym.expand(p);
+                // arr should never be empty
+                node.sym = arr[0];
+                if (arr.length > 1) {
+                    for (let i = 1; i < arr.length; i++) {
+                        let newNode = new LStringNode(arr[i], null);
+                        node.next = newNode;
+                        node = newNode;
+                    }
+                    node.next = nextNode;
+                }
             }
+            node = nextNode;
         }
-        return this.expansionRules[lastIdx].symbols;
     }
 
 };
 
-//export default ExpansionRule;
-//export default LSymbol;
+export default LString;
