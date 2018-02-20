@@ -9,6 +9,7 @@ class LSystem {
     turtleStack: Array<Turtle>;
     plant: Plant;
     axiom: LString;
+    lstring: LString;
 
     constructor() {
         //this.alphabet = [];
@@ -16,10 +17,12 @@ class LSystem {
         this.turtleStack = [new Turtle()];
         this.plant = new Plant(vec3.fromValues(0, 0, 0));
         this.axiom = new LString([]);
+        this.lstring = new LString([]);
     }
 
     setAxiom(axiomArray: Array<LSymbol>) {
         this.axiom.fromArray(axiomArray);
+        this.lstring.fromArray(axiomArray);
     }
 
     getTopTurtle(): Turtle {
@@ -28,7 +31,7 @@ class LSystem {
 
     addPrismAtTurtle(turtle: Turtle) {
         let trans = turtle.getTransformationToTurtle();
-        this.plant.addPrism(trans, 12);
+        this.plant.addPrism(trans, 8);
     }
 
     initAlphabet() {
@@ -41,6 +44,14 @@ class LSystem {
         this.alphabet.push(C);
         A.setExpansionRules([new ExpansionRule(1, [B, B, A]), new ExpansionRule(1, [A])]);
         B.setExpansionRules([new ExpansionRule(1, [C, B])]);
+    }
+
+    expandString() {
+        this.lstring.expand();
+    }
+
+    executeString() {
+        this.lstring.execute(this);
     }
 
 };

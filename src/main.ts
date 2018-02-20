@@ -1,4 +1,4 @@
-import {vec3, vec4} from 'gl-matrix';
+import {vec3, vec4, mat3, mat4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Icosphere from './geometry/Icosphere';
@@ -49,6 +49,8 @@ let plant: Plant;
 
 let renderer: OpenGLRenderer;
 
+let alphabet: Map<string, LSymbol>;
+
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
   icosphere.create();
@@ -70,19 +72,160 @@ function toggleAnimY() {
 
 function blah() {
     // define alphabet
+    alphabet = new Map<string, LSymbol>();
+
+    // symbol definitions below.
+    // they include:
+    //   * string representation
+    //   * action
+    //   * expansion rules, if any
+
     let F = new LSymbol("F", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
         lsys.addPrismAtTurtle(turtle);
         turtle.moveForward(PRISM_HEIGHT);
     });
+    alphabet.set(F.stringRepr, F);
     let push = new LSymbol("[", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
         let copy = turtle.makeDeepCopy();
         copy.depth++;
         lsys.turtleStack.push(copy);
     });
+    alphabet.set(push.stringRepr, push);
     let pop = new LSymbol("]", function (lsys: LSystem) {
         lsys.turtleStack.pop();
+    });
+    alphabet.set(pop.stringRepr, pop);
+    // "root"
+    let R = new LSymbol("R", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        lsys.addPrismAtTurtle(turtle);
+        turtle.moveForward(PRISM_HEIGHT * 0.8);
+    });
+    let plusZ = new LSymbol("(+Z)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        turtle.rotateZ(Math.PI * 0.2);
+    });
+    alphabet.set(plusZ.stringRepr, plusZ);
+    let minusZ = new LSymbol("(-Z)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        turtle.rotateZ(-Math.PI * 0.2);
+    });
+    alphabet.set(minusZ.stringRepr, minusZ);
+    // twisty trunk ===========================================
+    let twistyPlusBigY = new LSymbol("(T+Y)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        turtle.rotateY(Math.PI * 0.25);
+        lsys.addPrismAtTurtle(turtle);
+        turtle.moveForward(PRISM_HEIGHT * 0.8);
+    });
+    alphabet.set(twistyPlusBigY.stringRepr, twistyPlusBigY);
+    let twistyMinusBigY = new LSymbol("(T-Y)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        turtle.rotateY(-Math.PI * 0.25);
+        lsys.addPrismAtTurtle(turtle);
+        turtle.moveForward(PRISM_HEIGHT * 0.8);
+    });
+    alphabet.set(twistyMinusBigY.stringRepr, twistyMinusBigY);
+    // just expands it one of (T+Y) or (T-Y)
+    let twistyStart = new LSymbol("(TS)", function (lsys: LSystem) {
+    });
+    alphabet.set(twistyStart.stringRepr, twistyStart);
+    twistyStart.setExpansionRules([new ExpansionRule(1, [twistyPlusBigY]), new ExpansionRule(1, [twistyMinusBigY])]);
+    // set expansion rules for other twisty trunks
+    twistyPlusBigY.setExpansionRules([new ExpansionRule(6, [twistyPlusBigY, twistyPlusBigY]),
+                                      new ExpansionRule(3, [twistyPlusBigY]),
+                                      new ExpansionRule(1, [twistyPlusBigY, twistyMinusBigY])]);
+    twistyMinusBigY.setExpansionRules([new ExpansionRule(6, [twistyMinusBigY, twistyMinusBigY]),
+                                       new ExpansionRule(3, [twistyMinusBigY]),
+                                       new ExpansionRule(1, [twistyMinusBigY, twistyPlusBigY])]);
+    // branchy trunk ==========================================
+    let branchyTip = new LSymbol("B", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        lsys.addPrismAtTurtle(turtle);
+        turtle.moveForward(PRISM_HEIGHT);
+    });
+    let branchyPlusSmallX = new LSymbol("(B+x)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        turtle.rotateX(Math.PI * 0.1);
+        lsys.addPrismAtTurtle(turtle);
+        turtle.moveForward(PRISM_HEIGHT);
+    });
+    let branchyMinusSmallX = new LSymbol("(B-x)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        turtle.rotateX(-Math.PI * 0.1);
+        lsys.addPrismAtTurtle(turtle);
+        turtle.moveForward(PRISM_HEIGHT);
+    });
+    let branchyPlusSmallY = new LSymbol("(B+y)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        turtle.rotateY(Math.PI * 0.1);
+        lsys.addPrismAtTurtle(turtle);
+        turtle.moveForward(PRISM_HEIGHT);
+    });
+    let branchyMinusSmallY = new LSymbol("(B-y)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        turtle.rotateY(-Math.PI * 0.1);
+        lsys.addPrismAtTurtle(turtle);
+        turtle.moveForward(PRISM_HEIGHT);
+    });
+    // transition main trunk -> araucaria =====================
+    // use "vertify" to smoothly change into a mostly vertical direction
+    // similar to araucariaLong, but more intense
+    let vertify = new LSymbol("(vert)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        // draw some prisms while increasing Y to move orientation up
+        let VERTIFY_Y_INC = 0.4;
+        for (let i = 0; i < 5; i++) {
+            // draw part of the branch
+            lsys.addPrismAtTurtle(turtle);
+            turtle.moveForward(PRISM_HEIGHT);
+            // add to Y and normalize to nudge it upwards
+            vec3.add(turtle.orientation, turtle.orientation, vec3.fromValues(0, VERTIFY_Y_INC, 0));
+            vec3.normalize(turtle.orientation, turtle.orientation);
+        }
+    });
+    // do this by setting orientation to something with Y <= 0
+    // we call this "flatifying", as it "flattens" the direction
+    // (if you think of up as a "non-flat" direction. flatty mcflatty.)
+    let flatify = new LSymbol("(flat)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        let angle = Math.random() * 2.0 * Math.PI;
+        let y = -Math.random() * 0.3 + 0.05;
+        vec3.set(turtle.orientation, Math.cos(angle), y, Math.sin(angle));
+        vec3.normalize(turtle.orientation, turtle.orientation);
+    });
+    // araucaria branches =====================================
+    // the main branches coming off the main trunk have two parts:
+    // the "straight", long part coming from the main trunk; and
+    // the vertical tip at the end;
+    let araucariaLong = new LSymbol("(AL)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        // draw some prisms while increasing Y to move orientation up
+        let ARAUCARIA_Y_INC = 0.2;
+        for (let i = 0; i < 5; i++) {
+            // draw part of the branch
+            lsys.addPrismAtTurtle(turtle);
+            turtle.moveForward(PRISM_HEIGHT);
+            // add to Y and normalize to nudge it upwards
+            vec3.add(turtle.orientation, turtle.orientation, vec3.fromValues(0, ARAUCARIA_Y_INC, 0));
+            vec3.normalize(turtle.orientation, turtle.orientation);
+        }
+    });
+    let araucariaTip = new LSymbol("(AT)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        lsys.addPrismAtTurtle(turtle);
+        turtle.moveForward(PRISM_HEIGHT);
+    });
+    // "helper" symbol to change the turtle orientation randomly
+    // and make branches more chaotic
+    let randify = new LSymbol("(rand)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        let angle = Math.random() * 2.0 * Math.PI;
+        let y = Math.random() * 1.8 - 0.9;
+        vec3.set(turtle.orientation, Math.cos(angle), y, Math.sin(angle));
+        vec3.normalize(turtle.orientation, turtle.orientation);
     });
     // set expansion rules
     let lsys = new LSystem();
@@ -94,12 +237,18 @@ function blah() {
     lsys.axiom.expand();
     console.log(lsys.axiom.toString());
 
-    F.action(lsys);
-    let turtle = lsys.getTopTurtle();
-    turtle.orientation = vec3.fromValues(0.7071, 0.7071, 0);
-    F.action(lsys);
-    turtle.orientation = vec3.fromValues(1, 0, 0);
-    F.action(lsys);
+    //lsys.setAxiom([R, plusZ, R, plusZ, R, twistyPlusBigY, twistyPlusBigY, twistyPlusBigY]);
+    lsys.setAxiom([R, plusZ, R, plusZ, R, twistyPlusBigY, twistyPlusBigY, twistyPlusBigY, vertify, R, R]);
+    //lsys.setAxiom([R, R, R, push, flatify, araucariaLong, pop, push, flatify, araucariaLong, pop  ]);
+    //lsys.setAxiom([R, R, R, push, flatify, araucariaLong, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop, push, flatify, araucariaLong, pop  ]);
+    lsys.executeString();
+
+    //F.action(lsys);
+    //let turtle = lsys.getTopTurtle();
+    //turtle.orientation = vec3.fromValues(0.7071, 0.7071, 0);
+    //F.action(lsys);
+    //turtle.orientation = vec3.fromValues(1, 0, 0);
+    //F.action(lsys);
     plant = lsys.plant;
     plant.create();
 }

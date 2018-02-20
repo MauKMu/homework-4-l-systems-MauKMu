@@ -1,5 +1,6 @@
 import {vec3, mat4} from 'gl-matrix';
 import {LSymbol, ExpansionRule} from './LSymbol';
+import LSystem from './LSystem';
 
 // Node of the linked list (LString)
 class LStringNode {
@@ -69,6 +70,14 @@ class LString {
                 }
             }
             node = nextNode;
+        }
+    }
+
+    execute(lsys: LSystem) {
+        let node = this.head;
+        while (node != null) {
+            node.sym.action(lsys);
+            node = node.next;
         }
     }
 

@@ -6,7 +6,7 @@ import {gl} from '../globals';
 const PI = 3.14159265;
 const TWO_PI = 6.283185307;
 
-export const PRISM_HEIGHT = 3;
+export const PRISM_HEIGHT = 5;
 
 // helper function for copying values of a vec4 into an array
 function copyVec4ToArray(arr: Array<number>, startIdx: number, vec: vec4) {
