@@ -82,8 +82,9 @@ function blah() {
 
     let F = new LSymbol("F", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
-        lsys.addPrismAtTurtle(turtle);
-        turtle.moveForward(PRISM_HEIGHT);
+        //lsys.addPrismAtTurtle(turtle);
+        lsys.addScaledPrismAtTurtle(turtle, 2.0);
+        turtle.moveForward(PRISM_HEIGHT * 2.0);
     });
     alphabet.set(F.stringRepr, F);
     let push = new LSymbol("[", function (lsys: LSystem) {
@@ -105,12 +106,12 @@ function blah() {
     });
     let plusZ = new LSymbol("(+Z)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
-        turtle.rotateZ(Math.PI * 0.2);
+        turtle.rotateZ(Math.PI * 0.1333333);
     });
     alphabet.set(plusZ.stringRepr, plusZ);
     let minusZ = new LSymbol("(-Z)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
-        turtle.rotateZ(-Math.PI * 0.2);
+        turtle.rotateZ(-Math.PI * 0.1333333);
     });
     alphabet.set(minusZ.stringRepr, minusZ);
     // twisty trunk ===========================================
@@ -225,7 +226,7 @@ function blah() {
     let vertify = new LSymbol("(vert)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
         // draw some prisms while increasing Y to move orientation up
-        let VERTIFY_Y_INC = 0.6;
+        let VERTIFY_Y_INC = 0.8;
         for (let i = 0; i < 3; i++) {
             // draw part of the branch
             lsys.addPrismAtTurtle(turtle);
@@ -301,7 +302,7 @@ function blah() {
     //lsys.setAxiom([R, R, R, push, flatify, araucariaLong, pop, push, flatify, araucariaLong, pop  ]);
     //lsys.setAxiom([R, R, R, push, flatify, araucariaLong, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop, push, flatify, araucariaLong, pop  ]);
     lsys.setAxiom([
-        F, F, F, plusZ, F, plusZ, F, twistyStart, vertify, F, branchyStart
+        F, plusZ, F, plusZ, F, plusZ, F, twistyStart, vertify, F, branchyStart
     ]);
     console.log(lsys.lstring.toString());
     lsys.expandString();

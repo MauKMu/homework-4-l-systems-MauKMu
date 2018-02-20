@@ -31,7 +31,16 @@ class LSystem {
 
     addPrismAtTurtle(turtle: Turtle) {
         let trans = turtle.getTransformationToTurtle();
-        this.plant.addPrism(trans, 8);
+        this.plant.addPrism(trans, 8, turtle.scaleBottom, turtle.scaleTop, 1);
+        turtle.scaleBottom = turtle.scaleTop;
+        turtle.scaleTop *= 0.99;
+    }
+
+    addScaledPrismAtTurtle(turtle: Turtle, scaleHeight: number) {
+        let trans = turtle.getTransformationToTurtle();
+        this.plant.addPrism(trans, 8, turtle.scaleBottom, turtle.scaleTop, scaleHeight);
+        turtle.scaleBottom = turtle.scaleTop;
+        turtle.scaleTop *= 0.8;
     }
 
     initAlphabet() {

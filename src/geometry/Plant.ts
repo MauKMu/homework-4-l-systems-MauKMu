@@ -6,7 +6,7 @@ import {gl} from '../globals';
 const PI = 3.14159265;
 const TWO_PI = 6.283185307;
 
-export const PRISM_HEIGHT = 5;
+export const PRISM_HEIGHT = 10;
 
 // helper function for copying values of a vec4 into an array
 function copyVec4ToArray(arr: Array<number>, startIdx: number, vec: vec4) {
@@ -37,6 +37,7 @@ function appendTri(arr: Array<number>, i0: number, i1: number, i2: number) {
     arr[len + 2] = i2;
 }
 
+
 class Plant extends Drawable {
     indices: Uint32Array;
     positions: Float32Array;
@@ -62,7 +63,7 @@ class Plant extends Drawable {
     //   * lies on the XZ planes
     //   * has its center at the origin
     // the prism will extend in the +Y direction from the base.
-    addPrism(transform: mat4, sides: number) {
+    addPrism(transform: mat4, sides: number, scaleBottom: number, scaleTop: number, scaleHeight: number) {
         // set up =============================================
 
         let idxStart = this.stagedPositions.length / 4;
@@ -89,7 +90,7 @@ class Plant extends Drawable {
         let rotMat4 = mat4.create();
         mat4.fromRotation(rotMat4, angle, vec3.fromValues(0, 1, 0));
 
-        let localPos = vec4.fromValues(1, 0, 0, 1);
+        let localPos = vec4.fromValues(scaleBottom, 0, 0, 1);
 
         for (let i = 0; i < sides; i++) {
             // transform and append position
@@ -117,7 +118,7 @@ class Plant extends Drawable {
         // refresh idxStart
         idxStart = this.stagedPositions.length / 4;
         // add center
-        p = vec4.fromValues(0, PRISM_HEIGHT, 0, 1);
+        p = vec4.fromValues(0, PRISM_HEIGHT * scaleHeight, 0, 1);
         vec4.transformMat4(p, p, transform);
         appendVec4ToArray(this.stagedPositions, p);
 
@@ -128,7 +129,7 @@ class Plant extends Drawable {
 
         // add radial vertices
 
-        localPos = vec4.fromValues(1, PRISM_HEIGHT, 0, 1);
+        localPos = vec4.fromValues(scaleTop, PRISM_HEIGHT * scaleHeight, 0, 1);
 
         for (let i = 0; i < sides; i++) {
             // transform and append position
@@ -160,8 +161,8 @@ class Plant extends Drawable {
         mat3.fromMat4(rotMat3, rotMat4);
 
         // localPosBot will be computed from localPosTop by setting Y = 0
-        let localPosBot = vec4.create();
-        let localPosTop = vec4.fromValues(1, PRISM_HEIGHT, 0, 1);
+        let localPosBot = vec4.fromValues(scaleBottom, 0, 0, 1);
+        let localPosTop = vec4.fromValues(scaleTop, PRISM_HEIGHT * scaleHeight, 0, 1);
 
         // compute initial normal by rotating by half angle
         let halfRotMat4 = mat4.create();
@@ -176,7 +177,7 @@ class Plant extends Drawable {
             appendVec4ToArray(this.stagedPositions, p);
 
             // transform and append position -- bottom
-            vec4.set(localPosBot, localPosTop[0], 0, localPosTop[2], 1);
+            //vec4.set(localPosBot, localPosTop[0], 0, localPosTop[2], 1);
             vec4.transformMat4(p, localPosBot, transform);
             appendVec4ToArray(this.stagedPositions, p);
 
@@ -190,6 +191,7 @@ class Plant extends Drawable {
             if (i < sides - 1) {
                 // rotate local position
                 vec4.transformMat4(localPosTop, localPosTop, rotMat4);
+                vec4.transformMat4(localPosBot, localPosBot, rotMat4);
 
                 // rotate local normal
                 vec3.transformMat3(localNor, localNor, rotMat3);

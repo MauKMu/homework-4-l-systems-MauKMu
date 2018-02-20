@@ -15,8 +15,8 @@ class Turtle {
         this.orientation = vec3.create();
         vec3.copy(this.orientation, UP);
         this.depth = 0;
-        this.scaleBottom = 1;
-        this.scaleTop = 1;
+        this.scaleBottom = 12;
+        this.scaleTop = 12;
     }
 
     moveForward(distance: number) {
