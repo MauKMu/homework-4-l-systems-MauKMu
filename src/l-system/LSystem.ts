@@ -44,7 +44,10 @@ class LSystem {
     }
 
     addPearAtTurtle(turtle: Turtle, pearMesh: any) {
-        let trans = turtle.getTransformationToTurtle();
+        // extract only translation from turtle
+        let turtlePos = turtle.position;
+        let trans = mat4.create();
+        mat4.fromTranslation(trans, turtlePos);
         let toOrigin = mat4.create();
         let m = mat4.create();
         let q = quat.create();
@@ -53,7 +56,7 @@ class LSystem {
         mat4.fromTranslation(m, vec3.fromValues(0, 0, 15));
         mat4.multiply(toOrigin, toOrigin, m);
         mat4.multiply(trans, trans, toOrigin);
-        this.plant.addDecoration(pearMesh, toOrigin);
+        this.plant.addDecoration(pearMesh, trans);
     }
 
     initAlphabet() {

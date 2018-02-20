@@ -148,6 +148,12 @@ function blah() {
         turtle.rotateZ(-Math.PI * 0.1333333);
     });
     alphabet.set(minusZ.stringRepr, minusZ);
+    // decorations ============================================
+    let decorationPear = new LSymbol("(pear)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        lsys.addPearAtTurtle(turtle, mesh);
+    });
+    alphabet.set(decorationPear.stringRepr, decorationPear);
     // twisty trunk ===========================================
     let twistyPlusBigY = new LSymbol("(T+Y)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
@@ -325,7 +331,9 @@ function blah() {
     araucariaTip.setExpansionRules([
         new ExpansionRule(6, [araucariaTip]), // don't change
         new ExpansionRule(4, [araucariaTip, push, randify, araucariaTip, pop]), // add branch
-        new ExpansionRule(1, [araucariaTip, araucariaTip]) // grow current branch
+        new ExpansionRule(4, [araucariaTip, decorationPear, push, randify, araucariaTip, pop]), // add branch w/ pear
+        new ExpansionRule(1, [araucariaTip, araucariaTip]), // grow current branch
+        new ExpansionRule(1, [araucariaTip, decorationPear, araucariaTip]) // grow current branch w/ pear
     ]);
 
     // initialize L-system
@@ -365,6 +373,7 @@ function blah() {
     //F.action(lsys);
     plant = lsys.plant;
     lsys.addPearAtTurtle(new Turtle(), mesh);
+    lsys.addPearAtTurtle(lsys.getTopTurtle(), mesh);
     plant.addDecoration(mesh, mat4.create());
     plant.create();
 }
