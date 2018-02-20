@@ -11,6 +11,9 @@ import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 
+var OBJ = require('webgl-obj-loader');
+
+
 import Turtle from './l-system/Turtle';
 import {LSymbol, ExpansionRule} from './l-system/LSymbol';
 import LSystem from './l-system/LSystem';
@@ -70,7 +73,38 @@ function toggleAnimY() {
   renderer.toggleAnimY();
 }
 
+let objString: string;
+let isObjLoaded: boolean;
+
+function readTextFile(file: string) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                objString = rawFile.responseText;
+                isObjLoaded = true;
+                //alert(objString);
+            }
+        }
+        //objString = "Error when loading OBJ file!"        
+    }
+    rawFile.send(null);
+}
+
 function blah() {
+    //fetch("../models/Manzana.obj")
+        //.then(response => response.text())
+        //.then(text => console.log(text));
+    objString = "";
+    isObjLoaded = false;
+    readTextFile("models/fg_pear.obj");
+    console.log(isObjLoaded);
+    let mesh = new OBJ.Mesh(objString);
+    debugger;
     // define alphabet
     alphabet = new Map<string, LSymbol>();
 
@@ -330,6 +364,7 @@ function blah() {
     //turtle.orientation = vec3.fromValues(1, 0, 0);
     //F.action(lsys);
     plant = lsys.plant;
+    plant.addDecoration(mesh);
     plant.create();
 }
 

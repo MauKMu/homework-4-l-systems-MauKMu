@@ -57,6 +57,26 @@ class Plant extends Drawable {
         this.stagedNormals = [];
     }
 
+    // add mesh loaded by OBJ loader
+    addDecoration(mesh: any) {
+        // set up =============================================
+        let idxStart = this.stagedPositions.length / 4;
+
+        // add vertex data ====================================
+        for (let i = 0; i < mesh.vertices.length; i += 3) {
+            let p = vec4.fromValues(mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2], 1);
+            let n = vec3.fromValues(mesh.vertexNormals[i], mesh.vertexNormals[i + 1], mesh.vertexNormals[i + 2]);
+
+            appendVec4ToArray(this.stagedPositions, p);
+            appendNormalToArray(this.stagedNormals, n);
+        }
+
+        // add indices ========================================
+        for (let i = 0; i < mesh.indices.length; i += 3) {
+            appendTri(this.stagedIndices, idxStart + mesh.indices[i], idxStart + mesh.indices[i + 1], idxStart + mesh.indices[i + 2]); 
+        }
+    }
+
     // adds a prism to the staged* arrays, with all points transformed
     // by _transform_. with no transformation, the prism is
     // oriented such that its base:
@@ -65,7 +85,6 @@ class Plant extends Drawable {
     // the prism will extend in the +Y direction from the base.
     addPrism(transform: mat4, sides: number, scaleBottom: number, scaleTop: number, scaleHeight: number) {
         // set up =============================================
-
         let idxStart = this.stagedPositions.length / 4;
 
         // get the inverse transpose for normals
