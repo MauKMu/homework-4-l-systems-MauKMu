@@ -311,7 +311,8 @@ function blah() {
     let araucariaTip = new LSymbol("(AT)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
         lsys.addPrismAtTurtle(turtle);
-        lsys.addScaledPrismAtTurtle(turtle, 0.4);
+        turtle.scaleTop *= 0.81;
+        //lsys.addScaledPrismAtTurtle(turtle, 0.4);
         turtle.moveForward(PRISM_HEIGHT * 0.4);
     });
     alphabet.set(araucariaTip.stringRepr, araucariaTip);
