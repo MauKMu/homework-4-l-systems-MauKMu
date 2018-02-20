@@ -176,13 +176,13 @@ function blah() {
     twistyStart.setExpansionRules([new ExpansionRule(1, [twistyPlusBigY]), new ExpansionRule(1, [twistyMinusBigY])]);
     // set expansion rules for other twisty trunks
     twistyPlusBigY.setExpansionRules([
-        new ExpansionRule(6, [twistyPlusBigY, twistyPlusBigY]),
-        new ExpansionRule(3, [twistyPlusBigY]),
+        new ExpansionRule(2, [twistyPlusBigY, twistyPlusBigY]),
+        new ExpansionRule(4, [twistyPlusBigY]),
         new ExpansionRule(1, [twistyPlusBigY, twistyMinusBigY])
     ]);
     twistyMinusBigY.setExpansionRules([
-        new ExpansionRule(6, [twistyMinusBigY, twistyMinusBigY]),
-        new ExpansionRule(3, [twistyMinusBigY]),
+        new ExpansionRule(2, [twistyMinusBigY, twistyMinusBigY]),
+        new ExpansionRule(4, [twistyMinusBigY]),
         new ExpansionRule(1, [twistyMinusBigY, twistyPlusBigY])
     ]);
     // branchy trunk ==========================================
@@ -233,30 +233,30 @@ function blah() {
 
     // set expansion rules for branchy trunk pieces
     branchyPlusSmallX.setExpansionRules([
-        new ExpansionRule(4, [branchyPlusSmallX]),
+        new ExpansionRule(9, [branchyPlusSmallX, araucariaStart, araucariaStart, araucariaStart]), 
+        new ExpansionRule(6, [branchyPlusSmallX]),
         new ExpansionRule(2, [branchyPlusSmallX, branchyMinusSmallX]),
-        new ExpansionRule(9, [branchyPlusSmallX, araucariaStart]), 
         new ExpansionRule(1, [branchyPlusSmallX, branchyPlusSmallY]), 
         new ExpansionRule(1, [branchyPlusSmallX, branchyMinusSmallY])
     ]);
     branchyMinusSmallX.setExpansionRules([
-        new ExpansionRule(4, [branchyMinusSmallX]),
+        new ExpansionRule(9, [branchyMinusSmallX, araucariaStart, araucariaStart, araucariaStart]), 
+        new ExpansionRule(6, [branchyMinusSmallX]),
         new ExpansionRule(2, [branchyMinusSmallX, branchyPlusSmallX]),
-        new ExpansionRule(9, [branchyMinusSmallX, araucariaStart]), 
         new ExpansionRule(1, [branchyMinusSmallX, branchyPlusSmallY]), 
         new ExpansionRule(1, [branchyMinusSmallX, branchyMinusSmallY])
     ]);
     branchyPlusSmallY.setExpansionRules([
-        new ExpansionRule(4, [branchyPlusSmallY]),
+        new ExpansionRule(9, [branchyPlusSmallY, araucariaStart, araucariaStart, araucariaStart]), 
+        new ExpansionRule(6, [branchyPlusSmallY]),
         new ExpansionRule(2, [branchyPlusSmallY, branchyMinusSmallY]),
-        new ExpansionRule(9, [branchyPlusSmallY, araucariaStart]), 
         new ExpansionRule(1, [branchyPlusSmallY, branchyPlusSmallX]), 
         new ExpansionRule(1, [branchyPlusSmallY, branchyMinusSmallX])
     ]);
     branchyMinusSmallY.setExpansionRules([
-        new ExpansionRule(4, [branchyMinusSmallY]),
+        new ExpansionRule(9, [branchyMinusSmallY, araucariaStart, araucariaStart, araucariaStart]), 
+        new ExpansionRule(6, [branchyMinusSmallY]),
         new ExpansionRule(2, [branchyMinusSmallY, branchyPlusSmallY]),
-        new ExpansionRule(9, [branchyMinusSmallY, araucariaStart]), 
         new ExpansionRule(1, [branchyMinusSmallY, branchyPlusSmallX]), 
         new ExpansionRule(1, [branchyMinusSmallY, branchyMinusSmallX])
     ]);
@@ -294,12 +294,14 @@ function blah() {
     // the vertical tip at the end;
     let araucariaLong = new LSymbol("(AL)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
+        // make thinner branch
+        turtle.scaleTop *= 0.8;
         // draw some prisms while increasing Y to move orientation up
         let ARAUCARIA_Y_INC = 0.2;
         for (let i = 0; i < 5; i++) {
             // draw part of the branch
-            lsys.addPrismAtTurtle(turtle);
-            turtle.moveForward(PRISM_HEIGHT);
+            lsys.addScaledPrismAtTurtleNoShrink(turtle, 1.5);
+            turtle.moveForward(PRISM_HEIGHT * 1.5);
             // add to Y and normalize to nudge it upwards
             vec3.add(turtle.orientation, turtle.orientation, vec3.fromValues(0, ARAUCARIA_Y_INC, 0));
             vec3.normalize(turtle.orientation, turtle.orientation);
@@ -309,7 +311,8 @@ function blah() {
     let araucariaTip = new LSymbol("(AT)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
         lsys.addPrismAtTurtle(turtle);
-        turtle.moveForward(PRISM_HEIGHT);
+        lsys.addScaledPrismAtTurtle(turtle, 0.4);
+        turtle.moveForward(PRISM_HEIGHT * 0.4);
     });
     alphabet.set(araucariaTip.stringRepr, araucariaTip);
     // "helper" symbol to change the turtle orientation randomly
@@ -325,15 +328,88 @@ function blah() {
 
     // set expansion rules for araucaria
     araucariaStart.setExpansionRules([
-        new ExpansionRule(1, [push, flatify, araucariaLong, araucariaTip, pop])
+        // artificially force all araucaria branches to end with lots of branched araucariaTips
+        new ExpansionRule(6, [push, flatify, araucariaLong, decorationPear, araucariaTip,
+                                  push, randify, araucariaTip, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop,
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                  pop, 
+                              pop,
+                              push, flatify, araucariaLong, decorationPear, araucariaTip,
+                                  push, randify, araucariaTip, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                  pop, 
+                              pop,
+                              ]),
+        new ExpansionRule(1, [push, flatify, araucariaLong, decorationPear, araucariaTip,
+                                  push, randify, araucariaTip, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                  pop, 
+                              pop,
+                              branchyStart, // make tree go up a bit
+                              push, flatify, araucariaLong, decorationPear, araucariaTip,
+                                  push, randify, araucariaTip, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                    push, randify, araucariaTip, 
+                                        push, randify, araucariaTip, 
+                                        pop, 
+                                    pop, 
+                                  pop, 
+                              pop,
+                              ]),
+        //new ExpansionRule(6, [push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop, push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop]),
+        //new ExpansionRule(1, [push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop, branchyStart, push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop]),
     ]);
 
     araucariaTip.setExpansionRules([
-        new ExpansionRule(6, [araucariaTip]), // don't change
-        new ExpansionRule(4, [araucariaTip, push, randify, araucariaTip, pop]), // add branch
-        new ExpansionRule(4, [araucariaTip, decorationPear, push, randify, araucariaTip, pop]), // add branch w/ pear
+        new ExpansionRule(1, [araucariaTip]), // don't change
+        new ExpansionRule(6, [araucariaTip, push, randify, araucariaTip, pop]), // add branch
+        new ExpansionRule(3, [araucariaTip, decorationPear, push, randify, araucariaTip, pop]), // add branch w/ pear
         new ExpansionRule(1, [araucariaTip, araucariaTip]), // grow current branch
-        new ExpansionRule(1, [araucariaTip, decorationPear, araucariaTip]) // grow current branch w/ pear
+        new ExpansionRule(0.5, [araucariaTip, decorationPear, araucariaTip]) // grow current branch w/ pear
     ]);
 
     // initialize L-system
@@ -360,6 +436,21 @@ function blah() {
     lsys.expandString();
     console.log(lsys.lstring.toString());
     lsys.expandString();
+
+    // remove expansions that lead to araucariaStart
+    // we do this to avoid spawning new araucariaStarts that
+    // won't have enough iterations to expand into nice bushy branches
+    branchyPlusSmallX.setExpansionRules(branchyPlusSmallX.expansionRules.slice(1));
+    branchyMinusSmallX.setExpansionRules(branchyMinusSmallX.expansionRules.slice(1));
+    branchyPlusSmallY.setExpansionRules(branchyPlusSmallY.expansionRules.slice(1));
+    branchyMinusSmallY.setExpansionRules(branchyMinusSmallY.expansionRules.slice(1));
+
+    console.log(lsys.lstring.toString());
+    lsys.expandString();
+    console.log(lsys.lstring.toString());
+    lsys.expandString();
+    console.log(lsys.lstring.toString());
+    lsys.expandString();
     console.log(lsys.lstring.toString());
     lsys.expandString();
     console.log(lsys.lstring.toString());
@@ -372,9 +463,9 @@ function blah() {
     //turtle.orientation = vec3.fromValues(1, 0, 0);
     //F.action(lsys);
     plant = lsys.plant;
-    lsys.addPearAtTurtle(new Turtle(), mesh);
-    lsys.addPearAtTurtle(lsys.getTopTurtle(), mesh);
-    plant.addDecoration(mesh, mat4.create());
+    //lsys.addPearAtTurtle(new Turtle(), mesh);
+    //lsys.addPearAtTurtle(lsys.getTopTurtle(), mesh);
+    //plant.addDecoration(mesh, mat4.create());
     plant.create();
 }
 
