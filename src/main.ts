@@ -364,7 +364,8 @@ function blah() {
     //turtle.orientation = vec3.fromValues(1, 0, 0);
     //F.action(lsys);
     plant = lsys.plant;
-    plant.addDecoration(mesh);
+    lsys.addPearAtTurtle(new Turtle(), mesh);
+    plant.addDecoration(mesh, mat4.create());
     plant.create();
 }
 

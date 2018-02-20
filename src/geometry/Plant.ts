@@ -58,14 +58,22 @@ class Plant extends Drawable {
     }
 
     // add mesh loaded by OBJ loader
-    addDecoration(mesh: any) {
+    addDecoration(mesh: any, transform: mat4) {
         // set up =============================================
         let idxStart = this.stagedPositions.length / 4;
+
+        // get the inverse transpose for normals
+        let invTr = mat3.create();
+        mat3.fromMat4(invTr, transform);
+        mat3.invert(invTr, invTr);
+        mat3.transpose(invTr, invTr);
 
         // add vertex data ====================================
         for (let i = 0; i < mesh.vertices.length; i += 3) {
             let p = vec4.fromValues(mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2], 1);
+            vec4.transformMat4(p, p, transform);
             let n = vec3.fromValues(mesh.vertexNormals[i], mesh.vertexNormals[i + 1], mesh.vertexNormals[i + 2]);
+            vec3.transformMat3(n, n, invTr);
 
             appendVec4ToArray(this.stagedPositions, p);
             appendNormalToArray(this.stagedNormals, n);
