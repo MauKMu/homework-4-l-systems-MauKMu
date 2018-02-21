@@ -1,4 +1,4 @@
-import {vec3, mat4, quat} from 'gl-matrix';
+import {vec3, vec4, mat4, quat} from 'gl-matrix';
 import Turtle from './Turtle';
 import {LSymbol, ExpansionRule} from './LSymbol';
 import Plant from '../geometry/Plant';
@@ -29,11 +29,22 @@ class LSystem {
         return this.turtleStack[this.turtleStack.length - 1];
     }
 
+    useColor(color: vec4) {
+        this.plant.useColor(color);
+    }
+
     addPrismAtTurtle(turtle: Turtle) {
         let trans = turtle.getTransformationToTurtle();
         this.plant.addPrism(trans, 8, turtle.scaleBottom, turtle.scaleTop, 1);
         turtle.scaleBottom = turtle.scaleTop;
         turtle.scaleTop *= 0.99;
+    }
+
+    addTipPrismAtTurtle(turtle: Turtle) {
+        let trans = turtle.getTransformationToTurtle();
+        this.plant.addPrism(trans, 8, turtle.scaleBottom, turtle.scaleTop * 0.333, 1);
+        turtle.scaleBottom = turtle.scaleTop;
+        turtle.scaleTop *= 0.8;
     }
 
     addScaledPrismAtTurtle(turtle: Turtle, scaleHeight: number) {
@@ -50,6 +61,10 @@ class LSystem {
     }
 
     addPearAtTurtle(turtle: Turtle, pearMesh: any) {
+        // refuse to draw overly tiny pears
+        if (turtle.depth > 5) {
+            return;
+        }
         // extract only translation from turtle
         let turtlePos = turtle.position;
         let trans = mat4.create();

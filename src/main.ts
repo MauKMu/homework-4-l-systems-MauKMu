@@ -5,7 +5,7 @@ import Icosphere from './geometry/Icosphere';
 import Square from './geometry/Square';
 import Cube from './geometry/Cube';
 import Plant from './geometry/Plant';
-import { PRISM_HEIGHT } from './geometry/Plant';
+import { PRISM_HEIGHT, BRANCH_COLOR, TIP_COLOR, PEAR_COLOR } from './geometry/Plant';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
@@ -151,7 +151,9 @@ function blah() {
     // decorations ============================================
     let decorationPear = new LSymbol("(pear)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
+        lsys.useColor(PEAR_COLOR);
         lsys.addPearAtTurtle(turtle, mesh);
+        lsys.useColor(BRANCH_COLOR);
     });
     alphabet.set(decorationPear.stringRepr, decorationPear);
     // twisty trunk ===========================================
@@ -186,6 +188,7 @@ function blah() {
         new ExpansionRule(1, [twistyMinusBigY, twistyPlusBigY])
     ]);
     // branchy trunk ==========================================
+    // TODO: add logic for nudging up vertically?
     let branchyPlusSmallX = new LSymbol("(B+x)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
         turtle.rotateX(Math.PI * 0.1);
@@ -305,13 +308,26 @@ function blah() {
             // add to Y and normalize to nudge it upwards
             vec3.add(turtle.orientation, turtle.orientation, vec3.fromValues(0, ARAUCARIA_Y_INC, 0));
             vec3.normalize(turtle.orientation, turtle.orientation);
+            // draw a pear with a small probability
+            if (Math.random() < 0.15) {
+                lsys.useColor(PEAR_COLOR);
+                lsys.addPearAtTurtle(turtle, mesh);
+                lsys.useColor(BRANCH_COLOR);
+            }
         }
     });
     alphabet.set(araucariaLong.stringRepr, araucariaLong);
     let araucariaTip = new LSymbol("(AT)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
-        lsys.addPrismAtTurtle(turtle);
-        turtle.scaleTop *= 0.81;
+        // prepare to draw tip
+        lsys.useColor(TIP_COLOR);
+        // draw tip
+        //lsys.addPrismAtTurtle(turtle);
+        lsys.addTipPrismAtTurtle(turtle);
+        // undo color/thickness changes
+        lsys.useColor(BRANCH_COLOR);
+
+        //turtle.scaleTop *= 0.81;
         //lsys.addScaledPrismAtTurtle(turtle, 0.4);
         turtle.moveForward(PRISM_HEIGHT * 0.4);
     });

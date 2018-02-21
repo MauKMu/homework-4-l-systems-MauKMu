@@ -7,6 +7,9 @@ const PI = 3.14159265;
 const TWO_PI = 6.283185307;
 
 export const PRISM_HEIGHT = 10;
+export const BRANCH_COLOR = vec4.fromValues(1, 1, 1, 1);
+export const TIP_COLOR = vec4.fromValues(0.1, 0.5, 0.1, 1);
+export const PEAR_COLOR = vec4.fromValues(0.7, 0.9, 0.3, 1);
 
 // helper function for copying values of a vec4 into an array
 function copyVec4ToArray(arr: Array<number>, startIdx: number, vec: vec4) {
@@ -42,9 +45,13 @@ class Plant extends Drawable {
     indices: Uint32Array;
     positions: Float32Array;
     normals: Float32Array;
+    colors: Float32Array;
     stagedIndices: Array<number>;
     stagedPositions: Array<number>;
     stagedNormals: Array<number>;
+    stagedColors: Array<number>;
+
+    currColor: vec4;
 
     constructor(center: vec3) {
         super(); // Call the constructor of the super class. This is required.
@@ -55,6 +62,14 @@ class Plant extends Drawable {
         this.stagedIndices = [];
         this.stagedPositions = [];
         this.stagedNormals = [];
+        this.stagedColors = [];
+
+        this.currColor = vec4.create();
+        vec4.copy(this.currColor, BRANCH_COLOR);
+    }
+
+    useColor(color: vec4) {
+        vec4.copy(this.currColor, color);
     }
 
     // add mesh loaded by OBJ loader
@@ -76,6 +91,7 @@ class Plant extends Drawable {
             vec3.transformMat3(n, n, invTr);
 
             appendVec4ToArray(this.stagedPositions, p);
+            appendVec4ToArray(this.stagedColors, this.currColor);
             appendNormalToArray(this.stagedNormals, n);
         }
 
@@ -106,6 +122,7 @@ class Plant extends Drawable {
         let p = vec4.fromValues(0, 0, 0, 1);
         vec4.transformMat4(p, p, transform);
         appendVec4ToArray(this.stagedPositions, p);
+        appendVec4ToArray(this.stagedColors, this.currColor);
 
         let n = vec3.fromValues(0, -1, 0);
         vec3.transformMat3(n, n, invTr);
@@ -123,6 +140,7 @@ class Plant extends Drawable {
             // transform and append position
             vec4.transformMat4(p, localPos, transform);
             appendVec4ToArray(this.stagedPositions, p);
+            appendVec4ToArray(this.stagedColors, this.currColor);
 
             // append normal (already transformed when computing center)
             appendNormalToArray(this.stagedNormals, n);
@@ -148,6 +166,7 @@ class Plant extends Drawable {
         p = vec4.fromValues(0, PRISM_HEIGHT * scaleHeight, 0, 1);
         vec4.transformMat4(p, p, transform);
         appendVec4ToArray(this.stagedPositions, p);
+        appendVec4ToArray(this.stagedColors, this.currColor);
 
         n = vec3.fromValues(0, 1, 0);
         vec3.transformMat3(n, n, invTr);
@@ -162,6 +181,7 @@ class Plant extends Drawable {
             // transform and append position
             vec4.transformMat4(p, localPos, transform);
             appendVec4ToArray(this.stagedPositions, p);
+            appendVec4ToArray(this.stagedColors, this.currColor);
 
             // append normal (already transformed when computing center)
             appendNormalToArray(this.stagedNormals, n);
@@ -202,11 +222,13 @@ class Plant extends Drawable {
             // transform and append position -- top
             vec4.transformMat4(p, localPosTop, transform);
             appendVec4ToArray(this.stagedPositions, p);
+            appendVec4ToArray(this.stagedColors, this.currColor);
 
             // transform and append position -- bottom
             //vec4.set(localPosBot, localPosTop[0], 0, localPosTop[2], 1);
             vec4.transformMat4(p, localPosBot, transform);
             appendVec4ToArray(this.stagedPositions, p);
+            appendVec4ToArray(this.stagedColors, this.currColor);
 
             // transform and append normal (need to append twice)
             vec3.transformMat3(n, localNor, invTr);
@@ -240,23 +262,15 @@ class Plant extends Drawable {
 
 
     create() {
-        /*
-        this.addPrism(mat4.create(), 12);
-        let trans = mat4.create();
-        //mat4.fromRotation(trans, PI * 0.25, vec3.fromValues(0, 0, 1));
-        mat4.translate(trans, trans, vec3.fromValues(0, PRISM_HEIGHT, 0));
-        mat4.rotateY(trans, trans, PI * 0.5);
-        mat4.rotateZ(trans, trans, PI * 0.25);
-        this.addPrism(trans, 12);
-        */
-
         this.indices = new Uint32Array(this.stagedIndices);
         this.positions = new Float32Array(this.stagedPositions);
         this.normals = new Float32Array(this.stagedNormals);
+        this.colors = new Float32Array(this.stagedColors);
 
         this.generateIdx();
         this.generatePos();
         this.generateNor();
+        this.generateCol();
 
         this.count = this.indices.length;
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
@@ -264,6 +278,9 @@ class Plant extends Drawable {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bufNor);
         gl.bufferData(gl.ARRAY_BUFFER, this.normals, gl.STATIC_DRAW);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+        gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
         gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
