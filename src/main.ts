@@ -121,6 +121,18 @@ function blah() {
         turtle.moveForward(PRISM_HEIGHT * 2.0);
     });
     alphabet.set(F.stringRepr, F);
+    let shortF = new LSymbol("(f)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        lsys.addScaledPrismAtTurtle(turtle, 2.0);
+        turtle.moveForward(PRISM_HEIGHT * 1.55);
+    });
+    alphabet.set(shortF.stringRepr, shortF);
+    let midF = new LSymbol("(ff)", function (lsys: LSystem) {
+        let turtle = lsys.getTopTurtle();
+        lsys.addScaledPrismAtTurtle(turtle, 2.0);
+        turtle.moveForward(PRISM_HEIGHT * 1.75);
+    });
+    alphabet.set(midF.stringRepr, midF);
     let push = new LSymbol("[", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
         let copy = turtle.makeDeepCopy();
@@ -159,14 +171,14 @@ function blah() {
     // twisty trunk ===========================================
     let twistyPlusBigY = new LSymbol("(T+Y)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
-        turtle.rotateY(Math.PI * 0.25);
+        turtle.rotateY(Math.PI * 0.2);
         lsys.addPrismAtTurtle(turtle);
         turtle.moveForward(PRISM_HEIGHT * 0.8);
     });
     alphabet.set(twistyPlusBigY.stringRepr, twistyPlusBigY);
     let twistyMinusBigY = new LSymbol("(T-Y)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
-        turtle.rotateY(-Math.PI * 0.25);
+        turtle.rotateY(-Math.PI * 0.2);
         lsys.addPrismAtTurtle(turtle);
         turtle.moveForward(PRISM_HEIGHT * 0.8);
     });
@@ -189,7 +201,9 @@ function blah() {
     ]);
     // branchy trunk ==========================================
     // TODO: add logic for nudging up vertically?
+    // TODO: define "short F" for beginning of tree to make turning nicer looking?
     let branchyPlusSmallX = new LSymbol("(B+x)", function (lsys: LSystem) {
+        //BLATANT SYNTAX ; ERROR HERE !!@!@@
         let turtle = lsys.getTopTurtle();
         turtle.rotateX(Math.PI * 0.1);
         lsys.addPrismAtTurtle(turtle);
@@ -439,7 +453,8 @@ function blah() {
     //lsys.setAxiom([R, R, R, push, flatify, araucariaLong, pop, push, flatify, araucariaLong, pop  ]);
     //lsys.setAxiom([R, R, R, push, flatify, araucariaLong, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop, push, flatify, araucariaLong, pop  ]);
     lsys.setAxiom([
-        F, plusZ, F, plusZ, F, plusZ, F, twistyStart, vertify, F, branchyStart
+        //F, plusZ, F, plusZ, F, plusZ, F, twistyStart, vertify, F, branchyStart
+        shortF, plusZ, shortF, plusZ, shortF, plusZ, midF, twistyStart, vertify, F, branchyStart
     ]);
     console.log(lsys.lstring.toString());
     lsys.expandString();
