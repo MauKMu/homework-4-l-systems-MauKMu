@@ -201,10 +201,13 @@ function blah() {
     ]);
     // branchy trunk ==========================================
     // TODO: add logic for nudging up vertically?
-    // TODO: define "short F" for beginning of tree to make turning nicer looking?
+    let BRANCHY_Y_INC = 0.2;
     let branchyPlusSmallX = new LSymbol("(B+x)", function (lsys: LSystem) {
-        //BLATANT SYNTAX ; ERROR HERE !!@!@@
         let turtle = lsys.getTopTurtle();
+        // nudge upwards
+        vec3.add(turtle.orientation, turtle.orientation, vec3.fromValues(0, BRANCHY_Y_INC, 0));
+        vec3.normalize(turtle.orientation, turtle.orientation);
+        // apply desired rotation
         turtle.rotateX(Math.PI * 0.1);
         lsys.addPrismAtTurtle(turtle);
         turtle.moveForward(PRISM_HEIGHT);
@@ -212,6 +215,10 @@ function blah() {
     alphabet.set(branchyPlusSmallX.stringRepr, branchyPlusSmallX);
     let branchyMinusSmallX = new LSymbol("(B-x)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
+        // nudge upwards
+        vec3.add(turtle.orientation, turtle.orientation, vec3.fromValues(0, BRANCHY_Y_INC, 0));
+        vec3.normalize(turtle.orientation, turtle.orientation);
+        // apply desired rotation
         turtle.rotateX(-Math.PI * 0.1);
         lsys.addPrismAtTurtle(turtle);
         turtle.moveForward(PRISM_HEIGHT);
@@ -219,6 +226,10 @@ function blah() {
     alphabet.set(branchyMinusSmallX.stringRepr, branchyMinusSmallX);
     let branchyPlusSmallY = new LSymbol("(B+y)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
+        // nudge upwards
+        vec3.add(turtle.orientation, turtle.orientation, vec3.fromValues(0, BRANCHY_Y_INC, 0));
+        vec3.normalize(turtle.orientation, turtle.orientation);
+        // apply desired rotation
         turtle.rotateY(Math.PI * 0.1);
         lsys.addPrismAtTurtle(turtle);
         turtle.moveForward(PRISM_HEIGHT);
@@ -226,6 +237,10 @@ function blah() {
     alphabet.set(branchyPlusSmallY.stringRepr, branchyPlusSmallY);
     let branchyMinusSmallY = new LSymbol("(B-y)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
+        // nudge upwards
+        vec3.add(turtle.orientation, turtle.orientation, vec3.fromValues(0, BRANCHY_Y_INC, 0));
+        vec3.normalize(turtle.orientation, turtle.orientation);
+        // apply desired rotation
         turtle.rotateY(-Math.PI * 0.1);
         lsys.addPrismAtTurtle(turtle);
         turtle.moveForward(PRISM_HEIGHT);
