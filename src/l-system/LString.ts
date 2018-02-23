@@ -1,6 +1,7 @@
 import {vec3, mat4} from 'gl-matrix';
 import {LSymbol, ExpansionRule} from './LSymbol';
 import LSystem from './LSystem';
+import {lRandom, LRANDOM_MATH_RANDOM, LRANDOM_DETERMINISTIC} from './LRandom';
 
 // Node of the linked list (LString)
 class LStringNode {

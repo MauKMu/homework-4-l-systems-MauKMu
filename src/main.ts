@@ -5,7 +5,7 @@ import Icosphere from './geometry/Icosphere';
 import Square from './geometry/Square';
 import Cube from './geometry/Cube';
 import Plant from './geometry/Plant';
-import { PRISM_HEIGHT, BRANCH_COLOR, TIP_COLOR, PEAR_COLOR } from './geometry/Plant';
+import {PRISM_HEIGHT, BRANCH_COLOR, TIP_COLOR, PEAR_COLOR} from './geometry/Plant';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
@@ -17,6 +17,7 @@ var OBJ = require('webgl-obj-loader');
 import Turtle from './l-system/Turtle';
 import {LSymbol, ExpansionRule} from './l-system/LSymbol';
 import LSystem from './l-system/LSystem';
+import {lRandom, LRANDOM_MATH_RANDOM, LRANDOM_DETERMINISTIC} from './l-system/LRandom';
 
 enum ShaderEnum {
     LAMBERT = 1,
