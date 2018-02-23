@@ -57,7 +57,8 @@ class LString {
 
             if (node.sym.canExpand()) {
                 // expand!
-                let p = Math.random();
+                //let p = Math.random();
+                let p = lRandom.getNext();
                 let arr = node.sym.expand(p);
                 // arr should never be empty
                 node.sym = arr[0];

@@ -18,6 +18,7 @@ import Turtle from './l-system/Turtle';
 import {LSymbol, ExpansionRule} from './l-system/LSymbol';
 import LSystem from './l-system/LSystem';
 import {lRandom, LRANDOM_MATH_RANDOM, LRANDOM_DETERMINISTIC} from './l-system/LRandom';
+// TODO: use lRandom
 
 enum ShaderEnum {
     LAMBERT = 1,
@@ -97,6 +98,8 @@ function readTextFile(file: string) {
 }
 
 function blah() {
+    //lRandom.setMode(LRANDOM_DETERMINISTIC);
+    //lRandom.setSeed(10);
     //fetch("../models/Manzana.obj")
         //.then(response => response.text())
         //.then(text => console.log(text));
@@ -315,8 +318,8 @@ function blah() {
     // (if you think of up as a "non-flat" direction. flatty mcflatty.)
     let flatify = new LSymbol("(flat)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
-        let angle = Math.random() * 2.0 * Math.PI;
-        let y = -Math.random() * 0.3 + 0.05;
+        let angle = lRandom.getNext() * 2.0 * Math.PI;
+        let y = -lRandom.getNext() * 0.3 + 0.05;
         vec3.set(turtle.orientation, Math.cos(angle), y, Math.sin(angle));
         vec3.normalize(turtle.orientation, turtle.orientation);
     });
@@ -339,7 +342,7 @@ function blah() {
             vec3.add(turtle.orientation, turtle.orientation, vec3.fromValues(0, ARAUCARIA_Y_INC, 0));
             vec3.normalize(turtle.orientation, turtle.orientation);
             // draw a pear with a small probability
-            if (Math.random() < 0.15) {
+            if (lRandom.getNext() < 0.15) {
                 lsys.useColor(PEAR_COLOR);
                 lsys.addPearAtTurtle(turtle, mesh);
                 lsys.useColor(BRANCH_COLOR);
@@ -366,8 +369,8 @@ function blah() {
     // and make branches more chaotic
     let randify = new LSymbol("(rand)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
-        let angle = Math.random() * 2.0 * Math.PI;
-        let y = Math.random() * 1.8 - 0.9;
+        let angle = lRandom.getNext() * 2.0 * Math.PI;
+        let y = lRandom.getNext() * 1.8 - 0.9;
         vec3.set(turtle.orientation, Math.cos(angle), y, Math.sin(angle));
         vec3.normalize(turtle.orientation, turtle.orientation);
     });
