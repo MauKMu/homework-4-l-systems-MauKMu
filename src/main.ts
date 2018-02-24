@@ -31,21 +31,22 @@ enum ShaderEnum {
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  tesselations: 6,
-  'Load Scene': loadScene, // A function pointer, essentially
-  geometryColor: [200, 10, 10],
-  shader: ShaderEnum.LAMBERT,
-  shaderSpeed: 1,
-  'Toggle tilting': toggleAnimXZ,
-  'Toggle squishing': toggleAnimY,
-  lightX: 10,
-  lightY: 1,
-  lightZ: 1,
-  lavaBias: 50,
-  plumeBias: 0,
-  edgeClarity: 0,
-  randomMode: LRANDOM_MATH_RANDOM,
-  randomSeed: 0,
+    tesselations: 6,
+    'Load Scene': loadScene, // A function pointer, essentially
+    geometryColor: [200, 10, 10],
+    shader: ShaderEnum.LAMBERT,
+    shaderSpeed: 1,
+    'Toggle tilting': toggleAnimXZ,
+    'Toggle squishing': toggleAnimY,
+    lightX: 10,
+    lightY: 1,
+    lightZ: 1,
+    lavaBias: 50,
+    plumeBias: 0,
+    edgeClarity: 0,
+    iterations: 10,
+    randomMode: LRANDOM_MATH_RANDOM,
+    randomSeed: 0,
 };
 
 let icosphere: Icosphere;
@@ -59,22 +60,22 @@ let alphabet: Map<string, LSymbol>;
 let lsys: LSystem;
 
 function loadScene() {
-  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
-  icosphere.create();
-  square = new Square(vec3.fromValues(0, 0, 0));
-  square.create();
-  cube = new Cube(vec3.fromValues(1.5, 0, 0));
-  cube.create();
-  plant = new Plant(vec3.fromValues(0, 0, 0));
-  plant.create();
+    icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
+    icosphere.create();
+    square = new Square(vec3.fromValues(0, 0, 0));
+    square.create();
+    cube = new Cube(vec3.fromValues(1.5, 0, 0));
+    cube.create();
+    plant = new Plant(vec3.fromValues(0, 0, 0));
+    plant.create();
 }
 
 function toggleAnimXZ() {
-  renderer.toggleAnimXZ();
+    renderer.toggleAnimXZ();
 }
 
 function toggleAnimY() {
-  renderer.toggleAnimY();
+    renderer.toggleAnimY();
 }
 
 let objString: string;
@@ -83,12 +84,9 @@ let isObjLoaded: boolean;
 function readTextFile(file: string) {
     var rawFile = new XMLHttpRequest();
     rawFile.open("GET", file, false);
-    rawFile.onreadystatechange = function ()
-    {
-        if(rawFile.readyState === 4)
-        {
-            if(rawFile.status === 200 || rawFile.status == 0)
-            {
+    rawFile.onreadystatechange = function () {
+        if (rawFile.readyState === 4) {
+            if (rawFile.status === 200 || rawFile.status == 0) {
                 objString = rawFile.responseText;
                 isObjLoaded = true;
                 //alert(objString);
@@ -267,31 +265,31 @@ function blah() {
 
     // set expansion rules for branchy trunk pieces
     branchyPlusSmallX.setExpansionRules([
-        new ExpansionRule(9, [branchyPlusSmallX, araucariaStart, araucariaStart, araucariaStart]), 
+        new ExpansionRule(9, [branchyPlusSmallX, araucariaStart, araucariaStart, araucariaStart]),
         new ExpansionRule(6, [branchyPlusSmallX]),
         new ExpansionRule(2, [branchyPlusSmallX, branchyMinusSmallX]),
-        new ExpansionRule(1, [branchyPlusSmallX, branchyPlusSmallY]), 
+        new ExpansionRule(1, [branchyPlusSmallX, branchyPlusSmallY]),
         new ExpansionRule(1, [branchyPlusSmallX, branchyMinusSmallY])
     ]);
     branchyMinusSmallX.setExpansionRules([
-        new ExpansionRule(9, [branchyMinusSmallX, araucariaStart, araucariaStart, araucariaStart]), 
+        new ExpansionRule(9, [branchyMinusSmallX, araucariaStart, araucariaStart, araucariaStart]),
         new ExpansionRule(6, [branchyMinusSmallX]),
         new ExpansionRule(2, [branchyMinusSmallX, branchyPlusSmallX]),
-        new ExpansionRule(1, [branchyMinusSmallX, branchyPlusSmallY]), 
+        new ExpansionRule(1, [branchyMinusSmallX, branchyPlusSmallY]),
         new ExpansionRule(1, [branchyMinusSmallX, branchyMinusSmallY])
     ]);
     branchyPlusSmallY.setExpansionRules([
-        new ExpansionRule(9, [branchyPlusSmallY, araucariaStart, araucariaStart, araucariaStart]), 
+        new ExpansionRule(9, [branchyPlusSmallY, araucariaStart, araucariaStart, araucariaStart]),
         new ExpansionRule(6, [branchyPlusSmallY]),
         new ExpansionRule(2, [branchyPlusSmallY, branchyMinusSmallY]),
-        new ExpansionRule(1, [branchyPlusSmallY, branchyPlusSmallX]), 
+        new ExpansionRule(1, [branchyPlusSmallY, branchyPlusSmallX]),
         new ExpansionRule(1, [branchyPlusSmallY, branchyMinusSmallX])
     ]);
     branchyMinusSmallY.setExpansionRules([
-        new ExpansionRule(9, [branchyMinusSmallY, araucariaStart, araucariaStart, araucariaStart]), 
+        new ExpansionRule(9, [branchyMinusSmallY, araucariaStart, araucariaStart, araucariaStart]),
         new ExpansionRule(6, [branchyMinusSmallY]),
         new ExpansionRule(2, [branchyMinusSmallY, branchyPlusSmallY]),
-        new ExpansionRule(1, [branchyMinusSmallY, branchyPlusSmallX]), 
+        new ExpansionRule(1, [branchyMinusSmallY, branchyPlusSmallX]),
         new ExpansionRule(1, [branchyMinusSmallY, branchyMinusSmallX])
     ]);
     // transition main trunk -> araucaria =====================
@@ -378,76 +376,76 @@ function blah() {
     araucariaStart.setExpansionRules([
         // artificially force all araucaria branches to end with lots of branched araucariaTips
         new ExpansionRule(6, [push, flatify, araucariaLong, decorationPear, araucariaTip,
-                                  push, randify, araucariaTip, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop,
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                  pop, 
+                                  push, randify, araucariaTip,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                  pop,
                               pop,
                               push, flatify, araucariaLong, decorationPear, araucariaTip,
-                                  push, randify, araucariaTip, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                  pop, 
+                                  push, randify, araucariaTip,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                  pop,
                               pop,
-                              ]),
+        ]),
         new ExpansionRule(1, [push, flatify, araucariaLong, decorationPear, araucariaTip,
-                                  push, randify, araucariaTip, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                  pop, 
+                                  push, randify, araucariaTip,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                  pop,
                               pop,
                               branchyStart, // make tree go up a bit
                               push, flatify, araucariaLong, decorationPear, araucariaTip,
-                                  push, randify, araucariaTip, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                    push, randify, araucariaTip, 
-                                        push, randify, araucariaTip, 
-                                        pop, 
-                                    pop, 
-                                  pop, 
+                                  push, randify, araucariaTip,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                  pop,
                               pop,
-                              ]),
+        ]),
         //new ExpansionRule(6, [push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop, push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop]),
         //new ExpansionRule(1, [push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop, branchyStart, push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop]),
     ]);
@@ -471,6 +469,11 @@ function blah() {
         //F, plusZ, F, plusZ, F, plusZ, F, twistyStart, vertify, F, branchyStart
         shortF, plusZ, shortF, plusZ, shortF, plusZ, midF, twistyStart, vertify, F, branchyStart
     ]);
+
+    runIterations(12);
+    lsys.createPlant();
+
+    /*
     console.log(lsys.lstring.toString());
     lsys.expandString();
     console.log(lsys.lstring.toString());
@@ -504,6 +507,7 @@ function blah() {
     lsys.expandString();
     console.log(lsys.lstring.toString());
     lsys.executeString();
+    */
 
     //F.action(lsys);
     //let turtle = lsys.getTopTurtle();
@@ -515,9 +519,60 @@ function blah() {
     //lsys.addPearAtTurtle(new Turtle(), mesh);
     //lsys.addPearAtTurtle(lsys.getTopTurtle(), mesh);
     //plant.addDecoration(mesh, mat4.create());
-    plant.create();
+    //plant.create();
 
     console.log(alphabet.keys());
+}
+
+function runIterations(iterations: number) {
+    if (iterations > 9) {
+        for (let i = 0; i < iterations - 5; i++) {
+            lsys.expandString();
+        }
+
+        // remove expansions that lead to araucariaStart
+        // we do this to avoid spawning new araucariaStarts that
+        // won't have enough iterations to expand into nice bushy branches
+        let branchyPlusSmallX = alphabet.get("(B+x)");
+        let branchyMinusSmallX = alphabet.get("(B-x)");
+        let branchyPlusSmallY = alphabet.get("(B+y)");
+        let branchyMinusSmallY = alphabet.get("(B-y)");
+        // assume old weight is same for all
+        let oldWeight = branchyPlusSmallX.expansionRules[0].weight;
+
+        branchyPlusSmallX.expansionRules[0].weight = 0;
+        branchyMinusSmallX.expansionRules[0].weight = 0;
+        branchyPlusSmallY.expansionRules[0].weight = 0;
+        branchyMinusSmallY.expansionRules[0].weight = 0;
+
+        branchyPlusSmallX.updateWeights();
+        branchyMinusSmallX.updateWeights();
+        branchyPlusSmallY.updateWeights();
+        branchyMinusSmallY.updateWeights();
+
+        for (let i = 0; i < 5; i++) {
+            lsys.expandString();
+        }
+
+        branchyPlusSmallX.expansionRules[0].weight = oldWeight;
+        branchyMinusSmallX.expansionRules[0].weight = oldWeight;
+        branchyPlusSmallY.expansionRules[0].weight = oldWeight;
+        branchyMinusSmallY.expansionRules[0].weight = oldWeight;
+
+        branchyPlusSmallX.updateWeights();
+        branchyMinusSmallX.updateWeights();
+        branchyPlusSmallY.updateWeights();
+        branchyMinusSmallY.updateWeights();
+    }
+    else {
+        for (let i = 0; i < iterations; i++) {
+            lsys.expandString();
+        }
+    }
+    if (iterations == 15) {
+        console.log(lsys.lstring.toString());
+        debugger;
+    }
 }
 
 function main() {
@@ -531,157 +586,159 @@ function main() {
     s.action(1);
     console.log(s.stringRepr);
     */
-  // Initial display for framerate
-  const stats = Stats();
-  stats.setMode(0);
-  stats.domElement.style.position = 'absolute';
-  stats.domElement.style.left = '0px';
-  stats.domElement.style.top = '0px';
-  document.body.appendChild(stats.domElement);
+    // Initial display for framerate
+    const stats = Stats();
+    stats.setMode(0);
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '0px';
+    stats.domElement.style.top = '0px';
+    document.body.appendChild(stats.domElement);
 
-  // Add controls to the gui
-  const gui = new DAT.GUI();
-  gui.add(controls, 'tesselations', 0, 8).step(1);
-  gui.add(controls, 'Load Scene');
-  let colorController = gui.addColor(controls, 'geometryColor');
-  gui.add(controls, 'shader', {"Lame Lambert": ShaderEnum.LAMBERT, "Cool Custom": ShaderEnum.CUSTOM, "Decent Disks": ShaderEnum.DISKS, "Plumous Planet": ShaderEnum.PLANET, "Urban Planet": ShaderEnum.BLDGS, "Magic Plumous Planet": ShaderEnum.MAGIC});
-  let speedController = gui.add(controls, 'shaderSpeed', 0, 10);
-  //gui.add(controls, 'Toggle tilting');
-  //gui.add(controls, 'Toggle squishing');
-  gui.add(controls, 'lavaBias', 0, 100);
-  gui.add(controls, 'plumeBias', 0, 100);
-  gui.add(controls, 'edgeClarity', 0, 100);
-  let lightFolder = gui.addFolder('Light Position');
-  lightFolder.add(controls, 'lightX');
-  lightFolder.add(controls, 'lightY');
-  lightFolder.add(controls, 'lightZ');
-  let randomModeController = gui.add(controls, 'randomMode', { "Math.random()": LRANDOM_MATH_RANDOM, "Seeded Noise": LRANDOM_DETERMINISTIC });
-  let randomSeedController = gui.add(controls, 'randomSeed');
+    // Add controls to the gui
+    const gui = new DAT.GUI();
+    gui.add(controls, 'tesselations', 0, 8).step(1);
+    gui.add(controls, 'Load Scene');
+    let colorController = gui.addColor(controls, 'geometryColor');
+    gui.add(controls, 'shader', { "Lame Lambert": ShaderEnum.LAMBERT, "Cool Custom": ShaderEnum.CUSTOM, "Decent Disks": ShaderEnum.DISKS, "Plumous Planet": ShaderEnum.PLANET, "Urban Planet": ShaderEnum.BLDGS, "Magic Plumous Planet": ShaderEnum.MAGIC });
+    let speedController = gui.add(controls, 'shaderSpeed', 0, 10);
+    //gui.add(controls, 'Toggle tilting');
+    //gui.add(controls, 'Toggle squishing');
+    gui.add(controls, 'lavaBias', 0, 100);
+    gui.add(controls, 'plumeBias', 0, 100);
+    gui.add(controls, 'edgeClarity', 0, 100);
+    let lightFolder = gui.addFolder('Light Position');
+    lightFolder.add(controls, 'lightX');
+    lightFolder.add(controls, 'lightY');
+    lightFolder.add(controls, 'lightZ');
+    gui.add(controls, 'iterations').min(0).step(1);
+    let randomModeController = gui.add(controls, 'randomMode', { "Math.random()": LRANDOM_MATH_RANDOM, "Seeded Noise": LRANDOM_DETERMINISTIC });
+    let randomSeedController = gui.add(controls, 'randomSeed');
 
-  // Set up L-system event listeners
-  randomModeController.onChange(function (mode: number) {
-      console.log(mode);
-    lRandom.setMode(mode);
-  });
+    // Set up L-system event listeners
+    randomModeController.onChange(function (mode: number) {
+        console.log(mode);
+        lRandom.setMode(mode);
+    });
 
-  randomSeedController.onChange(function (seed: number) {
-    lRandom.setSeed(seed);
-    console.log(lRandom);
-    lsys.resetPlant();
-    lsys.createPlant();
-    plant = lsys.plant;
-    // TODO: iterate again...
-  });
+    randomSeedController.onChange(function (seed: number) {
+        lRandom.setSeed(seed);
+        console.log(lRandom);
+        lsys.resetSystem();
+        runIterations(controls.iterations);
+        lsys.createPlant();
+        plant = lsys.plant;
+        // TODO: iterations number in GUI
+    });
 
-  // get canvas and webgl context
-  const canvas = <HTMLCanvasElement> document.getElementById('canvas');
-  const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
-  if (!gl) {
-    alert('WebGL 2 not supported!');
-  }
-  // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
-  // Later, we can import `gl` from `globals.ts` to access it
-  setGL(gl);
+    // get canvas and webgl context
+    const canvas = <HTMLCanvasElement>document.getElementById('canvas');
+    const gl = <WebGL2RenderingContext>canvas.getContext('webgl2');
+    if (!gl) {
+        alert('WebGL 2 not supported!');
+    }
+    // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
+    // Later, we can import `gl` from `globals.ts` to access it
+    setGL(gl);
 
-  // Initial call to load scene
-  loadScene();
-  blah();
+    // Initial call to load scene
+    loadScene();
+    blah();
 
-  const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
+    const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
 
-  renderer = new OpenGLRenderer(canvas);
-  renderer.setClearColor(0.2, 0.2, 0.2, 1);
-  gl.enable(gl.DEPTH_TEST);
+    renderer = new OpenGLRenderer(canvas);
+    renderer.setClearColor(0.2, 0.2, 0.2, 1);
+    gl.enable(gl.DEPTH_TEST);
 
-  // Set up event listener for color change
-  colorController.onChange(function (color: Int32Array) {
-    renderer.setGeometryColor(vec4.fromValues(color[0] / 255, color[1] / 255, color[2] / 255, 1));
-  });
+    // Set up event listener for color change
+    colorController.onChange(function (color: Int32Array) {
+        renderer.setGeometryColor(vec4.fromValues(color[0] / 255, color[1] / 255, color[2] / 255, 1));
+    });
 
-  // Initialize color
-  renderer.setGeometryColor(vec4.fromValues(controls.geometryColor[0] / 255,
-                                            controls.geometryColor[1] / 255,
-                                            controls.geometryColor[2] / 255,
-                                            1
-  ));
+    // Initialize color
+    renderer.setGeometryColor(vec4.fromValues(controls.geometryColor[0] / 255,
+        controls.geometryColor[1] / 255,
+        controls.geometryColor[2] / 255,
+        1
+    ));
 
-  // Set up event listener for shader speed
-  speedController.onChange(function (speed: number) {
-    renderer.setShaderSpeed(speed);
-  });
+    // Set up event listener for shader speed
+    speedController.onChange(function (speed: number) {
+        renderer.setShaderSpeed(speed);
+    });
 
-  const lambert = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
-  ]);
-
-  const custom = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/custom-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/custom-frag.glsl')),
-  ]);
-
-  const disks = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/disks-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/disks-frag.glsl')),
-  ]);
-
-  const planet = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/planet-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-frag.glsl')),
-  ]);
-
-  const planetMagic = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/planet-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-magic-frag.glsl')),
-  ]);
-
-  const bldgs = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/bldgs-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/bldgs-frag.glsl')),
-  ]);
-
-  let shaders: { [id: number]: ShaderProgram; } = {};
-  shaders[ShaderEnum.LAMBERT] = lambert;
-  shaders[ShaderEnum.CUSTOM] = custom;
-  shaders[ShaderEnum.DISKS] = disks;
-  shaders[ShaderEnum.PLANET] = planet;
-  shaders[ShaderEnum.MAGIC] = planetMagic;
-  shaders[ShaderEnum.BLDGS] = bldgs;
-
-  // This function will be called every frame
-  function tick() {
-    camera.update();
-    stats.begin();
-    gl.viewport(0, 0, window.innerWidth, window.innerHeight);
-    renderer.clear();
-    renderer.setLightPos(vec3.fromValues(controls.lightX, controls.lightY, controls.lightZ));
-    renderer.setLavaBias(controls.lavaBias / 100);
-    renderer.setPlumeBias(controls.plumeBias / 100);
-    renderer.setEdgeClarity(controls.edgeClarity / 100);
-    renderer.render(camera, shaders[controls.shader], [
-      // icosphere,
-      // square,
-      //cube,
-      plant,
+    const lambert = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
     ]);
-    stats.end();
 
-    // Tell the browser to call `tick` again whenever it renders a new frame
-    requestAnimationFrame(tick);
-  }
+    const custom = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/custom-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/custom-frag.glsl')),
+    ]);
 
-  window.addEventListener('resize', function() {
+    const disks = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/disks-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/disks-frag.glsl')),
+    ]);
+
+    const planet = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/planet-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-frag.glsl')),
+    ]);
+
+    const planetMagic = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/planet-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/planet-magic-frag.glsl')),
+    ]);
+
+    const bldgs = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/bldgs-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/bldgs-frag.glsl')),
+    ]);
+
+    let shaders: { [id: number]: ShaderProgram; } = {};
+    shaders[ShaderEnum.LAMBERT] = lambert;
+    shaders[ShaderEnum.CUSTOM] = custom;
+    shaders[ShaderEnum.DISKS] = disks;
+    shaders[ShaderEnum.PLANET] = planet;
+    shaders[ShaderEnum.MAGIC] = planetMagic;
+    shaders[ShaderEnum.BLDGS] = bldgs;
+
+    // This function will be called every frame
+    function tick() {
+        camera.update();
+        stats.begin();
+        gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+        renderer.clear();
+        renderer.setLightPos(vec3.fromValues(controls.lightX, controls.lightY, controls.lightZ));
+        renderer.setLavaBias(controls.lavaBias / 100);
+        renderer.setPlumeBias(controls.plumeBias / 100);
+        renderer.setEdgeClarity(controls.edgeClarity / 100);
+        renderer.render(camera, shaders[controls.shader], [
+            // icosphere,
+            // square,
+            //cube,
+            plant,
+        ]);
+        stats.end();
+
+        // Tell the browser to call `tick` again whenever it renders a new frame
+        requestAnimationFrame(tick);
+    }
+
+    window.addEventListener('resize', function () {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.setAspectRatio(window.innerWidth / window.innerHeight);
+        camera.updateProjectionMatrix();
+    }, false);
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.setAspectRatio(window.innerWidth / window.innerHeight);
     camera.updateProjectionMatrix();
-  }, false);
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.setAspectRatio(window.innerWidth / window.innerHeight);
-  camera.updateProjectionMatrix();
-
-  // Start the render loop
-  tick();
+    // Start the render loop
+    tick();
 }
 
 main();

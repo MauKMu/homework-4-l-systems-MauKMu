@@ -8,7 +8,7 @@ class LSystem {
     alphabet: Array<LSymbol>;
     turtleStack: Array<Turtle>;
     plant: Plant;
-    axiom: LString;
+    axiom: Array<LSymbol>;
     lstring: LString;
 
     constructor() {
@@ -16,12 +16,12 @@ class LSystem {
         this.initAlphabet();
         this.turtleStack = [new Turtle()];
         this.plant = new Plant(vec3.fromValues(0, 0, 0));
-        this.axiom = new LString([]);
+        this.axiom = [];
         this.lstring = new LString([]);
     }
 
     setAxiom(axiomArray: Array<LSymbol>) {
-        this.axiom.fromArray(axiomArray);
+        this.axiom = axiomArray.slice();
         this.lstring.fromArray(axiomArray);
     }
 
@@ -93,12 +93,19 @@ class LSystem {
         B.setExpansionRules([new ExpansionRule(1, [C, B])]);
     }
 
+    // expand once
     expandString() {
         this.lstring.expand();
     }
 
     executeString() {
         this.lstring.execute(this);
+    }
+
+    // resets expansions and plant VBOs
+    resetSystem() {
+        this.lstring.fromArray(this.axiom);
+        this.resetPlant();
     }
 
     resetPlant() {
