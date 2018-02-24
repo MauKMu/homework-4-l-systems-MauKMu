@@ -101,6 +101,16 @@ class LSystem {
         this.lstring.execute(this);
     }
 
+    resetPlant() {
+        //this.plant.destroy();
+        this.plant.clearBuffers();
+        this.turtleStack = [new Turtle()];
+    }
+
+    createPlant() {
+        this.executeString();
+        this.plant.create();
+    }
 };
 
 export default LSystem;

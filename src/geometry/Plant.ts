@@ -68,6 +68,18 @@ class Plant extends Drawable {
         vec4.copy(this.currColor, BRANCH_COLOR);
     }
 
+    clearBuffers() {
+        this.stagedIndices = [];
+        this.stagedPositions = [];
+        this.stagedNormals = [];
+        this.stagedColors = [];
+    }
+
+    destroy() {
+        super.destroy();
+        this.clearBuffers();
+    }
+
     useColor(color: vec4) {
         vec4.copy(this.currColor, color);
     }

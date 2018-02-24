@@ -18,7 +18,6 @@ import Turtle from './l-system/Turtle';
 import {LSymbol, ExpansionRule} from './l-system/LSymbol';
 import LSystem from './l-system/LSystem';
 import {lRandom, LRANDOM_MATH_RANDOM, LRANDOM_DETERMINISTIC} from './l-system/LRandom';
-// TODO: use lRandom
 
 enum ShaderEnum {
     LAMBERT = 1,
@@ -45,6 +44,8 @@ const controls = {
   lavaBias: 50,
   plumeBias: 0,
   edgeClarity: 0,
+  randomMode: LRANDOM_MATH_RANDOM,
+  randomSeed: 0,
 };
 
 let icosphere: Icosphere;
@@ -55,6 +56,7 @@ let plant: Plant;
 let renderer: OpenGLRenderer;
 
 let alphabet: Map<string, LSymbol>;
+let lsys: LSystem;
 
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
@@ -100,9 +102,6 @@ function readTextFile(file: string) {
 function blah() {
     //lRandom.setMode(LRANDOM_DETERMINISTIC);
     //lRandom.setSeed(10);
-    //fetch("../models/Manzana.obj")
-        //.then(response => response.text())
-        //.then(text => console.log(text));
     objString = "";
     isObjLoaded = false;
     readTextFile("models/fg_pear.obj");
@@ -204,7 +203,6 @@ function blah() {
         new ExpansionRule(1, [twistyMinusBigY, twistyPlusBigY])
     ]);
     // branchy trunk ==========================================
-    // TODO: add logic for nudging up vertically?
     let BRANCHY_Y_INC = 0.2;
     let branchyPlusSmallX = new LSymbol("(B+x)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
@@ -463,9 +461,7 @@ function blah() {
     ]);
 
     // initialize L-system
-    let lsys = new LSystem();
-
-    // TODO: colors!!
+    lsys = new LSystem();
 
     //lsys.setAxiom([R, plusZ, R, plusZ, R, twistyPlusBigY, twistyPlusBigY, twistyPlusBigY]);
     //lsys.setAxiom([R, plusZ, R, plusZ, R, twistyPlusBigY, twistyPlusBigY, twistyPlusBigY, vertify, R, R]);
@@ -520,6 +516,8 @@ function blah() {
     //lsys.addPearAtTurtle(lsys.getTopTurtle(), mesh);
     //plant.addDecoration(mesh, mat4.create());
     plant.create();
+
+    console.log(alphabet.keys());
 }
 
 function main() {
@@ -557,6 +555,23 @@ function main() {
   lightFolder.add(controls, 'lightX');
   lightFolder.add(controls, 'lightY');
   lightFolder.add(controls, 'lightZ');
+  let randomModeController = gui.add(controls, 'randomMode', { "Math.random()": LRANDOM_MATH_RANDOM, "Seeded Noise": LRANDOM_DETERMINISTIC });
+  let randomSeedController = gui.add(controls, 'randomSeed');
+
+  // Set up L-system event listeners
+  randomModeController.onChange(function (mode: number) {
+      console.log(mode);
+    lRandom.setMode(mode);
+  });
+
+  randomSeedController.onChange(function (seed: number) {
+    lRandom.setSeed(seed);
+    console.log(lRandom);
+    lsys.resetPlant();
+    lsys.createPlant();
+    plant = lsys.plant;
+    // TODO: iterate again...
+  });
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
