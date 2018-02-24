@@ -83,6 +83,16 @@ class LString {
         }
     }
 
+    length() {
+        let len = 0;
+        let node = this.head;
+        while (node != null) {
+            len++;
+            node = node.next;
+        }
+        return len;
+    }
+
 };
 
 export default LString;

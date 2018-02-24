@@ -47,6 +47,7 @@ const controls = {
     iterations: 10,
     randomMode: LRANDOM_MATH_RANDOM,
     randomSeed: 0,
+    'Show Alphabet': showAlphabet,
 };
 
 let icosphere: Icosphere;
@@ -58,6 +59,15 @@ let renderer: OpenGLRenderer;
 
 let alphabet: Map<string, LSymbol>;
 let lsys: LSystem;
+
+function showAlphabet() {
+    let strBuilder = new Array<string>();
+    strBuilder.push("The alphabet is:");
+    alphabet.forEach(function (value: LSymbol, index: string, map: Map<string, LSymbol>) {
+        strBuilder.push(index);
+    });
+    alert(strBuilder.join("\n"));
+}
 
 function loadScene() {
     icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
@@ -385,22 +395,10 @@ function blah() {
                                           push, randify, araucariaTip,
                                           pop,
                                       pop,
-                                      push, randify, araucariaTip,
-                                          push, randify, araucariaTip,
-                                          pop,
-                                      pop,
-                                      push, randify, araucariaTip,
-                                          push, randify, araucariaTip,
-                                          pop,
-                                      pop,
                                   pop,
                               pop,
                               push, flatify, araucariaLong, decorationPear, araucariaTip,
                                   push, randify, araucariaTip,
-                                      push, randify, araucariaTip,
-                                          push, randify, araucariaTip,
-                                          pop,
-                                      pop,
                                       push, randify, araucariaTip,
                                           push, randify, araucariaTip,
                                           pop,
@@ -422,10 +420,6 @@ function blah() {
                                           push, randify, araucariaTip,
                                           pop,
                                       pop,
-                                      push, randify, araucariaTip,
-                                          push, randify, araucariaTip,
-                                          pop,
-                                      pop,
                                   pop,
                               pop,
                               branchyStart, // make tree go up a bit
@@ -439,22 +433,16 @@ function blah() {
                                           push, randify, araucariaTip,
                                           pop,
                                       pop,
-                                      push, randify, araucariaTip,
-                                          push, randify, araucariaTip,
-                                          pop,
-                                      pop,
                                   pop,
                               pop,
         ]),
-        //new ExpansionRule(6, [push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop, push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop]),
-        //new ExpansionRule(1, [push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop, branchyStart, push, flatify, araucariaLong, decorationPear, araucariaTip, push, randify, araucariaTip, pop, push, randify, araucariaTip, pop, pop]),
     ]);
 
     araucariaTip.setExpansionRules([
-        new ExpansionRule(1, [araucariaTip]), // don't change
+        new ExpansionRule(2, [araucariaTip]), // don't change
         new ExpansionRule(6, [araucariaTip, push, randify, araucariaTip, pop]), // add branch
         new ExpansionRule(3, [araucariaTip, decorationPear, push, randify, araucariaTip, pop]), // add branch w/ pear
-        new ExpansionRule(1, [araucariaTip, araucariaTip]), // grow current branch
+        new ExpansionRule(0.5, [araucariaTip, araucariaTip]), // grow current branch
         new ExpansionRule(0.5, [araucariaTip, decorationPear, araucariaTip]) // grow current branch w/ pear
     ]);
 
@@ -569,8 +557,10 @@ function runIterations(iterations: number) {
             lsys.expandString();
         }
     }
-    if (iterations == 15) {
+    if (iterations >= 13) {
         console.log(lsys.lstring.toString());
+        //console.log(["length is: ", lsys.lstring.length()]);
+        alert(["length is: ", lsys.lstring.length()]);
         debugger;
     }
 }
@@ -613,6 +603,7 @@ function main() {
     gui.add(controls, 'iterations').min(0).step(1);
     let randomModeController = gui.add(controls, 'randomMode', { "Math.random()": LRANDOM_MATH_RANDOM, "Seeded Noise": LRANDOM_DETERMINISTIC });
     let randomSeedController = gui.add(controls, 'randomSeed');
+    gui.add(controls, 'Show Alphabet');
 
     // Set up L-system event listeners
     randomModeController.onChange(function (mode: number) {
