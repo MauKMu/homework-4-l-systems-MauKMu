@@ -13,7 +13,6 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 
 var OBJ = require('webgl-obj-loader');
 
-
 import Turtle from './l-system/Turtle';
 import {LSymbol, ExpansionRule} from './l-system/LSymbol';
 import LSystem from './l-system/LSystem';
@@ -47,8 +46,11 @@ const controls = {
     iterations: 12,
     randomMode: LRANDOM_MATH_RANDOM,
     randomSeed: 0,
+    woodColor: [BRANCH_COLOR[0] * 255, BRANCH_COLOR[1] * 255, BRANCH_COLOR[2] * 255],
+    leafColor: [TIP_COLOR[0] * 255, TIP_COLOR[1] * 255, TIP_COLOR[2] * 255],
     'Show Alphabet': showAlphabet,
     'Regenerate Plant': remakePlant,
+    'Recolor Plant': recolorPlant,
 };
 
 let icosphere: Icosphere;
@@ -74,10 +76,15 @@ function remakePlant() {
     lsys.resetSystem();
     runIterations(controls.iterations);
     lsys.createPlant();
-    if (!lsys.plant.wasSafe) {
-        alert("Plant grew too much!");
-    }
-    //plant = lsys.plant;
+    //if (!lsys.plant.wasSafe) {
+        //alert("Plant grew too much!");
+    //}
+}
+
+function recolorPlant() {
+    // reset plant only
+    lsys.resetPlant();
+    lsys.createPlant();
 }
 
 function loadScene() {
@@ -636,8 +643,12 @@ function main() {
     gui.add(controls, 'iterations').min(0).step(1);
     let randomModeController = gui.add(controls, 'randomMode', { "Math.random()": LRANDOM_MATH_RANDOM, "Seeded Noise": LRANDOM_DETERMINISTIC });
     let randomSeedController = gui.add(controls, 'randomSeed');
+    let woodColorController = gui.addColor(controls, 'woodColor');
+    let leafColorController = gui.addColor(controls, 'leafColor');
     gui.add(controls, 'Show Alphabet');
     gui.add(controls, 'Regenerate Plant');
+    gui.add(controls, 'Recolor Plant');
+
 
     // Set up L-system event listeners
     randomModeController.onChange(function (mode: number) {
@@ -647,8 +658,14 @@ function main() {
 
     randomSeedController.onChange(function (seed: number) {
         lRandom.setSeed(seed);
-        // TODO: redraw only when button is pressed, o/w badness happens
-        // TODO; revert tip logic?
+    });
+
+    woodColorController.onChange(function (color: Int32Array) {
+        vec4.set(BRANCH_COLOR, color[0] / 255, color[1] / 255, color[2] / 255, 1);
+    });
+
+    leafColorController.onChange(function (color: Int32Array) {
+        vec4.set(TIP_COLOR, color[0] / 255, color[1] / 255, color[2] / 255, 1);
     });
 
     // get canvas and webgl context

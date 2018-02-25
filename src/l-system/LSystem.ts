@@ -2,6 +2,7 @@ import {vec3, vec4, mat4, quat} from 'gl-matrix';
 import Turtle from './Turtle';
 import {LSymbol, ExpansionRule} from './LSymbol';
 import Plant from '../geometry/Plant';
+import {BRANCH_COLOR} from '../geometry/Plant';
 import LString from './LString';
 
 class LSystem {
@@ -89,7 +90,8 @@ class LSystem {
         let q = quat.create();
         quat.fromEuler(q, 90, 0, 0); // angles in degrees, for some reason...
         let PEAR_SCALE = 0.25 * turtle.scaleBottom;
-        mat4.fromRotationTranslationScale(toOrigin, q, vec3.fromValues(0, -1, 0), vec3.fromValues(PEAR_SCALE, PEAR_SCALE, PEAR_SCALE));
+        // move pear down so stalk is more visible
+        mat4.fromRotationTranslationScale(toOrigin, q, vec3.fromValues(0, -2, 0), vec3.fromValues(PEAR_SCALE, PEAR_SCALE, PEAR_SCALE));
         mat4.fromTranslation(m, vec3.fromValues(0, 0, 15));
         mat4.multiply(toOrigin, toOrigin, m);
         mat4.multiply(trans, trans, toOrigin);
@@ -127,6 +129,7 @@ class LSystem {
         //this.plant.destroy();
         this.plant.clearBuffers();
         this.plant.wasSafe = true;
+        this.plant.useColor(BRANCH_COLOR);
         this.turtleStack = [new Turtle()];
     }
 
