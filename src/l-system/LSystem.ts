@@ -34,6 +34,9 @@ class LSystem {
     }
 
     addPrismAtTurtle(turtle: Turtle) {
+        if (!this.plant.isSafeToGrow()) {
+            return;
+        }
         let trans = turtle.getTransformationToTurtle();
         this.plant.addPrism(trans, 8, turtle.scaleBottom, turtle.scaleTop, 1);
         turtle.scaleBottom = turtle.scaleTop;
@@ -41,6 +44,9 @@ class LSystem {
     }
 
     addTipPrismAtTurtle(turtle: Turtle) {
+        if (!this.plant.isSafeToGrow()) {
+            return;
+        }
         let trans = turtle.getTransformationToTurtle();
         this.plant.addPrism(trans, 8, turtle.scaleBottom, turtle.scaleTop * 0.333, 1);
         turtle.scaleBottom = turtle.scaleTop;
@@ -48,6 +54,9 @@ class LSystem {
     }
 
     addScaledPrismAtTurtle(turtle: Turtle, scaleHeight: number) {
+        if (!this.plant.isSafeToGrow()) {
+            return;
+        }
         let trans = turtle.getTransformationToTurtle();
         this.plant.addPrism(trans, 8, turtle.scaleBottom, turtle.scaleTop, scaleHeight);
         turtle.scaleBottom = turtle.scaleTop;
@@ -56,11 +65,17 @@ class LSystem {
 
     // does not shrink thickness
     addScaledPrismAtTurtleNoShrink(turtle: Turtle, scaleHeight: number) {
+        if (!this.plant.isSafeToGrow()) {
+            return;
+        }
         let trans = turtle.getTransformationToTurtle();
         this.plant.addPrism(trans, 8, turtle.scaleBottom, turtle.scaleTop, scaleHeight);
     }
 
     addPearAtTurtle(turtle: Turtle, pearMesh: any) {
+        if (!this.plant.isSafeToGrow()) {
+            return;
+        }
         // refuse to draw overly tiny pears
         if (turtle.depth > 5) {
             return;
@@ -111,6 +126,7 @@ class LSystem {
     resetPlant() {
         //this.plant.destroy();
         this.plant.clearBuffers();
+        this.plant.wasSafe = true;
         this.turtleStack = [new Turtle()];
     }
 

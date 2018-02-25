@@ -44,10 +44,11 @@ const controls = {
     lavaBias: 50,
     plumeBias: 0,
     edgeClarity: 0,
-    iterations: 10,
+    iterations: 12,
     randomMode: LRANDOM_MATH_RANDOM,
     randomSeed: 0,
     'Show Alphabet': showAlphabet,
+    'Regenerate Plant': remakePlant,
 };
 
 let icosphere: Icosphere;
@@ -67,6 +68,16 @@ function showAlphabet() {
         strBuilder.push(index);
     });
     alert(strBuilder.join("\n"));
+}
+
+function remakePlant() {
+    lsys.resetSystem();
+    runIterations(controls.iterations);
+    lsys.createPlant();
+    if (!lsys.plant.wasSafe) {
+        alert("Plant grew too much!");
+    }
+    //plant = lsys.plant;
 }
 
 function loadScene() {
@@ -395,10 +406,22 @@ function blah() {
                                           push, randify, araucariaTip,
                                           pop,
                                       pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
                                   pop,
                               pop,
                               push, flatify, araucariaLong, decorationPear, araucariaTip,
                                   push, randify, araucariaTip,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
                                       push, randify, araucariaTip,
                                           push, randify, araucariaTip,
                                           pop,
@@ -420,11 +443,19 @@ function blah() {
                                           push, randify, araucariaTip,
                                           pop,
                                       pop,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
                                   pop,
                               pop,
                               branchyStart, // make tree go up a bit
                               push, flatify, araucariaLong, decorationPear, araucariaTip,
                                   push, randify, araucariaTip,
+                                      push, randify, araucariaTip,
+                                          push, randify, araucariaTip,
+                                          pop,
+                                      pop,
                                       push, randify, araucariaTip,
                                           push, randify, araucariaTip,
                                           pop,
@@ -439,7 +470,7 @@ function blah() {
     ]);
 
     araucariaTip.setExpansionRules([
-        new ExpansionRule(2, [araucariaTip]), // don't change
+        new ExpansionRule(1, [araucariaTip]), // don't change
         new ExpansionRule(6, [araucariaTip, push, randify, araucariaTip, pop]), // add branch
         new ExpansionRule(3, [araucariaTip, decorationPear, push, randify, araucariaTip, pop]), // add branch w/ pear
         new ExpansionRule(0.5, [araucariaTip, araucariaTip]), // grow current branch
@@ -557,12 +588,14 @@ function runIterations(iterations: number) {
             lsys.expandString();
         }
     }
+    /*
     if (iterations >= 13) {
         console.log(lsys.lstring.toString());
         //console.log(["length is: ", lsys.lstring.length()]);
         alert(["length is: ", lsys.lstring.length()]);
         debugger;
     }
+    */
 }
 
 function main() {
@@ -604,6 +637,7 @@ function main() {
     let randomModeController = gui.add(controls, 'randomMode', { "Math.random()": LRANDOM_MATH_RANDOM, "Seeded Noise": LRANDOM_DETERMINISTIC });
     let randomSeedController = gui.add(controls, 'randomSeed');
     gui.add(controls, 'Show Alphabet');
+    gui.add(controls, 'Regenerate Plant');
 
     // Set up L-system event listeners
     randomModeController.onChange(function (mode: number) {
@@ -613,12 +647,8 @@ function main() {
 
     randomSeedController.onChange(function (seed: number) {
         lRandom.setSeed(seed);
-        console.log(lRandom);
-        lsys.resetSystem();
-        runIterations(controls.iterations);
-        lsys.createPlant();
-        plant = lsys.plant;
-        // TODO: iterations number in GUI
+        // TODO: redraw only when button is pressed, o/w badness happens
+        // TODO; revert tip logic?
     });
 
     // get canvas and webgl context

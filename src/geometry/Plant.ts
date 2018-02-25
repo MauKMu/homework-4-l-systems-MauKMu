@@ -50,6 +50,7 @@ class Plant extends Drawable {
     stagedPositions: Array<number>;
     stagedNormals: Array<number>;
     stagedColors: Array<number>;
+    wasSafe: boolean;
 
     currColor: vec4;
 
@@ -66,6 +67,13 @@ class Plant extends Drawable {
 
         this.currColor = vec4.create();
         vec4.copy(this.currColor, BRANCH_COLOR);
+
+        this.wasSafe = true;
+    }
+
+    isSafeToGrow(): boolean {
+        this.wasSafe = this.stagedPositions.length < 12800000;
+        return this.wasSafe;
     }
 
     clearBuffers() {
