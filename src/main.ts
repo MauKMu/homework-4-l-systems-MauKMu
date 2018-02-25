@@ -10,6 +10,7 @@ import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
+import {loadTexture} from './rendering/gl/ImageLoader';
 
 var OBJ = require('webgl-obj-loader');
 
@@ -130,7 +131,8 @@ function blah() {
     //lRandom.setSeed(10);
     objString = "";
     isObjLoaded = false;
-    readTextFile("models/fg_pear.obj");
+    //readTextFile("models/fg_pear.obj");
+    readTextFile("models/banana.obj");
     console.log(isObjLoaded);
     let mesh = new OBJ.Mesh(objString);
     debugger;
@@ -626,20 +628,20 @@ function main() {
 
     // Add controls to the gui
     const gui = new DAT.GUI();
-    gui.add(controls, 'tesselations', 0, 8).step(1);
-    gui.add(controls, 'Load Scene');
+    //gui.add(controls, 'tesselations', 0, 8).step(1);
+    //gui.add(controls, 'Load Scene');
     let colorController = gui.addColor(controls, 'geometryColor');
-    gui.add(controls, 'shader', { "Lame Lambert": ShaderEnum.LAMBERT, "Cool Custom": ShaderEnum.CUSTOM, "Decent Disks": ShaderEnum.DISKS, "Plumous Planet": ShaderEnum.PLANET, "Urban Planet": ShaderEnum.BLDGS, "Magic Plumous Planet": ShaderEnum.MAGIC });
+    //gui.add(controls, 'shader', { "Lame Lambert": ShaderEnum.LAMBERT, "Cool Custom": ShaderEnum.CUSTOM, "Decent Disks": ShaderEnum.DISKS, "Plumous Planet": ShaderEnum.PLANET, "Urban Planet": ShaderEnum.BLDGS, "Magic Plumous Planet": ShaderEnum.MAGIC });
     let speedController = gui.add(controls, 'shaderSpeed', 0, 10);
     //gui.add(controls, 'Toggle tilting');
     //gui.add(controls, 'Toggle squishing');
-    gui.add(controls, 'lavaBias', 0, 100);
-    gui.add(controls, 'plumeBias', 0, 100);
-    gui.add(controls, 'edgeClarity', 0, 100);
-    let lightFolder = gui.addFolder('Light Position');
-    lightFolder.add(controls, 'lightX');
-    lightFolder.add(controls, 'lightY');
-    lightFolder.add(controls, 'lightZ');
+    //gui.add(controls, 'lavaBias', 0, 100);
+    //gui.add(controls, 'plumeBias', 0, 100);
+    //gui.add(controls, 'edgeClarity', 0, 100);
+    //let lightFolder = gui.addFolder('Light Position');
+    //lightFolder.add(controls, 'lightX');
+    //lightFolder.add(controls, 'lightY');
+    //lightFolder.add(controls, 'lightZ');
     gui.add(controls, 'iterations').min(0).step(1);
     let randomModeController = gui.add(controls, 'randomMode', { "Math.random()": LRANDOM_MATH_RANDOM, "Seeded Noise": LRANDOM_DETERMINISTIC });
     let randomSeedController = gui.add(controls, 'randomSeed');
@@ -681,6 +683,9 @@ function main() {
     // Initial call to load scene
     loadScene();
     blah();
+
+    // load textures
+    let pearTex = loadTexture(gl, "textures/banana.png");
 
     const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
 
@@ -749,6 +754,7 @@ function main() {
         stats.begin();
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
+        lambert.setSampler0(pearTex);
         renderer.setLightPos(vec3.fromValues(controls.lightX, controls.lightY, controls.lightZ));
         renderer.setLavaBias(controls.lavaBias / 100);
         renderer.setPlumeBias(controls.plumeBias / 100);

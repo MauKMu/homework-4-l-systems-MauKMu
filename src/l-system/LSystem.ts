@@ -4,6 +4,7 @@ import {LSymbol, ExpansionRule} from './LSymbol';
 import Plant from '../geometry/Plant';
 import {BRANCH_COLOR} from '../geometry/Plant';
 import LString from './LString';
+import {lRandom} from './LRandom';
 
 class LSystem {
     alphabet: Array<LSymbol>;
@@ -88,11 +89,16 @@ class LSystem {
         let toOrigin = mat4.create();
         let m = mat4.create();
         let q = quat.create();
-        quat.fromEuler(q, 90, 0, 0); // angles in degrees, for some reason...
+        quat.fromEuler(q, 0, lRandom.getNext() * 360, 0);
+        //quat.fromEuler(q, 90, 0, 0); // angles in degrees, for some reason...
+        //let PEAR_SCALE = 0.25 * turtle.scaleBottom;
         let PEAR_SCALE = 0.25 * turtle.scaleBottom;
+        let BANANA_SCALE = 6.0 * turtle.scaleBottom;
         // move pear down so stalk is more visible
-        mat4.fromRotationTranslationScale(toOrigin, q, vec3.fromValues(0, -2, 0), vec3.fromValues(PEAR_SCALE, PEAR_SCALE, PEAR_SCALE));
-        mat4.fromTranslation(m, vec3.fromValues(0, 0, 15));
+        //mat4.fromRotationTranslationScale(toOrigin, q, vec3.fromValues(0, 0, 0), vec3.fromValues(PEAR_SCALE, PEAR_SCALE, PEAR_SCALE));
+        mat4.fromRotationTranslationScale(toOrigin, q, vec3.fromValues(0, -1, -1), vec3.fromValues(BANANA_SCALE, BANANA_SCALE, BANANA_SCALE));
+        //mat4.fromTranslation(m, vec3.fromValues(0, 0, 15));
+        mat4.fromTranslation(m, vec3.fromValues(0, -1, 0));
         mat4.multiply(toOrigin, toOrigin, m);
         mat4.multiply(trans, trans, toOrigin);
         this.plant.addDecoration(pearMesh, trans);

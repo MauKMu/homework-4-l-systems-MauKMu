@@ -1,4 +1,4 @@
-import {vec3, vec4, mat3, mat4} from 'gl-matrix';
+import {vec2, vec3, vec4, mat3, mat4} from 'gl-matrix';
 import Drawable from '../rendering/gl/Drawable';
 import {gl} from '../globals';
 
@@ -33,6 +33,12 @@ function appendNormalToArray(arr: Array<number>, vec: vec3) {
     arr[len + 3] = 0;
 }
 
+function appendVec2ToArray(arr: Array<number>, vec: vec2) {
+    let len = arr.length;
+    arr[len] = vec[0];
+    arr[len + 1] = vec[1];
+}
+
 function appendTri(arr: Array<number>, i0: number, i1: number, i2: number) {
     let len = arr.length;
     arr[len] = i0;
@@ -46,10 +52,12 @@ class Plant extends Drawable {
     positions: Float32Array;
     normals: Float32Array;
     colors: Float32Array;
+    uvs: Float32Array;
     stagedIndices: Array<number>;
     stagedPositions: Array<number>;
     stagedNormals: Array<number>;
     stagedColors: Array<number>;
+    stagedUVs: Array<number>;
     wasSafe: boolean;
 
     currColor: vec4;
@@ -64,6 +72,7 @@ class Plant extends Drawable {
         this.stagedPositions = [];
         this.stagedNormals = [];
         this.stagedColors = [];
+        this.stagedUVs = [];
 
         this.currColor = vec4.create();
         vec4.copy(this.currColor, BRANCH_COLOR);
@@ -81,6 +90,7 @@ class Plant extends Drawable {
         this.stagedPositions = [];
         this.stagedNormals = [];
         this.stagedColors = [];
+        this.stagedUVs = [];
     }
 
     destroy() {
@@ -104,6 +114,7 @@ class Plant extends Drawable {
         mat3.transpose(invTr, invTr);
 
         // add vertex data ====================================
+        let uvIdx = 0;
         for (let i = 0; i < mesh.vertices.length; i += 3) {
             let p = vec4.fromValues(mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2], 1);
             vec4.transformMat4(p, p, transform);
@@ -112,7 +123,10 @@ class Plant extends Drawable {
 
             appendVec4ToArray(this.stagedPositions, p);
             appendVec4ToArray(this.stagedColors, this.currColor);
+            appendVec2ToArray(this.stagedUVs, vec2.fromValues(mesh.textures[uvIdx], 1.0 - mesh.textures[uvIdx + 1]));
             appendNormalToArray(this.stagedNormals, n);
+
+            uvIdx += 2;
         }
 
         // add indices ========================================
@@ -143,6 +157,7 @@ class Plant extends Drawable {
         vec4.transformMat4(p, p, transform);
         appendVec4ToArray(this.stagedPositions, p);
         appendVec4ToArray(this.stagedColors, this.currColor);
+        appendVec2ToArray(this.stagedUVs, vec2.fromValues(-1, -1));
 
         let n = vec3.fromValues(0, -1, 0);
         vec3.transformMat3(n, n, invTr);
@@ -161,6 +176,7 @@ class Plant extends Drawable {
             vec4.transformMat4(p, localPos, transform);
             appendVec4ToArray(this.stagedPositions, p);
             appendVec4ToArray(this.stagedColors, this.currColor);
+            appendVec2ToArray(this.stagedUVs, vec2.fromValues(-1, -1));
 
             // append normal (already transformed when computing center)
             appendNormalToArray(this.stagedNormals, n);
@@ -187,6 +203,7 @@ class Plant extends Drawable {
         vec4.transformMat4(p, p, transform);
         appendVec4ToArray(this.stagedPositions, p);
         appendVec4ToArray(this.stagedColors, this.currColor);
+        appendVec2ToArray(this.stagedUVs, vec2.fromValues(-1, -1));
 
         n = vec3.fromValues(0, 1, 0);
         vec3.transformMat3(n, n, invTr);
@@ -202,6 +219,7 @@ class Plant extends Drawable {
             vec4.transformMat4(p, localPos, transform);
             appendVec4ToArray(this.stagedPositions, p);
             appendVec4ToArray(this.stagedColors, this.currColor);
+            appendVec2ToArray(this.stagedUVs, vec2.fromValues(-1, -1));
 
             // append normal (already transformed when computing center)
             appendNormalToArray(this.stagedNormals, n);
@@ -243,12 +261,14 @@ class Plant extends Drawable {
             vec4.transformMat4(p, localPosTop, transform);
             appendVec4ToArray(this.stagedPositions, p);
             appendVec4ToArray(this.stagedColors, this.currColor);
+            appendVec2ToArray(this.stagedUVs, vec2.fromValues(-1, -1));
 
             // transform and append position -- bottom
             //vec4.set(localPosBot, localPosTop[0], 0, localPosTop[2], 1);
             vec4.transformMat4(p, localPosBot, transform);
             appendVec4ToArray(this.stagedPositions, p);
             appendVec4ToArray(this.stagedColors, this.currColor);
+            appendVec2ToArray(this.stagedUVs, vec2.fromValues(-1, -1));
 
             // transform and append normal (need to append twice)
             vec3.transformMat3(n, localNor, invTr);
@@ -286,11 +306,13 @@ class Plant extends Drawable {
         this.positions = new Float32Array(this.stagedPositions);
         this.normals = new Float32Array(this.stagedNormals);
         this.colors = new Float32Array(this.stagedColors);
+        this.uvs = new Float32Array(this.stagedUVs);
 
         this.generateIdx();
         this.generatePos();
         this.generateNor();
         this.generateCol();
+        this.generateUV();
 
         this.count = this.indices.length;
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
@@ -304,6 +326,9 @@ class Plant extends Drawable {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
         gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bufUV);
+        gl.bufferData(gl.ARRAY_BUFFER, this.uvs, gl.STATIC_DRAW);
 
         console.log(`Created Plant`);
     }
