@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 23);
+/******/ 	return __webpack_require__(__webpack_require__.s = 25);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -159,12 +159,12 @@ function setGL(_gl) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gl_matrix_common__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__gl_matrix_mat2__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__gl_matrix_mat2d__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__gl_matrix_mat2__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__gl_matrix_mat2d__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gl_matrix_mat3__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gl_matrix_mat4__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__gl_matrix_quat__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__gl_matrix_vec2__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gl_matrix_mat4__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__gl_matrix_quat__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__gl_matrix_vec2__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__gl_matrix_vec3__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__gl_matrix_vec4__ = __webpack_require__(10);
 /* unused harmony reexport glMatrix */
@@ -3042,6 +3042,33 @@ const forEach = (function() {
 
 /***/ }),
 /* 11 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3049,8 +3076,8 @@ const forEach = (function() {
 
 module.exports = createFilteredVector
 
-var cubicHermite = __webpack_require__(43)
-var bsearch = __webpack_require__(12)
+var cubicHermite = __webpack_require__(44)
+var bsearch = __webpack_require__(13)
 
 function clamp(lo, hi, x) {
   return Math.min(hi, Math.max(lo, x))
@@ -3339,7 +3366,7 @@ function createFilteredVector(initState, initVelocity, initTime) {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3406,7 +3433,7 @@ module.exports = {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = cross;
@@ -3430,7 +3457,7 @@ function cross(out, a, b) {
 }
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 module.exports = dot;
@@ -3447,10 +3474,10 @@ function dot(a, b) {
 }
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var identity = __webpack_require__(16);
+var identity = __webpack_require__(17);
 
 module.exports = lookAt;
 
@@ -3542,7 +3569,7 @@ function lookAt(out, eye, center, up) {
 };
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = identity;
@@ -3574,7 +3601,7 @@ function identity(out) {
 };
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = translate;
@@ -3617,7 +3644,7 @@ function translate(out, a, v) {
 };
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = create;
@@ -3649,7 +3676,7 @@ function create() {
 };
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = scale;
@@ -3685,7 +3712,7 @@ function scale(out, a, v) {
 };
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = determinant;
@@ -3720,7 +3747,66 @@ function determinant(a) {
 };
 
 /***/ }),
-/* 21 */
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var apply = Function.prototype.apply;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) {
+  if (timeout) {
+    timeout.close();
+  }
+};
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// setimmediate attaches itself to the global object
+__webpack_require__(74);
+exports.setImmediate = setImmediate;
+exports.clearImmediate = clearImmediate;
+
+
+/***/ }),
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3796,34 +3882,36 @@ class LSymbol {
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\r\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\r\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\r\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\r\n//This simultaneous transformation allows your program to run much faster, especially when rendering\r\n//geometry with millions of vertices.\r\n\r\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\r\n                            // object we're rendering. In this assignment,\r\n                            // this will be the result of traversing your scene graph.\r\n\r\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\r\n                            // This allows us to transform the object's normals properly\r\n                            // if the object has been non-uniformly scaled.\r\n\r\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\r\n                            // We've written a static matrix for you to use for HW2,\r\n                            // but in HW3 you'll have to generate one yourself\r\n\r\nuniform float u_Time;\r\nuniform float u_LavaBias;\r\nuniform float u_PlumeBias;\r\n\r\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\r\n\r\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\r\n\r\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\r\n\r\nout float fs_Shininess;\r\nout vec3 fs_Pos;\r\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\r\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\r\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\r\n\r\nuniform vec3 u_LightPos;\r\n\r\nconst float PI = 3.14159265;\r\n\r\n// https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83\r\nvec3 random3(vec3 c) {\r\n    float j = 4096.0*sin(dot(c, vec3(17.0, 59.4, 15.0)));\r\n    vec3 r;\r\n    r.z = fract(512.0*j);\r\n    j *= .125;\r\n    r.x = fract(512.0*j);\r\n    j *= .125;\r\n    r.y = fract(512.0*j);\r\n    return r;\r\n}\r\n\r\nvec3 getSmoothRandom3(vec3 pt) {\r\n    vec3 noiseSum = vec3(0.0);\r\n    float amplitudeSum = 0.0;\r\n    float amplitude = 0.5;\r\n    float frequency = 1.0;\r\n    for(int i = 0; i < 8; i++) {\r\n        vec3 freqPt = frequency * pt;\r\n        vec3 noise = random3(freqPt);\r\n        //vec3 noise = vec3(random2(freqPt.xy), 0.0) * 0.5 + 0.5;\r\n        //vec3 noise = vec3(noise1(pt.x), noise1(pt.y), noise1(pt.z));\r\n        noiseSum += noise * amplitude;\r\n        amplitudeSum += amplitude;\r\n        amplitude *= 0.5;\r\n        frequency *= 2.0;\r\n    }\r\n    return noiseSum / amplitudeSum;\r\n}\r\n\r\nfloat surflet(vec3 P, vec3 gridPoint)\r\n{\r\n    // Compute falloff function by converting linear distance to a polynomial\r\n    float distX = abs(P.x - gridPoint.x);\r\n    float distY = abs(P.y - gridPoint.y);\r\n    float distZ = abs(P.z - gridPoint.z);\r\n    float tX = 1.0 - 6.0 * pow(distX, 5.0) + 15.0 * pow(distX, 4.0) - 10.0 * pow(distX, 3.0);\r\n    float tY = 1.0 - 6.0 * pow(distY, 5.0) + 15.0 * pow(distY, 4.0) - 10.0 * pow(distY, 3.0);\r\n    float tZ = 1.0 - 6.0 * pow(distZ, 5.0) + 15.0 * pow(distZ, 4.0) - 10.0 * pow(distZ, 3.0);\r\n\r\n    // Get the random vector for the grid point\r\n    vec3 gradient = random3(gridPoint);\r\n    // Get the vector from the grid point to P\r\n    vec3 diff = P - gridPoint;\r\n    // Get the value of our height field by dotting grid->P with our gradient\r\n    float height = dot(diff, gradient);\r\n    // Scale our height field (i.e. reduce it) by our polynomial falloff function\r\n    return height * tX * tY * tZ;\r\n}\r\n\r\nfloat PerlinNoise(vec3 v)\r\n{\r\n    // Tile the space\r\n    vec3 vXLYLZL = floor(v);\r\n    vec3 vXHYLZL = vXLYLZL + vec3(1.0, 0.0, 0.0);\r\n    vec3 vXHYHZL = vXLYLZL + vec3(1.0, 1.0, 0.0);\r\n    vec3 vXLYHZL = vXLYLZL + vec3(0.0, 1.0, 0.0);\r\n    vec3 vXLYLZH = vXLYLZL + vec3(0.0, 0.0, 1.0);\r\n    vec3 vXHYLZH = vXLYLZH + vec3(1.0, 0.0, 0.0);\r\n    vec3 vXHYHZH = vXLYLZH + vec3(1.0, 1.0, 0.0);\r\n    vec3 vXLYHZH = vXLYLZH + vec3(0.0, 1.0, 0.0);\r\n\r\n    return surflet(v, vXLYLZL) + surflet(v, vXHYLZL) + surflet(v, vXHYHZL) + surflet(v, vXLYHZL) +\r\n           surflet(v, vXLYLZH) + surflet(v, vXHYLZH) + surflet(v, vXHYHZH) + surflet(v, vXLYHZH);\r\n}\r\n\r\nfloat normalizedPerlinNoise(vec3 v) {\r\n    return clamp(0.0, 1.0, PerlinNoise(v) * 0.5 + 0.5);\r\n}\r\n\r\nvec3 sphereToGrid(vec3 pt, float size) {\r\n    vec3 v = pt * 0.5 + 0.5;\r\n    return size * v;\r\n}\r\n\r\nstruct worleyResult {\r\n    vec3 closest0;\r\n    float closestDist0;\r\n    vec3 closest1;\r\n    float closestDist1;\r\n    vec3 normClosest0;\r\n    vec3 normClosest1;\r\n    vec3 normal;\r\n};\r\n\r\nconst float WORLEY_BIG_FLOAT = 1.0e10;\r\nconst float WORLEY_EPSILON = 0.001;\r\n\r\nworleyResult getWorley(vec3 pt, float gridSize, float timeFactor) {\r\n    vec3 gridOrigin;\r\n    if (gridSize >= 1.0) {\r\n        gridOrigin.x = pt.x > 0.0 ? 0.0 : -gridSize;\r\n        gridOrigin.y = pt.y > 0.0 ? 0.0 : -gridSize;\r\n        gridOrigin.z = pt.z > 0.0 ? 0.0 : -gridSize;\r\n    }\r\n    else {\r\n        gridOrigin = pt - mod(pt, gridSize);\r\n    }\r\n    worleyResult result;\r\n    result.closest0 = vec3(0.0);\r\n    result.closest1 = vec3(0.0);\r\n    result.closestDist0 = WORLEY_BIG_FLOAT;\r\n    result.closestDist1 = WORLEY_BIG_FLOAT;\r\n    for (float i = -gridSize; i < gridSize + WORLEY_EPSILON; i += gridSize) {\r\n        for (float j = -gridSize; j < gridSize + WORLEY_EPSILON; j += gridSize) {\r\n            for (float k = -gridSize; k < gridSize + WORLEY_EPSILON; k += gridSize) {\r\n                vec3 gridPt = gridOrigin + vec3(i, j, k);\r\n                // compute random point\r\n                vec3 randPt;\r\n                if (timeFactor < 0.0) {\r\n                    randPt = gridPt + random3(gridPt) * gridSize;\r\n                }\r\n                else {\r\n                    randPt = gridPt + (random3(gridPt) * 0.5 + vec3(cos(u_Time * 0.0001), sin(u_Time * 0.0001), sin(u_Time * 0.0002)) * 0.25 + 0.25) * gridSize;\r\n                }\r\n                // find distance\r\n                float dist = distance(randPt, pt);\r\n                // store if closest\r\n                if (dist < result.closestDist0) {\r\n                    // check if closest0 is already set\r\n                    // if it is, store it in closest1 (and distance too)\r\n                    // we don't want to overwrite and lose them\r\n                    if (result.closestDist0 < WORLEY_BIG_FLOAT) {\r\n                        result.closestDist1 = result.closestDist0;\r\n                        result.closest1 = result.closest0;\r\n                    }\r\n                    result.closestDist0 = dist;\r\n                    result.closest0 = randPt;\r\n                }\r\n                else if (dist < result.closestDist1) {\r\n                    result.closestDist1 = dist;\r\n                    result.closest1 = randPt;\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    result.normClosest0 = normalize(result.closest0);\r\n    result.normClosest1 = normalize(result.closest1);\r\n\r\n    return result;\r\n}\r\n\r\n\r\nconst float lavaRadius = 0.01;\r\n\r\nconst vec3 LAVA_ORANGE = vec3(255.0, 110.0, 0.0) / 255.0;\r\nconst vec3 LAVA_BRIGHT_ORANGE = vec3(255.0, 142.0, 56.0) / 255.0;\r\n\r\nconst vec3 LAVA_RED = vec3(209.0, 24.0, 0.0) / 255.0;\r\nconst vec3 LAVA_BRIGHT_RED = vec3(255.0, 26.0, 56.0) / 255.0;\r\n\r\nvec3 getLavaDisp(vec3 pt, inout worleyResult worley) {\r\n    vec3 lavaDir = worley.normClosest0;\r\n    float rawDist = distance(normalize(pt), worley.normClosest0);\r\n    // compute plume going up\r\n    float plumeDist = clamp(0.0, PI, rawDist * 20.0);\r\n    float plumeUp = pow(cos(plumeDist) * 0.5 + 0.5, 2.5);\r\n    // compute plume going down\r\n    plumeDist = clamp(PI, 2.0 * PI, rawDist * 20.0);\r\n    float plumeDown = pow(cos(plumeDist - PI) * 0.5 + 0.5, 0.8) * 0.367;\r\n    // mix plumeUp, plumeDown, and 0 to achieve animation???\r\n    float adjTime = u_Time * 0.001;\r\n    vec3 rand3 = random3(worley.normClosest0);\r\n    float rand = rand3.x * 5.0;\r\n    float heightModifier = mix(1.0, 1.4, rand3.y);\r\n    plumeUp *= heightModifier;\r\n    plumeDown *= heightModifier;\r\n    float time = cos(adjTime + rand) * 0.5 + 0.5;\r\n    // use derivative to make time always increase\r\n    time *= sin(adjTime + rand) > 0.0 ? 0.0 : 1.0;\r\n    const float STEP0 = 0.433;\r\n    const float STEP1 = 0.667;\r\n    float s;\r\n    s = time < STEP0 ? mix(0.0, plumeDown, smoothstep(0.0, STEP0, time)) :\r\n        time < STEP1 ? mix(plumeDown, plumeUp, smoothstep(STEP0, STEP1, time)) :\r\n                       mix(plumeUp, 0.0, smoothstep(STEP1, 1.0, time));\r\n    worley.normal = vs_Pos.xyz;\r\n    vec3 edgeColor = mix(LAVA_ORANGE, LAVA_BRIGHT_ORANGE, cos(u_Time * 0.001) * 0.5 + 0.5);\r\n    vec3 faceColor = mix(LAVA_BRIGHT_RED, LAVA_RED, cos(u_Time * 0.001) * 0.5 + 0.5);\r\n\r\n    return s * normalize(pt) * 0.81;\r\n}\r\n\r\n/* Recursive Perlin Noise */\r\nfloat getRecursivePerlin(vec3 pt, float freq) {\r\n    vec3 gridPt = sphereToGrid(pt, 6.0 * freq);\r\n    // we recursive now boys\r\n    float t0 = normalizedPerlinNoise(gridPt);\r\n    return normalizedPerlinNoise(gridPt + sphereToGrid(vec3(t0) * 2.0 - vec3(1.0), 4.0 * freq));\r\n}\r\n\r\n/* FBM (uses Recursive Perlin) */\r\nfloat getFBM(vec3 pt, float startFreq) {\r\n    float noiseSum = 0.0;\r\n    float amplitudeSum = 0.0;\r\n    float amplitude = 0.5;\r\n    float frequency = startFreq;\r\n    for(int i = 0; i < 5; i++) {\r\n        float perlin = getRecursivePerlin(pt, frequency);\r\n        //uv = vec2(cos(3.14159/3.0 * i) * uv.x - sin(3.14159/3.0 * i) * uv.y, sin(3.14159/3.0 * i) * uv.x + cos(3.14159/3.0 * i) * uv.y);\r\n        noiseSum += perlin * amplitude;\r\n        amplitudeSum += amplitude;\r\n        amplitude *= 0.5;\r\n        frequency *= 2.0;\r\n    }\r\n    return noiseSum / amplitudeSum;\r\n}\r\n\r\nvoid main()\r\n{\r\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\r\n\r\n    mat3 invTranspose = mat3(u_ModelInvTr);\r\n\r\n    const float EPSILON = 0.001;\r\n\r\n    // LAVA =========================================================\r\n    // this controls how large Worley cells are for lava plumes\r\n    float plumeWorleySize = mix(0.85, 0.35, u_PlumeBias);\r\n    worleyResult worley = getWorley(vs_Pos.xyz, plumeWorleySize, -1.0);\r\n    // time-dependent Worley is used for picking \"biomes\"\r\n    worleyResult worleyTime = getWorley(vs_Pos.xyz, 0.9, 1.0);\r\n    // lava displacement\r\n    vec4 lavaDisp = vec4(getLavaDisp(vs_Pos.xyz, worley), 0.0);\r\n    // f controls which biomes this pixel is in\r\n    float f = getFBM(worleyTime.closest0, 0.15);\r\n    // we \"scale\" f to put it in a more useful range using smoothstep\r\n    float lavaBias = mix(0.36, 0.9, u_LavaBias);\r\n    f = smoothstep(0.35, lavaBias, f);\r\n\r\n    // HILLS ========================================================\r\n    // t is the height from the FBM height field\r\n    float t = getFBM(vs_Pos.xyz, 0.5);\r\n    // estimate normal\r\n    const float GRADIENT_EPSILON = 0.05;\r\n    float fbmXL = getFBM(vs_Pos.xyz - vec3(GRADIENT_EPSILON, 0.0, 0.0), 0.5);\r\n    float fbmXH = getFBM(vs_Pos.xyz + vec3(GRADIENT_EPSILON, 0.0, 0.0), 0.5);\r\n    float fbmYL = getFBM(vs_Pos.xyz - vec3(0.0, GRADIENT_EPSILON, 0.0), 0.5);\r\n    float fbmYH = getFBM(vs_Pos.xyz + vec3(0.0, GRADIENT_EPSILON, 0.0), 0.5);\r\n    float fbmZL = getFBM(vs_Pos.xyz - vec3(0.0, 0.0, GRADIENT_EPSILON), 0.5);\r\n    float fbmZH = getFBM(vs_Pos.xyz + vec3(0.0, 0.0, GRADIENT_EPSILON), 0.5);\r\n    vec3 fbmNormal = normalize(vec3(fbmXL - fbmXH, fbmYL - fbmYH, fbmZL - fbmZH));\r\n\r\n    // erosion is confusingly named, but when it increases,\r\n    // the terrain becomes less flat\r\n    float erosion = f * smoothstep(0.33, 1.0, f);\r\n    t = pow(t, mix(0.77, 3.0, erosion)) * mix(0.8, 3.27, erosion);\r\n    t = 0.5 + 1.5 * t;\r\n    vec4 naturePos = (vec4(t, t, t, 1.0) * vs_Pos);\r\n    vec4 lavaPos = (lavaDisp + vs_Pos);\r\n    vec4 modelposition = u_Model * mix(lavaPos, naturePos,  smoothstep(0.1667, 0.33, f));\r\n    fs_Pos = modelposition.xyz;\r\n\r\n    const vec3 erodedColor = vec3(124.0, 87.0, 0.0) / 255.0;\r\n    const vec3 nonErodedColor = vec3(35.0, 94.0, 18.0) / 255.0;\r\n    vec3 natureCol = mix(erodedColor, nonErodedColor, smoothstep(0.33, 1.0, f));\r\n    fs_Col.xyz = natureCol;\r\n\r\n    vec3 localNor = fbmNormal;\r\n    fs_Nor = vec4(invTranspose * localNor, 0);\r\n\r\n    fs_Shininess = mix(5.0, 50.0, smoothstep(0.31, 0.33, f));\r\n    fs_LightVec = vec4(u_LightPos - modelposition.xyz, 0.0);  // Compute the direction in which the light source lies\r\n\r\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\r\n                                             // used to render the final positions of the geometry's vertices\r\n}\r\n"
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_stats_js__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_stats_js__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_stats_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_stats_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_dat_gui__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_dat_gui__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_dat_gui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_dat_gui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__geometry_Icosphere__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__geometry_Square__ = __webpack_require__(34);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__geometry_Cube__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__geometry_Icosphere__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__geometry_Square__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__geometry_Cube__ = __webpack_require__(37);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__geometry_Plant__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__rendering_gl_OpenGLRenderer__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Camera__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__rendering_gl_OpenGLRenderer__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Camera__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__globals__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__ = __webpack_require__(70);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__rendering_gl_ImageLoader__ = __webpack_require__(71);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__l_system_LSystem__ = __webpack_require__(73);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__rendering_gl_ImageLoader__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12_sweetalert__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12_sweetalert___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_12_sweetalert__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__l_system_LSystem__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__ = __webpack_require__(7);
 // models from https://www.models-resource.com/wii/kirbysreturntodreamland/model/4572/
 
 
@@ -3838,7 +3926,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-var OBJ = __webpack_require__(72);
+
+var OBJ = __webpack_require__(76);
 
 
 
@@ -3876,7 +3965,7 @@ const controls = {
     plumeBias: 0,
     edgeClarity: 0,
     iterations: 12,
-    randomMode: __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["b" /* LRANDOM_MATH_RANDOM */],
+    randomMode: __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["b" /* LRANDOM_MATH_RANDOM */],
     randomSeed: 0,
     woodColor: [__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["a" /* BRANCH_COLOR */][0] * 255, __WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["a" /* BRANCH_COLOR */][1] * 255, __WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["a" /* BRANCH_COLOR */][2] * 255],
     leafColor: [__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["d" /* TIP_COLOR */][0] * 255, __WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["d" /* TIP_COLOR */][1] * 255, __WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["d" /* TIP_COLOR */][2] * 255],
@@ -3900,37 +3989,35 @@ function showAlphabet() {
     alphabet.forEach(function (value, index, map) {
         strBuilder.push(index);
     });
-    alert(strBuilder.join("\n"));
+    __WEBPACK_IMPORTED_MODULE_12_sweetalert__(strBuilder.join("\n"));
 }
 function showCurrentString() {
-    alert(lsys.lstring.toString());
+    __WEBPACK_IMPORTED_MODULE_12_sweetalert__(lsys.lstring.toString());
 }
 function showHelp() {
-    alert([
-        "Light Position: controls the light position for shading\n\n" +
-            "iterations: number of times to expand the string\n\n" +
-            "randomMode: pick between using Math.random() or a deterministic seeded noise function\n\n" +
-            "randomSeed: seed for deterministic seeded noise function\n\n" +
-            "woodColor: color for wood geometry\n\n" +
-            "leafColor: color for leaf geometry\n\n" +
-            "fruit: pick one decoration to be placed on the branches (some non-fruity decorations may require more determination)\n\n" +
-            "**NOTE** any changes made to the options above will only be applied if you re-draw the plant using some of the buttons below\n\n" +
-            "Show Alphabet: shows L-system's alphabet\n\n" +
-            "Show String: shows current expanded L-system string\n\n" +
-            "Regenerate String and Plant: resets L-system string to axiom, re-expands it, then re-draws plant\n\n" +
-            "Redraw Plant: re-draws plant without modifying L-system string\n\n" +
-            "Show Help: shows this help message\n\n"
-    ]);
+    __WEBPACK_IMPORTED_MODULE_12_sweetalert__("Light Position: controls the light position for shading\n\n" +
+        "iterations: number of times to expand the string\n\n" +
+        "randomMode: pick between using Math.random() or a deterministic seeded noise function\n\n" +
+        "randomSeed: seed for deterministic seeded noise function\n\n" +
+        "woodColor: color for wood geometry\n\n" +
+        "leafColor: color for leaf geometry\n\n" +
+        "fruit: pick one decoration to be placed on the branches (some non-fruity decorations may require more determination)\n\n" +
+        "**NOTE** any changes made to the options above will only be applied if you re-draw the plant using some of the buttons below\n\n" +
+        "Show Alphabet: shows L-system's alphabet\n\n" +
+        "Show String: shows current expanded L-system string\n\n" +
+        "Regenerate String and Plant: resets L-system string to axiom, re-expands it, then re-draws plant\n\n" +
+        "Redraw Plant: re-draws plant without modifying L-system string\n\n" +
+        "Show Help: shows this help message\n\n");
 }
 function remakePlant() {
     updateFruit(controls.fruit);
-    __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["c" /* lRandom */].setSeed(controls.randomSeed);
+    __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["c" /* lRandom */].setSeed(controls.randomSeed);
     lsys.resetSystem();
     runIterations(controls.iterations);
     // expanding string also consumes RNG, so
     // we reset seed again to make this output consistent
     // with redrawPlant()
-    __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["c" /* lRandom */].setSeed(controls.randomSeed);
+    __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["c" /* lRandom */].setSeed(controls.randomSeed);
     lsys.createPlant();
     //if (!lsys.plant.wasSafe) {
     //alert("Plant grew too much!");
@@ -3939,7 +4026,7 @@ function remakePlant() {
 function redrawPlant() {
     // reset plant only, so we keep current string
     updateFruit(controls.fruit);
-    __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["c" /* lRandom */].setSeed(controls.randomSeed);
+    __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["c" /* lRandom */].setSeed(controls.randomSeed);
     lsys.resetPlant();
     lsys.createPlant();
 }
@@ -4009,13 +4096,13 @@ function updateFruit(fruit) {
     if (fruit == FruitEnum.CAKE) {
         // print "funny" message
         if (cakeCount <= 0) {
-            alert("the cake is a lie.");
+            __WEBPACK_IMPORTED_MODULE_12_sweetalert__("the cake is a lie.");
         }
         else if (cakeCount == 1) {
-            alert("Well... if you insist.");
+            __WEBPACK_IMPORTED_MODULE_12_sweetalert__("Well... if you insist.");
         }
         else if (cakeCount == 3) {
-            alert("Delicious and moist.");
+            __WEBPACK_IMPORTED_MODULE_12_sweetalert__("Delicious and moist.");
         }
         cakeCount++;
         if (cakeCount <= 1) {
@@ -4045,54 +4132,54 @@ function blah() {
     //   * string representation
     //   * action
     //   * expansion rules, if any
-    let F = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("F", function (lsys) {
+    let F = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("F", function (lsys) {
         let turtle = lsys.getTopTurtle();
         //lsys.addPrismAtTurtle(turtle);
         lsys.addScaledPrismAtTurtle(turtle, 2.0);
         turtle.moveForward(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["c" /* PRISM_HEIGHT */] * 2.0);
     });
     alphabet.set(F.stringRepr, F);
-    let shortF = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(f)", function (lsys) {
+    let shortF = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(f)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         lsys.addScaledPrismAtTurtle(turtle, 2.0);
         turtle.moveForward(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["c" /* PRISM_HEIGHT */] * 1.55);
     });
     alphabet.set(shortF.stringRepr, shortF);
-    let midF = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(ff)", function (lsys) {
+    let midF = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(ff)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         lsys.addScaledPrismAtTurtle(turtle, 2.0);
         turtle.moveForward(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["c" /* PRISM_HEIGHT */] * 1.75);
     });
     alphabet.set(midF.stringRepr, midF);
-    let push = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("[", function (lsys) {
+    let push = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("[", function (lsys) {
         let turtle = lsys.getTopTurtle();
         let copy = turtle.makeDeepCopy();
         copy.depth++;
         lsys.turtleStack.push(copy);
     });
     alphabet.set(push.stringRepr, push);
-    let pop = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("]", function (lsys) {
+    let pop = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("]", function (lsys) {
         lsys.turtleStack.pop();
     });
     alphabet.set(pop.stringRepr, pop);
     // "root"
-    let R = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("R", function (lsys) {
+    let R = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("R", function (lsys) {
         let turtle = lsys.getTopTurtle();
         lsys.addPrismAtTurtle(turtle);
         turtle.moveForward(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["c" /* PRISM_HEIGHT */] * 0.8);
     });
-    let plusZ = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(+Z)", function (lsys) {
+    let plusZ = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(+Z)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         turtle.rotateZ(Math.PI * 0.1333333);
     });
     alphabet.set(plusZ.stringRepr, plusZ);
-    let minusZ = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(-Z)", function (lsys) {
+    let minusZ = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(-Z)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         turtle.rotateZ(-Math.PI * 0.1333333);
     });
     alphabet.set(minusZ.stringRepr, minusZ);
     // decorations ============================================
-    let decorationPear = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(pear)", function (lsys) {
+    let decorationPear = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(pear)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         lsys.useColor(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["b" /* PEAR_COLOR */]);
         lsys.addPearAtTurtle(turtle, mesh);
@@ -4100,14 +4187,14 @@ function blah() {
     });
     alphabet.set(decorationPear.stringRepr, decorationPear);
     // twisty trunk ===========================================
-    let twistyPlusBigY = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(T+Y)", function (lsys) {
+    let twistyPlusBigY = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(T+Y)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         turtle.rotateY(Math.PI * 0.2);
         lsys.addPrismAtTurtle(turtle);
         turtle.moveForward(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["c" /* PRISM_HEIGHT */] * 0.8);
     });
     alphabet.set(twistyPlusBigY.stringRepr, twistyPlusBigY);
-    let twistyMinusBigY = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(T-Y)", function (lsys) {
+    let twistyMinusBigY = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(T-Y)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         turtle.rotateY(-Math.PI * 0.2);
         lsys.addPrismAtTurtle(turtle);
@@ -4115,24 +4202,24 @@ function blah() {
     });
     alphabet.set(twistyMinusBigY.stringRepr, twistyMinusBigY);
     // just expands to one of (T+Y) or (T-Y)
-    let twistyStart = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(TS)", function (lsys) {
+    let twistyStart = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(TS)", function (lsys) {
     });
     alphabet.set(twistyStart.stringRepr, twistyStart);
-    twistyStart.setExpansionRules([new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [twistyPlusBigY]), new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [twistyMinusBigY])]);
+    twistyStart.setExpansionRules([new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [twistyPlusBigY]), new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [twistyMinusBigY])]);
     // set expansion rules for other twisty trunks
     twistyPlusBigY.setExpansionRules([
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](2, [twistyPlusBigY, twistyPlusBigY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](4, [twistyPlusBigY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [twistyPlusBigY, twistyMinusBigY])
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](2, [twistyPlusBigY, twistyPlusBigY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](4, [twistyPlusBigY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [twistyPlusBigY, twistyMinusBigY])
     ]);
     twistyMinusBigY.setExpansionRules([
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](2, [twistyMinusBigY, twistyMinusBigY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](4, [twistyMinusBigY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [twistyMinusBigY, twistyPlusBigY])
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](2, [twistyMinusBigY, twistyMinusBigY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](4, [twistyMinusBigY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [twistyMinusBigY, twistyPlusBigY])
     ]);
     // branchy trunk ==========================================
     let BRANCHY_Y_INC = 0.2;
-    let branchyPlusSmallX = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(B+x)", function (lsys) {
+    let branchyPlusSmallX = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(B+x)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         // nudge upwards
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(turtle.orientation, turtle.orientation, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, BRANCHY_Y_INC, 0));
@@ -4143,7 +4230,7 @@ function blah() {
         turtle.moveForward(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["c" /* PRISM_HEIGHT */]);
     });
     alphabet.set(branchyPlusSmallX.stringRepr, branchyPlusSmallX);
-    let branchyMinusSmallX = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(B-x)", function (lsys) {
+    let branchyMinusSmallX = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(B-x)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         // nudge upwards
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(turtle.orientation, turtle.orientation, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, BRANCHY_Y_INC, 0));
@@ -4154,7 +4241,7 @@ function blah() {
         turtle.moveForward(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["c" /* PRISM_HEIGHT */]);
     });
     alphabet.set(branchyMinusSmallX.stringRepr, branchyMinusSmallX);
-    let branchyPlusSmallY = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(B+y)", function (lsys) {
+    let branchyPlusSmallY = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(B+y)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         // nudge upwards
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(turtle.orientation, turtle.orientation, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, BRANCHY_Y_INC, 0));
@@ -4165,7 +4252,7 @@ function blah() {
         turtle.moveForward(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["c" /* PRISM_HEIGHT */]);
     });
     alphabet.set(branchyPlusSmallY.stringRepr, branchyPlusSmallY);
-    let branchyMinusSmallY = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(B-y)", function (lsys) {
+    let branchyMinusSmallY = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(B-y)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         // nudge upwards
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(turtle.orientation, turtle.orientation, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, BRANCHY_Y_INC, 0));
@@ -4177,53 +4264,53 @@ function blah() {
     });
     alphabet.set(branchyMinusSmallY.stringRepr, branchyMinusSmallY);
     // expands to a branchy trunk
-    let branchyStart = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(BS)", function (lsys) {
+    let branchyStart = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(BS)", function (lsys) {
     });
     alphabet.set(branchyStart.stringRepr, branchyStart);
     branchyStart.setExpansionRules([
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallX]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallX]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallX]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallX]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallY]),
     ]);
     // define this here so we can add it to branchy expansion rules
     // "seed" for araucaria branches
-    let araucariaStart = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(AS)", function (lsys) {
+    let araucariaStart = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(AS)", function (lsys) {
     });
     alphabet.set(araucariaStart.stringRepr, araucariaStart);
     // set expansion rules for branchy trunk pieces
     branchyPlusSmallX.setExpansionRules([
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](9, [branchyPlusSmallX, araucariaStart, araucariaStart, araucariaStart]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](6, [branchyPlusSmallX]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](2, [branchyPlusSmallX, branchyMinusSmallX]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallX, branchyPlusSmallY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallX, branchyMinusSmallY])
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](9, [branchyPlusSmallX, araucariaStart, araucariaStart, araucariaStart]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](6, [branchyPlusSmallX]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](2, [branchyPlusSmallX, branchyMinusSmallX]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallX, branchyPlusSmallY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallX, branchyMinusSmallY])
     ]);
     branchyMinusSmallX.setExpansionRules([
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](9, [branchyMinusSmallX, araucariaStart, araucariaStart, araucariaStart]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](6, [branchyMinusSmallX]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](2, [branchyMinusSmallX, branchyPlusSmallX]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallX, branchyPlusSmallY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallX, branchyMinusSmallY])
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](9, [branchyMinusSmallX, araucariaStart, araucariaStart, araucariaStart]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](6, [branchyMinusSmallX]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](2, [branchyMinusSmallX, branchyPlusSmallX]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallX, branchyPlusSmallY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallX, branchyMinusSmallY])
     ]);
     branchyPlusSmallY.setExpansionRules([
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](9, [branchyPlusSmallY, araucariaStart, araucariaStart, araucariaStart]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](6, [branchyPlusSmallY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](2, [branchyPlusSmallY, branchyMinusSmallY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallY, branchyPlusSmallX]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallY, branchyMinusSmallX])
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](9, [branchyPlusSmallY, araucariaStart, araucariaStart, araucariaStart]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](6, [branchyPlusSmallY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](2, [branchyPlusSmallY, branchyMinusSmallY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallY, branchyPlusSmallX]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyPlusSmallY, branchyMinusSmallX])
     ]);
     branchyMinusSmallY.setExpansionRules([
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](9, [branchyMinusSmallY, araucariaStart, araucariaStart, araucariaStart]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](6, [branchyMinusSmallY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](2, [branchyMinusSmallY, branchyPlusSmallY]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallY, branchyPlusSmallX]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallY, branchyMinusSmallX])
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](9, [branchyMinusSmallY, araucariaStart, araucariaStart, araucariaStart]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](6, [branchyMinusSmallY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](2, [branchyMinusSmallY, branchyPlusSmallY]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallY, branchyPlusSmallX]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [branchyMinusSmallY, branchyMinusSmallX])
     ]);
     // transition main trunk -> araucaria =====================
     // use "vertify" to smoothly change into a mostly vertical direction
     // similar to araucariaLong, but more intense
-    let vertify = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(vert)", function (lsys) {
+    let vertify = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(vert)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         // draw some prisms while increasing Y to move orientation up
         let VERTIFY_Y_INC = 0.8;
@@ -4240,10 +4327,10 @@ function blah() {
     // do this by setting orientation to something with Y <= 0
     // we call this "flatifying", as it "flattens" the direction
     // (if you think of up as a "non-flat" direction. flatty mcflatty.)
-    let flatify = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(flat)", function (lsys) {
+    let flatify = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(flat)", function (lsys) {
         let turtle = lsys.getTopTurtle();
-        let angle = __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["c" /* lRandom */].getNext() * 2.0 * Math.PI;
-        let y = -__WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["c" /* lRandom */].getNext() * 0.3 + 0.05;
+        let angle = __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["c" /* lRandom */].getNext() * 2.0 * Math.PI;
+        let y = -__WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["c" /* lRandom */].getNext() * 0.3 + 0.05;
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].set(turtle.orientation, Math.cos(angle), y, Math.sin(angle));
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].normalize(turtle.orientation, turtle.orientation);
     });
@@ -4252,7 +4339,7 @@ function blah() {
     // the main branches coming off the main trunk have two parts:
     // the "straight", long part coming from the main trunk; and
     // the vertical tip at the end;
-    let araucariaLong = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(AL)", function (lsys) {
+    let araucariaLong = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(AL)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         // make thinner branch
         turtle.scaleTop *= 0.8;
@@ -4266,7 +4353,7 @@ function blah() {
             __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].add(turtle.orientation, turtle.orientation, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].fromValues(0, ARAUCARIA_Y_INC, 0));
             __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].normalize(turtle.orientation, turtle.orientation);
             // draw a pear with a small probability
-            if (__WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["c" /* lRandom */].getNext() < 0.15) {
+            if (__WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["c" /* lRandom */].getNext() < 0.15) {
                 lsys.useColor(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["b" /* PEAR_COLOR */]);
                 lsys.addPearAtTurtle(turtle, mesh);
                 lsys.useColor(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["a" /* BRANCH_COLOR */]);
@@ -4274,7 +4361,7 @@ function blah() {
         }
     });
     alphabet.set(araucariaLong.stringRepr, araucariaLong);
-    let araucariaTip = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(AT)", function (lsys) {
+    let araucariaTip = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(AT)", function (lsys) {
         let turtle = lsys.getTopTurtle();
         // prepare to draw tip
         lsys.useColor(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["d" /* TIP_COLOR */]);
@@ -4290,10 +4377,10 @@ function blah() {
     alphabet.set(araucariaTip.stringRepr, araucariaTip);
     // "helper" symbol to change the turtle orientation randomly
     // and make branches more chaotic
-    let randify = new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["b" /* LSymbol */]("(rand)", function (lsys) {
+    let randify = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["b" /* LSymbol */]("(rand)", function (lsys) {
         let turtle = lsys.getTopTurtle();
-        let angle = __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["c" /* lRandom */].getNext() * 2.0 * Math.PI;
-        let y = __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["c" /* lRandom */].getNext() * 1.8 - 0.9;
+        let angle = __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["c" /* lRandom */].getNext() * 2.0 * Math.PI;
+        let y = __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["c" /* lRandom */].getNext() * 1.8 - 0.9;
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].set(turtle.orientation, Math.cos(angle), y, Math.sin(angle));
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec3 */].normalize(turtle.orientation, turtle.orientation);
     });
@@ -4301,7 +4388,7 @@ function blah() {
     // set expansion rules for araucaria
     araucariaStart.setExpansionRules([
         // artificially force all araucaria branches to end with lots of branched araucariaTips
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](6, [push, flatify, araucariaLong, decorationPear, araucariaTip,
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](6, [push, flatify, araucariaLong, decorationPear, araucariaTip,
             push, randify, araucariaTip,
             push, randify, araucariaTip,
             push, randify, araucariaTip,
@@ -4338,7 +4425,7 @@ function blah() {
             pop,
             pop,
         ]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [push, flatify, araucariaLong, decorationPear, araucariaTip,
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [push, flatify, araucariaLong, decorationPear, araucariaTip,
             push, randify, araucariaTip,
             push, randify, araucariaTip,
             push, randify, araucariaTip,
@@ -4374,14 +4461,14 @@ function blah() {
         ]),
     ]);
     araucariaTip.setExpansionRules([
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](1, [araucariaTip]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](6, [araucariaTip, push, randify, araucariaTip, pop]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](3, [araucariaTip, decorationPear, push, randify, araucariaTip, pop]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](0.5, [araucariaTip, araucariaTip]),
-        new __WEBPACK_IMPORTED_MODULE_12__l_system_LSymbol__["a" /* ExpansionRule */](0.5, [araucariaTip, decorationPear, araucariaTip]) // grow current branch w/ pear
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](1, [araucariaTip]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](6, [araucariaTip, push, randify, araucariaTip, pop]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](3, [araucariaTip, decorationPear, push, randify, araucariaTip, pop]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](0.5, [araucariaTip, araucariaTip]),
+        new __WEBPACK_IMPORTED_MODULE_13__l_system_LSymbol__["a" /* ExpansionRule */](0.5, [araucariaTip, decorationPear, araucariaTip]) // grow current branch w/ pear
     ]);
     // initialize L-system
-    lsys = new __WEBPACK_IMPORTED_MODULE_13__l_system_LSystem__["a" /* default */]();
+    lsys = new __WEBPACK_IMPORTED_MODULE_14__l_system_LSystem__["a" /* default */]();
     //lsys.setAxiom([R, plusZ, R, plusZ, R, twistyPlusBigY, twistyPlusBigY, twistyPlusBigY]);
     //lsys.setAxiom([R, plusZ, R, plusZ, R, twistyPlusBigY, twistyPlusBigY, twistyPlusBigY, vertify, R, R]);
     //lsys.setAxiom([R, R, R, push, flatify, araucariaLong, pop, push, flatify, araucariaLong, pop  ]);
@@ -4523,7 +4610,7 @@ function main() {
     lightFolder.add(controls, 'lightY');
     lightFolder.add(controls, 'lightZ');
     gui.add(controls, 'iterations').min(0).step(1);
-    let randomModeController = gui.add(controls, 'randomMode', { "Math.random()": __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["b" /* LRANDOM_MATH_RANDOM */], "Seeded Noise": __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["a" /* LRANDOM_DETERMINISTIC */] });
+    let randomModeController = gui.add(controls, 'randomMode', { "Math.random()": __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["b" /* LRANDOM_MATH_RANDOM */], "Seeded Noise": __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["a" /* LRANDOM_DETERMINISTIC */] });
     let randomSeedController = gui.add(controls, 'randomSeed');
     let woodColorController = gui.addColor(controls, 'woodColor');
     let leafColorController = gui.addColor(controls, 'leafColor');
@@ -4536,10 +4623,10 @@ function main() {
     // Set up L-system event listeners
     randomModeController.onChange(function (mode) {
         console.log(mode);
-        __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["c" /* lRandom */].setMode(mode);
+        __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["c" /* lRandom */].setMode(mode);
     });
     randomSeedController.onChange(function (seed) {
-        __WEBPACK_IMPORTED_MODULE_14__l_system_LRandom__["c" /* lRandom */].setSeed(seed);
+        __WEBPACK_IMPORTED_MODULE_15__l_system_LRandom__["c" /* lRandom */].setSeed(seed);
     });
     woodColorController.onChange(function (color) {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["f" /* vec4 */].set(__WEBPACK_IMPORTED_MODULE_6__geometry_Plant__["a" /* BRANCH_COLOR */], color[0] / 255, color[1] / 255, color[2] / 255, 1);
@@ -4576,28 +4663,28 @@ function main() {
     //renderer.setShaderSpeed(speed);
     //});
     const lambert = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(76)),
-        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(77)),
-    ]);
-    const custom = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(78)),
-        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(79)),
-    ]);
-    const disks = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(80)),
         new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(81)),
     ]);
-    const planet = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(22)),
-        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(82)),
-    ]);
-    const planetMagic = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(22)),
+    const custom = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
+        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(82)),
         new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(83)),
     ]);
-    const bldgs = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
+    const disks = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(84)),
         new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(85)),
+    ]);
+    const planet = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
+        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(24)),
+        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(86)),
+    ]);
+    const planetMagic = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
+        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(24)),
+        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(87)),
+    ]);
+    const bldgs = new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["b" /* default */]([
+        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(88)),
+        new __WEBPACK_IMPORTED_MODULE_10__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(89)),
     ]);
     let shaders = {};
     shaders[ShaderEnum.LAMBERT] = lambert;
@@ -4643,7 +4730,7 @@ main();
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5112,7 +5199,7 @@ const sub = subtract;
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5613,7 +5700,7 @@ const sub = subtract;
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7351,7 +7438,7 @@ const sub = subtract;
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8042,7 +8129,7 @@ const setAxes = (function() {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8685,7 +8772,7 @@ const forEach = (function() {
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports) {
 
 // stats.js - http://github.com/mrdoob/stats.js
@@ -8697,14 +8784,14 @@ a+"px",m=b,r=0);return b},update:function(){l=this.end()}}};"object"===typeof mo
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(31)
-module.exports.color = __webpack_require__(32)
+module.exports = __webpack_require__(33)
+module.exports.color = __webpack_require__(34)
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports) {
 
 /**
@@ -12369,7 +12456,7 @@ dat.dom.dom,
 dat.utils.common);
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports) {
 
 /**
@@ -13129,7 +13216,7 @@ dat.color.toString,
 dat.utils.common);
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13287,7 +13374,7 @@ class Icosphere extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a"
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13329,7 +13416,7 @@ class Square extends __WEBPACK_IMPORTED_MODULE_0__rendering_gl_Drawable__["a" /*
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13445,7 +13532,7 @@ class Cube extends __WEBPACK_IMPORTED_MODULE_0__rendering_gl_Drawable__["a" /* d
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13559,11 +13646,11 @@ class OpenGLRenderer {
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_3d_view_controls__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_3d_view_controls__ = __webpack_require__(40);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_3d_view_controls___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_3d_view_controls__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix__ = __webpack_require__(2);
 
@@ -13604,7 +13691,7 @@ class Camera {
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13612,11 +13699,11 @@ class Camera {
 
 module.exports = createCamera
 
-var now         = __webpack_require__(39)
-var createView  = __webpack_require__(41)
-var mouseChange = __webpack_require__(64)
-var mouseWheel  = __webpack_require__(66)
-var mouseOffset = __webpack_require__(69)
+var now         = __webpack_require__(41)
+var createView  = __webpack_require__(42)
+var mouseChange = __webpack_require__(65)
+var mouseWheel  = __webpack_require__(67)
+var mouseOffset = __webpack_require__(70)
 
 function createCamera(element, options) {
   element = element || document.body
@@ -13838,7 +13925,7 @@ function createCamera(element, options) {
 
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {module.exports =
@@ -13849,37 +13936,10 @@ function createCamera(element, options) {
     return +new Date
   }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(40)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ }),
-/* 40 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13887,9 +13947,9 @@ module.exports = g;
 
 module.exports = createViewController
 
-var createTurntable = __webpack_require__(42)
-var createOrbit     = __webpack_require__(45)
-var createMatrix    = __webpack_require__(48)
+var createTurntable = __webpack_require__(43)
+var createOrbit     = __webpack_require__(46)
+var createMatrix    = __webpack_require__(49)
 
 function ViewController(controllers, mode) {
   this._controllerNames = Object.keys(controllers)
@@ -14007,7 +14067,7 @@ function createViewController(options) {
 }
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14015,12 +14075,12 @@ function createViewController(options) {
 
 module.exports = createTurntableController
 
-var filterVector = __webpack_require__(11)
+var filterVector = __webpack_require__(12)
 var invert44     = __webpack_require__(5)
-var rotateM      = __webpack_require__(44)
-var cross        = __webpack_require__(13)
+var rotateM      = __webpack_require__(45)
+var cross        = __webpack_require__(14)
 var normalize3   = __webpack_require__(6)
-var dot3         = __webpack_require__(14)
+var dot3         = __webpack_require__(15)
 
 function len3(x, y, z) {
   return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2))
@@ -14585,7 +14645,7 @@ function createTurntableController(options) {
 }
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14630,7 +14690,7 @@ module.exports = cubicHermite
 module.exports.derivative = dcubicHermite
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports) {
 
 module.exports = rotate;
@@ -14699,7 +14759,7 @@ function rotate(out, a, rad, axis) {
 };
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14707,11 +14767,11 @@ function rotate(out, a, rad, axis) {
 
 module.exports = createOrbitController
 
-var filterVector  = __webpack_require__(11)
-var lookAt        = __webpack_require__(15)
-var mat4FromQuat  = __webpack_require__(46)
+var filterVector  = __webpack_require__(12)
+var lookAt        = __webpack_require__(16)
+var mat4FromQuat  = __webpack_require__(47)
 var invert44      = __webpack_require__(5)
-var quatFromFrame = __webpack_require__(47)
+var quatFromFrame = __webpack_require__(48)
 
 function len3(x,y,z) {
   return Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(z,2))
@@ -15098,7 +15158,7 @@ function createOrbitController(options) {
 }
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports) {
 
 module.exports = fromQuat;
@@ -15150,7 +15210,7 @@ function fromQuat(out, q) {
 };
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15197,21 +15257,21 @@ function quatFromFrame(
 }
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var bsearch   = __webpack_require__(12)
-var m4interp  = __webpack_require__(49)
+var bsearch   = __webpack_require__(13)
+var m4interp  = __webpack_require__(50)
 var invert44  = __webpack_require__(5)
-var rotateX   = __webpack_require__(61)
-var rotateY   = __webpack_require__(62)
-var rotateZ   = __webpack_require__(63)
-var lookAt    = __webpack_require__(15)
-var translate = __webpack_require__(17)
-var scale     = __webpack_require__(19)
+var rotateX   = __webpack_require__(62)
+var rotateY   = __webpack_require__(63)
+var rotateZ   = __webpack_require__(64)
+var lookAt    = __webpack_require__(16)
+var translate = __webpack_require__(18)
+var scale     = __webpack_require__(20)
 var normalize = __webpack_require__(6)
 
 var DEFAULT_CENTER = [0,0,0]
@@ -15402,15 +15462,15 @@ function createMatrixCameraController(options) {
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var lerp = __webpack_require__(50)
+var lerp = __webpack_require__(51)
 
-var recompose = __webpack_require__(51)
-var decompose = __webpack_require__(54)
-var determinant = __webpack_require__(20)
-var slerp = __webpack_require__(59)
+var recompose = __webpack_require__(52)
+var decompose = __webpack_require__(55)
+var determinant = __webpack_require__(21)
+var slerp = __webpack_require__(60)
 
 var state0 = state()
 var state1 = state()
@@ -15459,7 +15519,7 @@ function vec4() {
 }
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports) {
 
 module.exports = lerp;
@@ -15484,7 +15544,7 @@ function lerp(out, a, b, t) {
 }
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -15499,12 +15559,12 @@ From: http://www.w3.org/TR/css3-transforms/#recomposing-to-a-3d-matrix
 */
 
 var mat4 = {
-    identity: __webpack_require__(16),
-    translate: __webpack_require__(17),
-    multiply: __webpack_require__(52),
-    create: __webpack_require__(18),
-    scale: __webpack_require__(19),
-    fromRotationTranslation: __webpack_require__(53)
+    identity: __webpack_require__(17),
+    translate: __webpack_require__(18),
+    multiply: __webpack_require__(53),
+    create: __webpack_require__(19),
+    scale: __webpack_require__(20),
+    fromRotationTranslation: __webpack_require__(54)
 }
 
 var rotationMatrix = mat4.create()
@@ -15549,7 +15609,7 @@ module.exports = function recomposeMat4(matrix, translation, scale, skew, perspe
 }
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports) {
 
 module.exports = multiply;
@@ -15596,7 +15656,7 @@ function multiply(out, a, b) {
 };
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports) {
 
 module.exports = fromRotationTranslation;
@@ -15654,7 +15714,7 @@ function fromRotationTranslation(out, q, v) {
 };
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*jshint unused:true*/
@@ -15674,18 +15734,18 @@ https://github.com/ChromiumWebApps/chromium/blob/master/ui/gfx/transform_util.cc
 http://www.w3.org/TR/css3-transforms/#decomposing-a-3d-matrix
 */
 
-var normalize = __webpack_require__(55)
+var normalize = __webpack_require__(56)
 
-var create = __webpack_require__(18)
-var clone = __webpack_require__(56)
-var determinant = __webpack_require__(20)
+var create = __webpack_require__(19)
+var clone = __webpack_require__(57)
+var determinant = __webpack_require__(21)
 var invert = __webpack_require__(5)
-var transpose = __webpack_require__(57)
+var transpose = __webpack_require__(58)
 var vec3 = {
-    length: __webpack_require__(58),
+    length: __webpack_require__(59),
     normalize: __webpack_require__(6),
-    dot: __webpack_require__(14),
-    cross: __webpack_require__(13)
+    dot: __webpack_require__(15),
+    cross: __webpack_require__(14)
 }
 
 var tmp = create()
@@ -15838,7 +15898,7 @@ function combine(out, a, b, scale1, scale2) {
 }
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = function normalize(out, mat) {
@@ -15853,7 +15913,7 @@ module.exports = function normalize(out, mat) {
 }
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports) {
 
 module.exports = clone;
@@ -15886,7 +15946,7 @@ function clone(a) {
 };
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports) {
 
 module.exports = transpose;
@@ -15940,7 +16000,7 @@ function transpose(out, a) {
 };
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports) {
 
 module.exports = length;
@@ -15959,13 +16019,13 @@ function length(a) {
 }
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(60)
+module.exports = __webpack_require__(61)
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports) {
 
 module.exports = slerp
@@ -16022,7 +16082,7 @@ function slerp (out, a, b, t) {
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports) {
 
 module.exports = rotateX;
@@ -16071,7 +16131,7 @@ function rotateX(out, a, rad) {
 };
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports) {
 
 module.exports = rotateY;
@@ -16120,7 +16180,7 @@ function rotateY(out, a, rad) {
 };
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports) {
 
 module.exports = rotateZ;
@@ -16169,7 +16229,7 @@ function rotateZ(out, a, rad) {
 };
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16177,7 +16237,7 @@ function rotateZ(out, a, rad) {
 
 module.exports = mouseListen
 
-var mouse = __webpack_require__(65)
+var mouse = __webpack_require__(66)
 
 function mouseListen (element, callback) {
   if (!callback) {
@@ -16381,7 +16441,7 @@ function mouseListen (element, callback) {
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16448,13 +16508,13 @@ exports.y = mouseRelativeY
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var toPX = __webpack_require__(67)
+var toPX = __webpack_require__(68)
 
 module.exports = mouseWheelListen
 
@@ -16495,13 +16555,13 @@ function mouseWheelListen(element, callback, noScroll) {
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var parseUnit = __webpack_require__(68)
+var parseUnit = __webpack_require__(69)
 
 module.exports = toPX
 
@@ -16561,7 +16621,7 @@ function toPX(str, element) {
 }
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports) {
 
 module.exports = function parseUnit(str, out) {
@@ -16576,7 +16636,7 @@ module.exports = function parseUnit(str, out) {
 }
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports) {
 
 var rootPosition = { left: 0, top: 0 }
@@ -16607,7 +16667,7 @@ function getBoundingClientOffset (element) {
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16788,7 +16848,7 @@ class ShaderProgram {
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16849,21 +16909,411 @@ function isPowerOf2(value) {
 
 
 /***/ }),
-/* 72 */
+/* 73 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {!function(t,e){ true?module.exports=e():"function"==typeof define&&define.amd?define([],e):"object"==typeof exports?exports.swal=e():t.swal=e()}(this,function(){return function(t){function e(o){if(n[o])return n[o].exports;var r=n[o]={i:o,l:!1,exports:{}};return t[o].call(r.exports,r,r.exports,e),r.l=!0,r.exports}var n={};return e.m=t,e.c=n,e.d=function(t,n,o){e.o(t,n)||Object.defineProperty(t,n,{configurable:!1,enumerable:!0,get:o})},e.n=function(t){var n=t&&t.__esModule?function(){return t.default}:function(){return t};return e.d(n,"a",n),n},e.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},e.p="",e(e.s=8)}([function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o="swal-button";e.CLASS_NAMES={MODAL:"swal-modal",OVERLAY:"swal-overlay",SHOW_MODAL:"swal-overlay--show-modal",MODAL_TITLE:"swal-title",MODAL_TEXT:"swal-text",ICON:"swal-icon",ICON_CUSTOM:"swal-icon--custom",CONTENT:"swal-content",FOOTER:"swal-footer",BUTTON_CONTAINER:"swal-button-container",BUTTON:o,CONFIRM_BUTTON:o+"--confirm",CANCEL_BUTTON:o+"--cancel",DANGER_BUTTON:o+"--danger",BUTTON_LOADING:o+"--loading",BUTTON_LOADER:o+"__loader"},e.default=e.CLASS_NAMES},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.getNode=function(t){var e="."+t;return document.querySelector(e)},e.stringToNode=function(t){var e=document.createElement("div");return e.innerHTML=t.trim(),e.firstChild},e.insertAfter=function(t,e){var n=e.nextSibling;e.parentNode.insertBefore(t,n)},e.removeNode=function(t){t.parentElement.removeChild(t)},e.throwErr=function(t){throw t=t.replace(/ +(?= )/g,""),"SweetAlert: "+(t=t.trim())},e.isPlainObject=function(t){if("[object Object]"!==Object.prototype.toString.call(t))return!1;var e=Object.getPrototypeOf(t);return null===e||e===Object.prototype},e.ordinalSuffixOf=function(t){var e=t%10,n=t%100;return 1===e&&11!==n?t+"st":2===e&&12!==n?t+"nd":3===e&&13!==n?t+"rd":t+"th"}},function(t,e,n){"use strict";function o(t){for(var n in t)e.hasOwnProperty(n)||(e[n]=t[n])}Object.defineProperty(e,"__esModule",{value:!0}),o(n(25));var r=n(26);e.overlayMarkup=r.default,o(n(27)),o(n(28)),o(n(29));var i=n(0),a=i.default.MODAL_TITLE,s=i.default.MODAL_TEXT,c=i.default.ICON,l=i.default.FOOTER;e.iconMarkup='\n  <div class="'+c+'"></div>',e.titleMarkup='\n  <div class="'+a+'"></div>\n',e.textMarkup='\n  <div class="'+s+'"></div>',e.footerMarkup='\n  <div class="'+l+'"></div>\n'},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1);e.CONFIRM_KEY="confirm",e.CANCEL_KEY="cancel";var r={visible:!0,text:null,value:null,className:"",closeModal:!0},i=Object.assign({},r,{visible:!1,text:"Cancel",value:null}),a=Object.assign({},r,{text:"OK",value:!0});e.defaultButtonList={cancel:i,confirm:a};var s=function(t){switch(t){case e.CONFIRM_KEY:return a;case e.CANCEL_KEY:return i;default:var n=t.charAt(0).toUpperCase()+t.slice(1);return Object.assign({},r,{text:n,value:t})}},c=function(t,e){var n=s(t);return!0===e?Object.assign({},n,{visible:!0}):"string"==typeof e?Object.assign({},n,{visible:!0,text:e}):o.isPlainObject(e)?Object.assign({visible:!0},n,e):Object.assign({},n,{visible:!1})},l=function(t){for(var e={},n=0,o=Object.keys(t);n<o.length;n++){var r=o[n],a=t[r],s=c(r,a);e[r]=s}return e.cancel||(e.cancel=i),e},u=function(t){var n={};switch(t.length){case 1:n[e.CANCEL_KEY]=Object.assign({},i,{visible:!1});break;case 2:n[e.CANCEL_KEY]=c(e.CANCEL_KEY,t[0]),n[e.CONFIRM_KEY]=c(e.CONFIRM_KEY,t[1]);break;default:o.throwErr("Invalid number of 'buttons' in array ("+t.length+").\n      If you want more than 2 buttons, you need to use an object!")}return n};e.getButtonListOpts=function(t){var n=e.defaultButtonList;return"string"==typeof t?n[e.CONFIRM_KEY]=c(e.CONFIRM_KEY,t):Array.isArray(t)?n=u(t):o.isPlainObject(t)?n=l(t):!0===t?n=u([!0,!0]):!1===t?n=u([!1,!1]):void 0===t&&(n=e.defaultButtonList),n}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(2),i=n(0),a=i.default.MODAL,s=i.default.OVERLAY,c=n(30),l=n(31),u=n(32),f=n(33);e.injectElIntoModal=function(t){var e=o.getNode(a),n=o.stringToNode(t);return e.appendChild(n),n};var d=function(t){t.className=a,t.textContent=""},p=function(t,e){d(t);var n=e.className;n&&t.classList.add(n)};e.initModalContent=function(t){var e=o.getNode(a);p(e,t),c.default(t.icon),l.initTitle(t.title),l.initText(t.text),f.default(t.content),u.default(t.buttons,t.dangerMode)};var m=function(){var t=o.getNode(s),e=o.stringToNode(r.modalMarkup);t.appendChild(e)};e.default=m},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(3),r={isOpen:!1,promise:null,actions:{},timer:null},i=Object.assign({},r);e.resetState=function(){i=Object.assign({},r)},e.setActionValue=function(t){if("string"==typeof t)return a(o.CONFIRM_KEY,t);for(var e in t)a(e,t[e])};var a=function(t,e){i.actions[t]||(i.actions[t]={}),Object.assign(i.actions[t],{value:e})};e.setActionOptionsFor=function(t,e){var n=(void 0===e?{}:e).closeModal,o=void 0===n||n;Object.assign(i.actions[t],{closeModal:o})},e.default=i},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(3),i=n(0),a=i.default.OVERLAY,s=i.default.SHOW_MODAL,c=i.default.BUTTON,l=i.default.BUTTON_LOADING,u=n(5);e.openModal=function(){o.getNode(a).classList.add(s),u.default.isOpen=!0};var f=function(){o.getNode(a).classList.remove(s),u.default.isOpen=!1};e.onAction=function(t){void 0===t&&(t=r.CANCEL_KEY);var e=u.default.actions[t],n=e.value;if(!1===e.closeModal){var i=c+"--"+t;o.getNode(i).classList.add(l)}else f();u.default.promise.resolve(n)},e.getState=function(){var t=Object.assign({},u.default);return delete t.promise,delete t.timer,t},e.stopLoading=function(){for(var t=document.querySelectorAll("."+c),e=0;e<t.length;e++){t[e].classList.remove(l)}}},function(t,e){var n;n=function(){return this}();try{n=n||Function("return this")()||(0,eval)("this")}catch(t){"object"==typeof window&&(n=window)}t.exports=n},function(t,e,n){(function(e){t.exports=e.sweetAlert=n(9)}).call(e,n(7))},function(t,e,n){(function(e){t.exports=e.swal=n(10)}).call(e,n(7))},function(t,e,n){"undefined"!=typeof window&&n(11),n(16);var o=n(23).default;t.exports=o},function(t,e,n){var o=n(12);"string"==typeof o&&(o=[[t.i,o,""]]);var r={insertAt:"top"};r.transform=void 0;n(14)(o,r);o.locals&&(t.exports=o.locals)},function(t,e,n){e=t.exports=n(13)(void 0),e.push([t.i,'.swal-icon--error{border-color:#f27474;-webkit-animation:animateErrorIcon .5s;animation:animateErrorIcon .5s}.swal-icon--error__x-mark{position:relative;display:block;-webkit-animation:animateXMark .5s;animation:animateXMark .5s}.swal-icon--error__line{position:absolute;height:5px;width:47px;background-color:#f27474;display:block;top:37px;border-radius:2px}.swal-icon--error__line--left{-webkit-transform:rotate(45deg);transform:rotate(45deg);left:17px}.swal-icon--error__line--right{-webkit-transform:rotate(-45deg);transform:rotate(-45deg);right:16px}@-webkit-keyframes animateErrorIcon{0%{-webkit-transform:rotateX(100deg);transform:rotateX(100deg);opacity:0}to{-webkit-transform:rotateX(0deg);transform:rotateX(0deg);opacity:1}}@keyframes animateErrorIcon{0%{-webkit-transform:rotateX(100deg);transform:rotateX(100deg);opacity:0}to{-webkit-transform:rotateX(0deg);transform:rotateX(0deg);opacity:1}}@-webkit-keyframes animateXMark{0%{-webkit-transform:scale(.4);transform:scale(.4);margin-top:26px;opacity:0}50%{-webkit-transform:scale(.4);transform:scale(.4);margin-top:26px;opacity:0}80%{-webkit-transform:scale(1.15);transform:scale(1.15);margin-top:-6px}to{-webkit-transform:scale(1);transform:scale(1);margin-top:0;opacity:1}}@keyframes animateXMark{0%{-webkit-transform:scale(.4);transform:scale(.4);margin-top:26px;opacity:0}50%{-webkit-transform:scale(.4);transform:scale(.4);margin-top:26px;opacity:0}80%{-webkit-transform:scale(1.15);transform:scale(1.15);margin-top:-6px}to{-webkit-transform:scale(1);transform:scale(1);margin-top:0;opacity:1}}.swal-icon--warning{border-color:#f8bb86;-webkit-animation:pulseWarning .75s infinite alternate;animation:pulseWarning .75s infinite alternate}.swal-icon--warning__body{width:5px;height:47px;top:10px;border-radius:2px;margin-left:-2px}.swal-icon--warning__body,.swal-icon--warning__dot{position:absolute;left:50%;background-color:#f8bb86}.swal-icon--warning__dot{width:7px;height:7px;border-radius:50%;margin-left:-4px;bottom:-11px}@-webkit-keyframes pulseWarning{0%{border-color:#f8d486}to{border-color:#f8bb86}}@keyframes pulseWarning{0%{border-color:#f8d486}to{border-color:#f8bb86}}.swal-icon--success{border-color:#a5dc86}.swal-icon--success:after,.swal-icon--success:before{content:"";border-radius:50%;position:absolute;width:60px;height:120px;background:#fff;-webkit-transform:rotate(45deg);transform:rotate(45deg)}.swal-icon--success:before{border-radius:120px 0 0 120px;top:-7px;left:-33px;-webkit-transform:rotate(-45deg);transform:rotate(-45deg);-webkit-transform-origin:60px 60px;transform-origin:60px 60px}.swal-icon--success:after{border-radius:0 120px 120px 0;top:-11px;left:30px;-webkit-transform:rotate(-45deg);transform:rotate(-45deg);-webkit-transform-origin:0 60px;transform-origin:0 60px;-webkit-animation:rotatePlaceholder 4.25s ease-in;animation:rotatePlaceholder 4.25s ease-in}.swal-icon--success__ring{width:80px;height:80px;border:4px solid hsla(98,55%,69%,.2);border-radius:50%;box-sizing:content-box;position:absolute;left:-4px;top:-4px;z-index:2}.swal-icon--success__hide-corners{width:5px;height:90px;background-color:#fff;padding:1px;position:absolute;left:28px;top:8px;z-index:1;-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}.swal-icon--success__line{height:5px;background-color:#a5dc86;display:block;border-radius:2px;position:absolute;z-index:2}.swal-icon--success__line--tip{width:25px;left:14px;top:46px;-webkit-transform:rotate(45deg);transform:rotate(45deg);-webkit-animation:animateSuccessTip .75s;animation:animateSuccessTip .75s}.swal-icon--success__line--long{width:47px;right:8px;top:38px;-webkit-transform:rotate(-45deg);transform:rotate(-45deg);-webkit-animation:animateSuccessLong .75s;animation:animateSuccessLong .75s}@-webkit-keyframes rotatePlaceholder{0%{-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}5%{-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}12%{-webkit-transform:rotate(-405deg);transform:rotate(-405deg)}to{-webkit-transform:rotate(-405deg);transform:rotate(-405deg)}}@keyframes rotatePlaceholder{0%{-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}5%{-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}12%{-webkit-transform:rotate(-405deg);transform:rotate(-405deg)}to{-webkit-transform:rotate(-405deg);transform:rotate(-405deg)}}@-webkit-keyframes animateSuccessTip{0%{width:0;left:1px;top:19px}54%{width:0;left:1px;top:19px}70%{width:50px;left:-8px;top:37px}84%{width:17px;left:21px;top:48px}to{width:25px;left:14px;top:45px}}@keyframes animateSuccessTip{0%{width:0;left:1px;top:19px}54%{width:0;left:1px;top:19px}70%{width:50px;left:-8px;top:37px}84%{width:17px;left:21px;top:48px}to{width:25px;left:14px;top:45px}}@-webkit-keyframes animateSuccessLong{0%{width:0;right:46px;top:54px}65%{width:0;right:46px;top:54px}84%{width:55px;right:0;top:35px}to{width:47px;right:8px;top:38px}}@keyframes animateSuccessLong{0%{width:0;right:46px;top:54px}65%{width:0;right:46px;top:54px}84%{width:55px;right:0;top:35px}to{width:47px;right:8px;top:38px}}.swal-icon--info{border-color:#c9dae1}.swal-icon--info:before{width:5px;height:29px;bottom:17px;border-radius:2px;margin-left:-2px}.swal-icon--info:after,.swal-icon--info:before{content:"";position:absolute;left:50%;background-color:#c9dae1}.swal-icon--info:after{width:7px;height:7px;border-radius:50%;margin-left:-3px;top:19px}.swal-icon{width:80px;height:80px;border-width:4px;border-style:solid;border-radius:50%;padding:0;position:relative;box-sizing:content-box;margin:20px auto}.swal-icon:first-child{margin-top:32px}.swal-icon--custom{width:auto;height:auto;max-width:100%;border:none;border-radius:0}.swal-icon img{max-width:100%;max-height:100%}.swal-title{color:rgba(0,0,0,.65);font-weight:600;text-transform:none;position:relative;display:block;padding:13px 16px;font-size:27px;line-height:normal;text-align:center;margin-bottom:0}.swal-title:first-child{margin-top:26px}.swal-title:not(:first-child){padding-bottom:0}.swal-title:not(:last-child){margin-bottom:13px}.swal-text{font-size:16px;position:relative;float:none;line-height:normal;vertical-align:top;text-align:left;display:inline-block;margin:0;padding:0 10px;font-weight:400;color:rgba(0,0,0,.64);max-width:calc(100% - 20px);overflow-wrap:break-word;box-sizing:border-box}.swal-text:first-child{margin-top:45px}.swal-text:last-child{margin-bottom:45px}.swal-footer{text-align:right;padding-top:13px;margin-top:13px;padding:13px 16px;border-radius:inherit;border-top-left-radius:0;border-top-right-radius:0}.swal-button-container{margin:5px;display:inline-block;position:relative}.swal-button{background-color:#7cd1f9;color:#fff;border:none;box-shadow:none;border-radius:5px;font-weight:600;font-size:14px;padding:10px 24px;margin:0;cursor:pointer}.swal-button[not:disabled]:hover{background-color:#78cbf2}.swal-button:active{background-color:#70bce0}.swal-button:focus{outline:none;box-shadow:0 0 0 1px #fff,0 0 0 3px rgba(43,114,165,.29)}.swal-button[disabled]{opacity:.5;cursor:default}.swal-button::-moz-focus-inner{border:0}.swal-button--cancel{color:#555;background-color:#efefef}.swal-button--cancel[not:disabled]:hover{background-color:#e8e8e8}.swal-button--cancel:active{background-color:#d7d7d7}.swal-button--cancel:focus{box-shadow:0 0 0 1px #fff,0 0 0 3px rgba(116,136,150,.29)}.swal-button--danger{background-color:#e64942}.swal-button--danger[not:disabled]:hover{background-color:#df4740}.swal-button--danger:active{background-color:#cf423b}.swal-button--danger:focus{box-shadow:0 0 0 1px #fff,0 0 0 3px rgba(165,43,43,.29)}.swal-content{padding:0 20px;margin-top:20px;font-size:medium}.swal-content:last-child{margin-bottom:20px}.swal-content__input,.swal-content__textarea{-webkit-appearance:none;background-color:#fff;border:none;font-size:14px;display:block;box-sizing:border-box;width:100%;border:1px solid rgba(0,0,0,.14);padding:10px 13px;border-radius:2px;transition:border-color .2s}.swal-content__input:focus,.swal-content__textarea:focus{outline:none;border-color:#6db8ff}.swal-content__textarea{resize:vertical}.swal-button--loading{color:transparent}.swal-button--loading~.swal-button__loader{opacity:1}.swal-button__loader{position:absolute;height:auto;width:43px;z-index:2;left:50%;top:50%;-webkit-transform:translateX(-50%) translateY(-50%);transform:translateX(-50%) translateY(-50%);text-align:center;pointer-events:none;opacity:0}.swal-button__loader div{display:inline-block;float:none;vertical-align:baseline;width:9px;height:9px;padding:0;border:none;margin:2px;opacity:.4;border-radius:7px;background-color:hsla(0,0%,100%,.9);transition:background .2s;-webkit-animation:swal-loading-anim 1s infinite;animation:swal-loading-anim 1s infinite}.swal-button__loader div:nth-child(3n+2){-webkit-animation-delay:.15s;animation-delay:.15s}.swal-button__loader div:nth-child(3n+3){-webkit-animation-delay:.3s;animation-delay:.3s}@-webkit-keyframes swal-loading-anim{0%{opacity:.4}20%{opacity:.4}50%{opacity:1}to{opacity:.4}}@keyframes swal-loading-anim{0%{opacity:.4}20%{opacity:.4}50%{opacity:1}to{opacity:.4}}.swal-overlay{position:fixed;top:0;bottom:0;left:0;right:0;text-align:center;font-size:0;overflow-y:auto;background-color:rgba(0,0,0,.4);z-index:10000;pointer-events:none;opacity:0;transition:opacity .3s}.swal-overlay:before{content:" ";display:inline-block;vertical-align:middle;height:100%}.swal-overlay--show-modal{opacity:1;pointer-events:auto}.swal-overlay--show-modal .swal-modal{opacity:1;pointer-events:auto;box-sizing:border-box;-webkit-animation:showSweetAlert .3s;animation:showSweetAlert .3s;will-change:transform}.swal-modal{width:478px;opacity:0;pointer-events:none;background-color:#fff;text-align:center;border-radius:5px;position:static;margin:20px auto;display:inline-block;vertical-align:middle;-webkit-transform:scale(1);transform:scale(1);-webkit-transform-origin:50% 50%;transform-origin:50% 50%;z-index:10001;transition:opacity .2s,-webkit-transform .3s;transition:transform .3s,opacity .2s;transition:transform .3s,opacity .2s,-webkit-transform .3s}@media (max-width:500px){.swal-modal{width:calc(100% - 20px)}}@-webkit-keyframes showSweetAlert{0%{-webkit-transform:scale(1);transform:scale(1)}1%{-webkit-transform:scale(.5);transform:scale(.5)}45%{-webkit-transform:scale(1.05);transform:scale(1.05)}80%{-webkit-transform:scale(.95);transform:scale(.95)}to{-webkit-transform:scale(1);transform:scale(1)}}@keyframes showSweetAlert{0%{-webkit-transform:scale(1);transform:scale(1)}1%{-webkit-transform:scale(.5);transform:scale(.5)}45%{-webkit-transform:scale(1.05);transform:scale(1.05)}80%{-webkit-transform:scale(.95);transform:scale(.95)}to{-webkit-transform:scale(1);transform:scale(1)}}',""])},function(t,e){function n(t,e){var n=t[1]||"",r=t[3];if(!r)return n;if(e&&"function"==typeof btoa){var i=o(r);return[n].concat(r.sources.map(function(t){return"/*# sourceURL="+r.sourceRoot+t+" */"})).concat([i]).join("\n")}return[n].join("\n")}function o(t){return"/*# sourceMappingURL=data:application/json;charset=utf-8;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(t))))+" */"}t.exports=function(t){var e=[];return e.toString=function(){return this.map(function(e){var o=n(e,t);return e[2]?"@media "+e[2]+"{"+o+"}":o}).join("")},e.i=function(t,n){"string"==typeof t&&(t=[[null,t,""]]);for(var o={},r=0;r<this.length;r++){var i=this[r][0];"number"==typeof i&&(o[i]=!0)}for(r=0;r<t.length;r++){var a=t[r];"number"==typeof a[0]&&o[a[0]]||(n&&!a[2]?a[2]=n:n&&(a[2]="("+a[2]+") and ("+n+")"),e.push(a))}},e}},function(t,e,n){function o(t,e){for(var n=0;n<t.length;n++){var o=t[n],r=m[o.id];if(r){r.refs++;for(var i=0;i<r.parts.length;i++)r.parts[i](o.parts[i]);for(;i<o.parts.length;i++)r.parts.push(u(o.parts[i],e))}else{for(var a=[],i=0;i<o.parts.length;i++)a.push(u(o.parts[i],e));m[o.id]={id:o.id,refs:1,parts:a}}}}function r(t,e){for(var n=[],o={},r=0;r<t.length;r++){var i=t[r],a=e.base?i[0]+e.base:i[0],s=i[1],c=i[2],l=i[3],u={css:s,media:c,sourceMap:l};o[a]?o[a].parts.push(u):n.push(o[a]={id:a,parts:[u]})}return n}function i(t,e){var n=v(t.insertInto);if(!n)throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");var o=w[w.length-1];if("top"===t.insertAt)o?o.nextSibling?n.insertBefore(e,o.nextSibling):n.appendChild(e):n.insertBefore(e,n.firstChild),w.push(e);else{if("bottom"!==t.insertAt)throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");n.appendChild(e)}}function a(t){if(null===t.parentNode)return!1;t.parentNode.removeChild(t);var e=w.indexOf(t);e>=0&&w.splice(e,1)}function s(t){var e=document.createElement("style");return t.attrs.type="text/css",l(e,t.attrs),i(t,e),e}function c(t){var e=document.createElement("link");return t.attrs.type="text/css",t.attrs.rel="stylesheet",l(e,t.attrs),i(t,e),e}function l(t,e){Object.keys(e).forEach(function(n){t.setAttribute(n,e[n])})}function u(t,e){var n,o,r,i;if(e.transform&&t.css){if(!(i=e.transform(t.css)))return function(){};t.css=i}if(e.singleton){var l=h++;n=g||(g=s(e)),o=f.bind(null,n,l,!1),r=f.bind(null,n,l,!0)}else t.sourceMap&&"function"==typeof URL&&"function"==typeof URL.createObjectURL&&"function"==typeof URL.revokeObjectURL&&"function"==typeof Blob&&"function"==typeof btoa?(n=c(e),o=p.bind(null,n,e),r=function(){a(n),n.href&&URL.revokeObjectURL(n.href)}):(n=s(e),o=d.bind(null,n),r=function(){a(n)});return o(t),function(e){if(e){if(e.css===t.css&&e.media===t.media&&e.sourceMap===t.sourceMap)return;o(t=e)}else r()}}function f(t,e,n,o){var r=n?"":o.css;if(t.styleSheet)t.styleSheet.cssText=x(e,r);else{var i=document.createTextNode(r),a=t.childNodes;a[e]&&t.removeChild(a[e]),a.length?t.insertBefore(i,a[e]):t.appendChild(i)}}function d(t,e){var n=e.css,o=e.media;if(o&&t.setAttribute("media",o),t.styleSheet)t.styleSheet.cssText=n;else{for(;t.firstChild;)t.removeChild(t.firstChild);t.appendChild(document.createTextNode(n))}}function p(t,e,n){var o=n.css,r=n.sourceMap,i=void 0===e.convertToAbsoluteUrls&&r;(e.convertToAbsoluteUrls||i)&&(o=y(o)),r&&(o+="\n/*# sourceMappingURL=data:application/json;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(r))))+" */");var a=new Blob([o],{type:"text/css"}),s=t.href;t.href=URL.createObjectURL(a),s&&URL.revokeObjectURL(s)}var m={},b=function(t){var e;return function(){return void 0===e&&(e=t.apply(this,arguments)),e}}(function(){return window&&document&&document.all&&!window.atob}),v=function(t){var e={};return function(n){return void 0===e[n]&&(e[n]=t.call(this,n)),e[n]}}(function(t){return document.querySelector(t)}),g=null,h=0,w=[],y=n(15);t.exports=function(t,e){if("undefined"!=typeof DEBUG&&DEBUG&&"object"!=typeof document)throw new Error("The style-loader cannot be used in a non-browser environment");e=e||{},e.attrs="object"==typeof e.attrs?e.attrs:{},e.singleton||(e.singleton=b()),e.insertInto||(e.insertInto="head"),e.insertAt||(e.insertAt="bottom");var n=r(t,e);return o(n,e),function(t){for(var i=[],a=0;a<n.length;a++){var s=n[a],c=m[s.id];c.refs--,i.push(c)}if(t){o(r(t,e),e)}for(var a=0;a<i.length;a++){var c=i[a];if(0===c.refs){for(var l=0;l<c.parts.length;l++)c.parts[l]();delete m[c.id]}}}};var x=function(){var t=[];return function(e,n){return t[e]=n,t.filter(Boolean).join("\n")}}()},function(t,e){t.exports=function(t){var e="undefined"!=typeof window&&window.location;if(!e)throw new Error("fixUrls requires window.location");if(!t||"string"!=typeof t)return t;var n=e.protocol+"//"+e.host,o=n+e.pathname.replace(/\/[^\/]*$/,"/");return t.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi,function(t,e){var r=e.trim().replace(/^"(.*)"$/,function(t,e){return e}).replace(/^'(.*)'$/,function(t,e){return e});if(/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/)/i.test(r))return t;var i;return i=0===r.indexOf("//")?r:0===r.indexOf("/")?n+r:o+r.replace(/^\.\//,""),"url("+JSON.stringify(i)+")"})}},function(t,e,n){var o=n(17);"undefined"==typeof window||window.Promise||(window.Promise=o),n(21),String.prototype.includes||(String.prototype.includes=function(t,e){"use strict";return"number"!=typeof e&&(e=0),!(e+t.length>this.length)&&-1!==this.indexOf(t,e)}),Array.prototype.includes||Object.defineProperty(Array.prototype,"includes",{value:function(t,e){if(null==this)throw new TypeError('"this" is null or not defined');var n=Object(this),o=n.length>>>0;if(0===o)return!1;for(var r=0|e,i=Math.max(r>=0?r:o-Math.abs(r),0);i<o;){if(function(t,e){return t===e||"number"==typeof t&&"number"==typeof e&&isNaN(t)&&isNaN(e)}(n[i],t))return!0;i++}return!1}}),"undefined"!=typeof window&&function(t){t.forEach(function(t){t.hasOwnProperty("remove")||Object.defineProperty(t,"remove",{configurable:!0,enumerable:!0,writable:!0,value:function(){this.parentNode.removeChild(this)}})})}([Element.prototype,CharacterData.prototype,DocumentType.prototype])},function(t,e,n){(function(e){!function(n){function o(){}function r(t,e){return function(){t.apply(e,arguments)}}function i(t){if("object"!=typeof this)throw new TypeError("Promises must be constructed via new");if("function"!=typeof t)throw new TypeError("not a function");this._state=0,this._handled=!1,this._value=void 0,this._deferreds=[],f(t,this)}function a(t,e){for(;3===t._state;)t=t._value;if(0===t._state)return void t._deferreds.push(e);t._handled=!0,i._immediateFn(function(){var n=1===t._state?e.onFulfilled:e.onRejected;if(null===n)return void(1===t._state?s:c)(e.promise,t._value);var o;try{o=n(t._value)}catch(t){return void c(e.promise,t)}s(e.promise,o)})}function s(t,e){try{if(e===t)throw new TypeError("A promise cannot be resolved with itself.");if(e&&("object"==typeof e||"function"==typeof e)){var n=e.then;if(e instanceof i)return t._state=3,t._value=e,void l(t);if("function"==typeof n)return void f(r(n,e),t)}t._state=1,t._value=e,l(t)}catch(e){c(t,e)}}function c(t,e){t._state=2,t._value=e,l(t)}function l(t){2===t._state&&0===t._deferreds.length&&i._immediateFn(function(){t._handled||i._unhandledRejectionFn(t._value)});for(var e=0,n=t._deferreds.length;e<n;e++)a(t,t._deferreds[e]);t._deferreds=null}function u(t,e,n){this.onFulfilled="function"==typeof t?t:null,this.onRejected="function"==typeof e?e:null,this.promise=n}function f(t,e){var n=!1;try{t(function(t){n||(n=!0,s(e,t))},function(t){n||(n=!0,c(e,t))})}catch(t){if(n)return;n=!0,c(e,t)}}var d=setTimeout;i.prototype.catch=function(t){return this.then(null,t)},i.prototype.then=function(t,e){var n=new this.constructor(o);return a(this,new u(t,e,n)),n},i.all=function(t){var e=Array.prototype.slice.call(t);return new i(function(t,n){function o(i,a){try{if(a&&("object"==typeof a||"function"==typeof a)){var s=a.then;if("function"==typeof s)return void s.call(a,function(t){o(i,t)},n)}e[i]=a,0==--r&&t(e)}catch(t){n(t)}}if(0===e.length)return t([]);for(var r=e.length,i=0;i<e.length;i++)o(i,e[i])})},i.resolve=function(t){return t&&"object"==typeof t&&t.constructor===i?t:new i(function(e){e(t)})},i.reject=function(t){return new i(function(e,n){n(t)})},i.race=function(t){return new i(function(e,n){for(var o=0,r=t.length;o<r;o++)t[o].then(e,n)})},i._immediateFn="function"==typeof e&&function(t){e(t)}||function(t){d(t,0)},i._unhandledRejectionFn=function(t){"undefined"!=typeof console&&console&&console.warn("Possible Unhandled Promise Rejection:",t)},i._setImmediateFn=function(t){i._immediateFn=t},i._setUnhandledRejectionFn=function(t){i._unhandledRejectionFn=t},void 0!==t&&t.exports?t.exports=i:n.Promise||(n.Promise=i)}(this)}).call(e,n(18).setImmediate)},function(t,e,n){function o(t,e){this._id=t,this._clearFn=e}var r=Function.prototype.apply;e.setTimeout=function(){return new o(r.call(setTimeout,window,arguments),clearTimeout)},e.setInterval=function(){return new o(r.call(setInterval,window,arguments),clearInterval)},e.clearTimeout=e.clearInterval=function(t){t&&t.close()},o.prototype.unref=o.prototype.ref=function(){},o.prototype.close=function(){this._clearFn.call(window,this._id)},e.enroll=function(t,e){clearTimeout(t._idleTimeoutId),t._idleTimeout=e},e.unenroll=function(t){clearTimeout(t._idleTimeoutId),t._idleTimeout=-1},e._unrefActive=e.active=function(t){clearTimeout(t._idleTimeoutId);var e=t._idleTimeout;e>=0&&(t._idleTimeoutId=setTimeout(function(){t._onTimeout&&t._onTimeout()},e))},n(19),e.setImmediate=setImmediate,e.clearImmediate=clearImmediate},function(t,e,n){(function(t,e){!function(t,n){"use strict";function o(t){"function"!=typeof t&&(t=new Function(""+t));for(var e=new Array(arguments.length-1),n=0;n<e.length;n++)e[n]=arguments[n+1];var o={callback:t,args:e};return l[c]=o,s(c),c++}function r(t){delete l[t]}function i(t){var e=t.callback,o=t.args;switch(o.length){case 0:e();break;case 1:e(o[0]);break;case 2:e(o[0],o[1]);break;case 3:e(o[0],o[1],o[2]);break;default:e.apply(n,o)}}function a(t){if(u)setTimeout(a,0,t);else{var e=l[t];if(e){u=!0;try{i(e)}finally{r(t),u=!1}}}}if(!t.setImmediate){var s,c=1,l={},u=!1,f=t.document,d=Object.getPrototypeOf&&Object.getPrototypeOf(t);d=d&&d.setTimeout?d:t,"[object process]"==={}.toString.call(t.process)?function(){s=function(t){e.nextTick(function(){a(t)})}}():function(){if(t.postMessage&&!t.importScripts){var e=!0,n=t.onmessage;return t.onmessage=function(){e=!1},t.postMessage("","*"),t.onmessage=n,e}}()?function(){var e="setImmediate$"+Math.random()+"$",n=function(n){n.source===t&&"string"==typeof n.data&&0===n.data.indexOf(e)&&a(+n.data.slice(e.length))};t.addEventListener?t.addEventListener("message",n,!1):t.attachEvent("onmessage",n),s=function(n){t.postMessage(e+n,"*")}}():t.MessageChannel?function(){var t=new MessageChannel;t.port1.onmessage=function(t){a(t.data)},s=function(e){t.port2.postMessage(e)}}():f&&"onreadystatechange"in f.createElement("script")?function(){var t=f.documentElement;s=function(e){var n=f.createElement("script");n.onreadystatechange=function(){a(e),n.onreadystatechange=null,t.removeChild(n),n=null},t.appendChild(n)}}():function(){s=function(t){setTimeout(a,0,t)}}(),d.setImmediate=o,d.clearImmediate=r}}("undefined"==typeof self?void 0===t?this:t:self)}).call(e,n(7),n(20))},function(t,e){function n(){throw new Error("setTimeout has not been defined")}function o(){throw new Error("clearTimeout has not been defined")}function r(t){if(u===setTimeout)return setTimeout(t,0);if((u===n||!u)&&setTimeout)return u=setTimeout,setTimeout(t,0);try{return u(t,0)}catch(e){try{return u.call(null,t,0)}catch(e){return u.call(this,t,0)}}}function i(t){if(f===clearTimeout)return clearTimeout(t);if((f===o||!f)&&clearTimeout)return f=clearTimeout,clearTimeout(t);try{return f(t)}catch(e){try{return f.call(null,t)}catch(e){return f.call(this,t)}}}function a(){b&&p&&(b=!1,p.length?m=p.concat(m):v=-1,m.length&&s())}function s(){if(!b){var t=r(a);b=!0;for(var e=m.length;e;){for(p=m,m=[];++v<e;)p&&p[v].run();v=-1,e=m.length}p=null,b=!1,i(t)}}function c(t,e){this.fun=t,this.array=e}function l(){}var u,f,d=t.exports={};!function(){try{u="function"==typeof setTimeout?setTimeout:n}catch(t){u=n}try{f="function"==typeof clearTimeout?clearTimeout:o}catch(t){f=o}}();var p,m=[],b=!1,v=-1;d.nextTick=function(t){var e=new Array(arguments.length-1);if(arguments.length>1)for(var n=1;n<arguments.length;n++)e[n-1]=arguments[n];m.push(new c(t,e)),1!==m.length||b||r(s)},c.prototype.run=function(){this.fun.apply(null,this.array)},d.title="browser",d.browser=!0,d.env={},d.argv=[],d.version="",d.versions={},d.on=l,d.addListener=l,d.once=l,d.off=l,d.removeListener=l,d.removeAllListeners=l,d.emit=l,d.prependListener=l,d.prependOnceListener=l,d.listeners=function(t){return[]},d.binding=function(t){throw new Error("process.binding is not supported")},d.cwd=function(){return"/"},d.chdir=function(t){throw new Error("process.chdir is not supported")},d.umask=function(){return 0}},function(t,e,n){"use strict";n(22).polyfill()},function(t,e,n){"use strict";function o(t,e){if(void 0===t||null===t)throw new TypeError("Cannot convert first argument to object");for(var n=Object(t),o=1;o<arguments.length;o++){var r=arguments[o];if(void 0!==r&&null!==r)for(var i=Object.keys(Object(r)),a=0,s=i.length;a<s;a++){var c=i[a],l=Object.getOwnPropertyDescriptor(r,c);void 0!==l&&l.enumerable&&(n[c]=r[c])}}return n}function r(){Object.assign||Object.defineProperty(Object,"assign",{enumerable:!1,configurable:!0,writable:!0,value:o})}t.exports={assign:o,polyfill:r}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(24),r=n(6),i=n(5),a=n(36),s=function(){for(var t=[],e=0;e<arguments.length;e++)t[e]=arguments[e];if("undefined"!=typeof window){var n=a.getOpts.apply(void 0,t);return new Promise(function(t,e){i.default.promise={resolve:t,reject:e},o.default(n),setTimeout(function(){r.openModal()})})}};s.close=r.onAction,s.getState=r.getState,s.setActionValue=i.setActionValue,s.stopLoading=r.stopLoading,s.setDefaults=a.setDefaults,e.default=s},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(0),i=r.default.MODAL,a=n(4),s=n(34),c=n(35),l=n(1);e.init=function(t){o.getNode(i)||(document.body||l.throwErr("You can only use SweetAlert AFTER the DOM has loaded!"),s.default(),a.default()),a.initModalContent(t),c.default(t)},e.default=e.init},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(0),r=o.default.MODAL;e.modalMarkup='\n  <div class="'+r+'" role="dialog" aria-modal="true"></div>',e.default=e.modalMarkup},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(0),r=o.default.OVERLAY,i='<div \n    class="'+r+'"\n    tabIndex="-1">\n  </div>';e.default=i},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(0),r=o.default.ICON;e.errorIconMarkup=function(){var t=r+"--error",e=t+"__line";return'\n    <div class="'+t+'__x-mark">\n      <span class="'+e+" "+e+'--left"></span>\n      <span class="'+e+" "+e+'--right"></span>\n    </div>\n  '},e.warningIconMarkup=function(){var t=r+"--warning";return'\n    <span class="'+t+'__body">\n      <span class="'+t+'__dot"></span>\n    </span>\n  '},e.successIconMarkup=function(){var t=r+"--success";return'\n    <span class="'+t+"__line "+t+'__line--long"></span>\n    <span class="'+t+"__line "+t+'__line--tip"></span>\n\n    <div class="'+t+'__ring"></div>\n    <div class="'+t+'__hide-corners"></div>\n  '}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(0),r=o.default.CONTENT;e.contentMarkup='\n  <div class="'+r+'">\n\n  </div>\n'},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(0),r=o.default.BUTTON_CONTAINER,i=o.default.BUTTON,a=o.default.BUTTON_LOADER;e.buttonMarkup='\n  <div class="'+r+'">\n\n    <button\n      class="'+i+'"\n    ></button>\n\n    <div class="'+a+'">\n      <div></div>\n      <div></div>\n      <div></div>\n    </div>\n\n  </div>\n'},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(4),r=n(2),i=n(0),a=i.default.ICON,s=i.default.ICON_CUSTOM,c=["error","warning","success","info"],l={error:r.errorIconMarkup(),warning:r.warningIconMarkup(),success:r.successIconMarkup()},u=function(t,e){var n=a+"--"+t;e.classList.add(n);var o=l[t];o&&(e.innerHTML=o)},f=function(t,e){e.classList.add(s);var n=document.createElement("img");n.src=t,e.appendChild(n)},d=function(t){if(t){var e=o.injectElIntoModal(r.iconMarkup);c.includes(t)?u(t,e):f(t,e)}};e.default=d},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(2),r=n(4),i=function(t){navigator.userAgent.includes("AppleWebKit")&&(t.style.display="none",t.offsetHeight,t.style.display="")};e.initTitle=function(t){if(t){var e=r.injectElIntoModal(o.titleMarkup);e.textContent=t,i(e)}},e.initText=function(t){if(t){var e=document.createDocumentFragment();t.split("\n").forEach(function(t,n,o){e.appendChild(document.createTextNode(t)),n<o.length-1&&e.appendChild(document.createElement("br"))});var n=r.injectElIntoModal(o.textMarkup);n.appendChild(e),i(n)}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(4),i=n(0),a=i.default.BUTTON,s=i.default.DANGER_BUTTON,c=n(3),l=n(2),u=n(6),f=n(5),d=function(t,e,n){var r=e.text,i=e.value,d=e.className,p=e.closeModal,m=o.stringToNode(l.buttonMarkup),b=m.querySelector("."+a),v=a+"--"+t;if(b.classList.add(v),d){(Array.isArray(d)?d:d.split(" ")).filter(function(t){return t.length>0}).forEach(function(t){b.classList.add(t)})}n&&t===c.CONFIRM_KEY&&b.classList.add(s),b.textContent=r;var g={};return g[t]=i,f.setActionValue(g),f.setActionOptionsFor(t,{closeModal:p}),b.addEventListener("click",function(){return u.onAction(t)}),m},p=function(t,e){var n=r.injectElIntoModal(l.footerMarkup);for(var o in t){var i=t[o],a=d(o,i,e);i.visible&&n.appendChild(a)}0===n.children.length&&n.remove()};e.default=p},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(3),r=n(4),i=n(2),a=n(5),s=n(6),c=n(0),l=c.default.CONTENT,u=function(t){t.addEventListener("input",function(t){var e=t.target,n=e.value;a.setActionValue(n)}),t.addEventListener("keyup",function(t){if("Enter"===t.key)return s.onAction(o.CONFIRM_KEY)}),setTimeout(function(){t.focus(),a.setActionValue("")},0)},f=function(t,e,n){var o=document.createElement(e),r=l+"__"+e;o.classList.add(r);for(var i in n){var a=n[i];o[i]=a}"input"===e&&u(o),t.appendChild(o)},d=function(t){if(t){var e=r.injectElIntoModal(i.contentMarkup),n=t.element,o=t.attributes;"string"==typeof n?f(e,n,o):e.appendChild(n)}};e.default=d},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(2),i=function(){var t=o.stringToNode(r.overlayMarkup);document.body.appendChild(t)};e.default=i},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(5),r=n(6),i=n(1),a=n(3),s=n(0),c=s.default.MODAL,l=s.default.BUTTON,u=s.default.OVERLAY,f=function(t){t.preventDefault(),v()},d=function(t){t.preventDefault(),g()},p=function(t){if(o.default.isOpen)switch(t.key){case"Escape":return r.onAction(a.CANCEL_KEY)}},m=function(t){if(o.default.isOpen)switch(t.key){case"Tab":return f(t)}},b=function(t){if(o.default.isOpen)return"Tab"===t.key&&t.shiftKey?d(t):void 0},v=function(){var t=i.getNode(l);t&&(t.tabIndex=0,t.focus())},g=function(){var t=i.getNode(c),e=t.querySelectorAll("."+l),n=e.length-1,o=e[n];o&&o.focus()},h=function(t){t[t.length-1].addEventListener("keydown",m)},w=function(t){t[0].addEventListener("keydown",b)},y=function(){var t=i.getNode(c),e=t.querySelectorAll("."+l);e.length&&(h(e),w(e))},x=function(t){if(i.getNode(u)===t.target)return r.onAction(a.CANCEL_KEY)},_=function(t){var e=i.getNode(u);e.removeEventListener("click",x),t&&e.addEventListener("click",x)},k=function(t){o.default.timer&&clearTimeout(o.default.timer),t&&(o.default.timer=window.setTimeout(function(){return r.onAction(a.CANCEL_KEY)},t))},O=function(t){t.closeOnEsc?document.addEventListener("keyup",p):document.removeEventListener("keyup",p),t.dangerMode?v():g(),y(),_(t.closeOnClickOutside),k(t.timer)};e.default=O},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(3),i=n(37),a=n(38),s={title:null,text:null,icon:null,buttons:r.defaultButtonList,content:null,className:null,closeOnClickOutside:!0,closeOnEsc:!0,dangerMode:!1,timer:null},c=Object.assign({},s);e.setDefaults=function(t){c=Object.assign({},s,t)};var l=function(t){var e=t&&t.button,n=t&&t.buttons;return void 0!==e&&void 0!==n&&o.throwErr("Cannot set both 'button' and 'buttons' options!"),void 0!==e?{confirm:e}:n},u=function(t){return o.ordinalSuffixOf(t+1)},f=function(t,e){o.throwErr(u(e)+" argument ('"+t+"') is invalid")},d=function(t,e){var n=t+1,r=e[n];o.isPlainObject(r)||void 0===r||o.throwErr("Expected "+u(n)+" argument ('"+r+"') to be a plain object")},p=function(t,e){var n=t+1,r=e[n];void 0!==r&&o.throwErr("Unexpected "+u(n)+" argument ("+r+")")},m=function(t,e,n,r){var i=typeof e,a="string"===i,s=e instanceof Element;if(a){if(0===n)return{text:e};if(1===n)return{text:e,title:r[0]};if(2===n)return d(n,r),{icon:e};f(e,n)}else{if(s&&0===n)return d(n,r),{content:e};if(o.isPlainObject(e))return p(n,r),e;f(e,n)}};e.getOpts=function(){for(var t=[],e=0;e<arguments.length;e++)t[e]=arguments[e];var n={};t.forEach(function(e,o){var r=m(0,e,o,t);Object.assign(n,r)});var o=l(n);n.buttons=r.getButtonListOpts(o),delete n.button,n.content=i.getContentOpts(n.content);var u=Object.assign({},s,c,n);return Object.keys(u).forEach(function(t){a.DEPRECATED_OPTS[t]&&a.logDeprecation(t)}),u}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r={element:"input",attributes:{placeholder:""}};e.getContentOpts=function(t){var e={};return o.isPlainObject(t)?Object.assign(e,t):t instanceof Element?{element:t}:"input"===t?r:null}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.logDeprecation=function(t){var n=e.DEPRECATED_OPTS[t],o=n.onlyRename,r=n.replacement,i=n.subOption,a=n.link,s=o?"renamed":"deprecated",c='SweetAlert warning: "'+t+'" option has been '+s+".";if(r){c+=" Please use"+(i?' "'+i+'" in ':" ")+'"'+r+'" instead.'}var l="https://sweetalert.js.org";c+=a?" More details: "+l+a:" More details: "+l+"/guides/#upgrading-from-1x",console.warn(c)},e.DEPRECATED_OPTS={type:{replacement:"icon",link:"/docs/#icon"},imageUrl:{replacement:"icon",link:"/docs/#icon"},customClass:{replacement:"className",onlyRename:!0,link:"/docs/#classname"},imageSize:{},showCancelButton:{replacement:"buttons",link:"/docs/#buttons"},showConfirmButton:{replacement:"button",link:"/docs/#button"},confirmButtonText:{replacement:"button",link:"/docs/#button"},confirmButtonColor:{},cancelButtonText:{replacement:"buttons",link:"/docs/#buttons"},closeOnConfirm:{replacement:"button",subOption:"closeModal",link:"/docs/#button"},closeOnCancel:{replacement:"buttons",subOption:"closeModal",link:"/docs/#buttons"},showLoaderOnConfirm:{replacement:"buttons"},animation:{},inputType:{replacement:"content",link:"/docs/#content"},inputValue:{replacement:"content",link:"/docs/#content"},inputPlaceholder:{replacement:"content",link:"/docs/#content"},html:{replacement:"content",link:"/docs/#content"},allowEscapeKey:{replacement:"closeOnEsc",onlyRename:!0,link:"/docs/#closeonesc"},allowClickOutside:{replacement:"closeOnClickOutside",onlyRename:!0,link:"/docs/#closeonclickoutside"}}}])});
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22).setImmediate, __webpack_require__(22).clearImmediate))
+
+/***/ }),
+/* 74 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
+    "use strict";
+
+    if (global.setImmediate) {
+        return;
+    }
+
+    var nextHandle = 1; // Spec says greater than zero
+    var tasksByHandle = {};
+    var currentlyRunningATask = false;
+    var doc = global.document;
+    var registerImmediate;
+
+    function setImmediate(callback) {
+      // Callback can either be a function or a string
+      if (typeof callback !== "function") {
+        callback = new Function("" + callback);
+      }
+      // Copy function arguments
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i + 1];
+      }
+      // Store and register the task
+      var task = { callback: callback, args: args };
+      tasksByHandle[nextHandle] = task;
+      registerImmediate(nextHandle);
+      return nextHandle++;
+    }
+
+    function clearImmediate(handle) {
+        delete tasksByHandle[handle];
+    }
+
+    function run(task) {
+        var callback = task.callback;
+        var args = task.args;
+        switch (args.length) {
+        case 0:
+            callback();
+            break;
+        case 1:
+            callback(args[0]);
+            break;
+        case 2:
+            callback(args[0], args[1]);
+            break;
+        case 3:
+            callback(args[0], args[1], args[2]);
+            break;
+        default:
+            callback.apply(undefined, args);
+            break;
+        }
+    }
+
+    function runIfPresent(handle) {
+        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
+        // So if we're currently running a task, we'll need to delay this invocation.
+        if (currentlyRunningATask) {
+            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
+            // "too much recursion" error.
+            setTimeout(runIfPresent, 0, handle);
+        } else {
+            var task = tasksByHandle[handle];
+            if (task) {
+                currentlyRunningATask = true;
+                try {
+                    run(task);
+                } finally {
+                    clearImmediate(handle);
+                    currentlyRunningATask = false;
+                }
+            }
+        }
+    }
+
+    function installNextTickImplementation() {
+        registerImmediate = function(handle) {
+            process.nextTick(function () { runIfPresent(handle); });
+        };
+    }
+
+    function canUsePostMessage() {
+        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
+        // where `global.postMessage` means something completely different and can't be used for this purpose.
+        if (global.postMessage && !global.importScripts) {
+            var postMessageIsAsynchronous = true;
+            var oldOnMessage = global.onmessage;
+            global.onmessage = function() {
+                postMessageIsAsynchronous = false;
+            };
+            global.postMessage("", "*");
+            global.onmessage = oldOnMessage;
+            return postMessageIsAsynchronous;
+        }
+    }
+
+    function installPostMessageImplementation() {
+        // Installs an event handler on `global` for the `message` event: see
+        // * https://developer.mozilla.org/en/DOM/window.postMessage
+        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
+
+        var messagePrefix = "setImmediate$" + Math.random() + "$";
+        var onGlobalMessage = function(event) {
+            if (event.source === global &&
+                typeof event.data === "string" &&
+                event.data.indexOf(messagePrefix) === 0) {
+                runIfPresent(+event.data.slice(messagePrefix.length));
+            }
+        };
+
+        if (global.addEventListener) {
+            global.addEventListener("message", onGlobalMessage, false);
+        } else {
+            global.attachEvent("onmessage", onGlobalMessage);
+        }
+
+        registerImmediate = function(handle) {
+            global.postMessage(messagePrefix + handle, "*");
+        };
+    }
+
+    function installMessageChannelImplementation() {
+        var channel = new MessageChannel();
+        channel.port1.onmessage = function(event) {
+            var handle = event.data;
+            runIfPresent(handle);
+        };
+
+        registerImmediate = function(handle) {
+            channel.port2.postMessage(handle);
+        };
+    }
+
+    function installReadyStateChangeImplementation() {
+        var html = doc.documentElement;
+        registerImmediate = function(handle) {
+            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+            var script = doc.createElement("script");
+            script.onreadystatechange = function () {
+                runIfPresent(handle);
+                script.onreadystatechange = null;
+                html.removeChild(script);
+                script = null;
+            };
+            html.appendChild(script);
+        };
+    }
+
+    function installSetTimeoutImplementation() {
+        registerImmediate = function(handle) {
+            setTimeout(runIfPresent, 0, handle);
+        };
+    }
+
+    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
+    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
+    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
+
+    // Don't get fooled by e.g. browserify environments.
+    if ({}.toString.call(global.process) === "[object process]") {
+        // For Node.js before 0.9
+        installNextTickImplementation();
+
+    } else if (canUsePostMessage()) {
+        // For non-IE10 modern browsers
+        installPostMessageImplementation();
+
+    } else if (global.MessageChannel) {
+        // For web workers, where supported
+        installMessageChannelImplementation();
+
+    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
+        // For IE 6–8
+        installReadyStateChangeImplementation();
+
+    } else {
+        // For older browsers
+        installSetTimeoutImplementation();
+    }
+
+    attachTo.setImmediate = setImmediate;
+    attachTo.clearImmediate = clearImmediate;
+}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11), __webpack_require__(75)))
+
+/***/ }),
+/* 75 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 !function(e,t){ true?module.exports=t():"function"==typeof define&&define.amd?define("OBJ",[],t):"object"==typeof exports?exports.OBJ=t():e.OBJ=t()}(this,function(){return function(e){function t(a){if(r[a])return r[a].exports;var i=r[a]={i:a,l:!1,exports:{}};return e[a].call(i.exports,i,i.exports,t),i.l=!0,i.exports}var r={};return t.m=e,t.c=r,t.d=function(exports,e,r){t.o(exports,e)||Object.defineProperty(exports,e,{configurable:!1,enumerable:!0,get:r})},t.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(r,"a",r),r},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p="/",t(t.s=3)}([function(e,exports,t){"use strict";function r(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function a(e){switch(e){case"BYTE":case"UNSIGNED_BYTE":return 1;case"SHORT":case"UNSIGNED_SHORT":return 2;case"FLOAT":return 4}}Object.defineProperty(exports,"__esModule",{value:!0});var i=exports.Layout=function e(){r(this,e);for(var t=arguments.length,a=Array(t),i=0;i<t;i++)a[i]=arguments[i];this.attributes=a;var s=0,l=0,o=!0,u=!1,f=void 0;try{for(var c,p=a[Symbol.iterator]();!(o=(c=p.next()).done);o=!0){var h=c.value;if(this[h.key])throw new n(h);s%h.sizeOfType!=0&&(s+=h.sizeOfType-s%h.sizeOfType),this[h.key]={attribute:h,size:h.size,type:h.type,normalized:h.normalized,offset:s},s+=h.sizeInBytes,l=Math.max(l,h.sizeOfType)}}catch(e){u=!0,f=e}finally{try{!o&&p.return&&p.return()}finally{if(u)throw f}}s%l!=0&&(s+=l-s%l),this.stride=s;var v=!0,m=!1,y=void 0;try{for(var d,M=a[Symbol.iterator]();!(v=(d=M.next()).done);v=!0){this[d.value.key].stride=this.stride}}catch(e){m=!0,y=e}finally{try{!v&&M.return&&M.return()}finally{if(m)throw y}}},n=function e(t){r(this,e),this.message="found duplicate attribute: "+t.key},s=function e(t,i,n){arguments.length>3&&void 0!==arguments[3]&&arguments[3];r(this,e),this.key=t,this.size=i,this.type=n,this.normalized=!1,this.sizeOfType=a(n),this.sizeInBytes=this.sizeOfType*i};i.POSITION=new s("position",3,"FLOAT"),i.NORMAL=new s("normal",3,"FLOAT"),i.TANGENT=new s("tangent",3,"FLOAT"),i.BITANGENT=new s("bitangent",3,"FLOAT"),i.UV=new s("uv",2,"FLOAT"),i.MATERIAL_INDEX=new s("materialIndex",1,"SHORT"),i.MATERIAL_ENABLED=new s("materialEnabled",1,"UNSIGNED_SHORT"),i.AMBIENT=new s("ambient",3,"FLOAT"),i.DIFFUSE=new s("diffuse",3,"FLOAT"),i.SPECULAR=new s("specular",3,"FLOAT"),i.SPECULAR_EXPONENT=new s("specularExponent",3,"FLOAT"),i.EMISSIVE=new s("emissive",3,"FLOAT"),i.TRANSMISSION_FILTER=new s("transmissionFilter",3,"FLOAT"),i.DISSOLVE=new s("dissolve",1,"FLOAT"),i.ILLUMINATION=new s("illumination",1,"UNSIGNED_SHORT"),i.REFRACTION_INDEX=new s("refractionIndex",1,"FLOAT"),i.SHARPNESS=new s("sharpness",1,"FLOAT"),i.MAP_DIFFUSE=new s("mapDiffuse",1,"SHORT"),i.MAP_AMBIENT=new s("mapAmbient",1,"SHORT"),i.MAP_SPECULAR=new s("mapSpecular",1,"SHORT"),i.MAP_SPECULAR_EXPONENT=new s("mapSpecularExponent",1,"SHORT"),i.MAP_DISSOLVE=new s("mapDissolve",1,"SHORT"),i.ANTI_ALIASING=new s("antiAliasing",1,"UNSIGNED_SHORT"),i.MAP_BUMP=new s("mapBump",1,"SHORT"),i.MAP_DISPLACEMENT=new s("mapDisplacement",1,"SHORT"),i.MAP_DECAL=new s("mapDecal",1,"SHORT"),i.MAP_EMISSIVE=new s("mapEmissive",1,"SHORT")},function(e,exports,t){"use strict";function r(e){if(Array.isArray(e)){for(var t=0,r=Array(e.length);t<e.length;t++)r[t]=e[t];return r}return Array.from(e)}function a(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(exports,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var a=t[r];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}return function(t,r,a){return r&&e(t.prototype,r),a&&e(t,a),t}}(),n=t(0),s=function(){function e(t,i){a(this,e),i=i||{},i.materials=i.materials||[];var n=this;n.has_materials=!!i.materials,n.materials={},n.vertices=[],n.vertexNormals=[],n.textures=[],n.indices=[],this.name="";var s=[],l=[],o=[],u={},f=[],c={},p=-1;u.verts=[],u.norms=[],u.textures=[],u.hashindices={},u.indices=[],u.materialIndices=[],u.index=0;for(var h=/^v\s/,v=/^vn\s/,m=/^vt\s/,y=/^f\s/,d=/\s+/,M=/^usemtl/,b=t.split("\n"),I=0;I<b.length;I++){var _=b[I].trim();if(_&&!_.startsWith("#")){var x=_.split(d);if(x.shift(),h.test(_))s.push.apply(s,r(x));else if(v.test(_))l.push.apply(l,r(x));else if(m.test(_))o.push.apply(o,r(x));else if(M.test(_)){var k=x[0];k in c||(f.push(k),c[k]=f.length-1),p=c[k]}else if(y.test(_))for(var A=!1,w=0,F=x.length;w<F;w++){3!==w||A||(w=2,A=!0);var E=x[0]+","+p,S=x[w]+","+p;if(S in u.hashindices)u.indices.push(u.hashindices[S]);else{var T=x[w].split("/"),O=T.length-1;u.verts.push(+s[3*(T[0]-1)+0]),u.verts.push(+s[3*(T[0]-1)+1]),u.verts.push(+s[3*(T[0]-1)+2]),o.length&&(u.textures.push(+o[2*(T[1]-1)+0]),u.textures.push(+o[2*(T[1]-1)+1])),u.norms.push(+l[3*(T[O]-1)+0]),u.norms.push(+l[3*(T[O]-1)+1]),u.norms.push(+l[3*(T[O]-1)+2]),u.materialIndices.push(p),u.hashindices[S]=u.index,u.indices.push(u.index),u.index+=1}3===w&&A&&u.indices.push(u.hashindices[E])}}}n.vertices=u.verts,n.vertexNormals=u.norms,n.textures=u.textures,n.vertexMaterialIndices=u.materialIndices,n.indices=u.indices,n.materialNames=f,n.materialIndices=c,n.materialsByIndex={}}return i(e,[{key:"makeBufferData",value:function(e){var t=this.vertices.length/3,r=new ArrayBuffer(e.stride*t);r.numItems=t;for(var a=new DataView(r),i=0,s=0;i<t;i++){s=i*e.stride;var l=!0,o=!1,u=void 0;try{for(var f,c=e.attributes[Symbol.iterator]();!(l=(f=c.next()).done);l=!0){var p=f.value,h=s+e[p.key].offset;switch(p.key){case n.Layout.POSITION.key:a.setFloat32(h,this.vertices[3*i],!0),a.setFloat32(h+4,this.vertices[3*i+1],!0),a.setFloat32(h+8,this.vertices[3*i+2],!0);break;case n.Layout.UV.key:a.setFloat32(h,this.textures[2*i],!0),a.setFloat32(h+4,this.vertices[2*i+1],!0);break;case n.Layout.NORMAL.key:a.setFloat32(h,this.vertexNormals[3*i],!0),a.setFloat32(h+4,this.vertexNormals[3*i+1],!0),a.setFloat32(h+8,this.vertexNormals[3*i+2],!0);break;case n.Layout.MATERIAL_INDEX.key:a.setInt16(h,this.vertexMaterialIndices[i],!0);break;case n.Layout.AMBIENT.key:var v=this.vertexMaterialIndices[i],m=this.materialsByIndex[v];if(!m)break;a.setFloat32(h,m.ambient[0],!0),a.setFloat32(h+4,m.ambient[1],!0),a.setFloat32(h+8,m.ambient[2],!0);break;case n.Layout.DIFFUSE.key:var y=this.vertexMaterialIndices[i],d=this.materialsByIndex[y];if(!d)break;a.setFloat32(h,d.diffuse[0],!0),a.setFloat32(h+4,d.diffuse[1],!0),a.setFloat32(h+8,d.diffuse[2],!0);break;case n.Layout.SPECULAR.key:var M=this.vertexMaterialIndices[i],b=this.materialsByIndex[M];if(!b)break;a.setFloat32(h,b.specular[0],!0),a.setFloat32(h+4,b.specular[1],!0),a.setFloat32(h+8,b.specular[2],!0);break;case n.Layout.SPECULAR_EXPONENT.key:var I=this.vertexMaterialIndices[i],_=this.materialsByIndex[I];if(!_)break;a.setFloat32(h,_.specularExponent,!0);break;case n.Layout.EMISSIVE.key:var x=this.vertexMaterialIndices[i],k=this.materialsByIndex[x];if(!k)break;a.setFloat32(h,k.emissive[0],!0),a.setFloat32(h+4,k.emissive[1],!0),a.setFloat32(h+8,k.emissive[2],!0);break;case n.Layout.TRANSMISSION_FILTER.key:var A=this.vertexMaterialIndices[i],w=this.materialsByIndex[A];if(!w)break;a.setFloat32(h,w.transmissionFilter[0],!0),a.setFloat32(h+4,w.transmissionFilter[1],!0),a.setFloat32(h+8,w.transmissionFilter[2],!0);break;case n.Layout.DISSOLVE.key:var F=this.vertexMaterialIndices[i],E=this.materialsByIndex[F];if(!E)break;a.setFloat32(h,E.dissolve,!0);break;case n.Layout.ILLUMINATION.key:var S=this.vertexMaterialIndices[i],T=this.materialsByIndex[S];if(!T)break;a.setInt16(h,T.illumination,!0);break;case n.Layout.REFRACTION_INDEX.key:var O=this.vertexMaterialIndices[i],L=this.materialsByIndex[O];if(!L)break;a.setFloat32(h,L.refractionIndex,!0);break;case n.Layout.SHARPNESS.key:var B=this.vertexMaterialIndices[i],N=this.materialsByIndex[B];if(!N)break;a.setFloat32(h,N.sharpness,!0);break;case n.Layout.ANTI_ALIASING.key:var R=this.vertexMaterialIndices[i],P=this.materialsByIndex[R];if(!P)break;a.setInt16(h,P.antiAliasing,!0)}}}catch(e){o=!0,u=e}finally{try{!l&&c.return&&c.return()}finally{if(o)throw u}}}return r}},{key:"makeIndexBufferData",value:function(){var e=new Uint16Array(this.indices);return e.numItems=this.indices.length,e}},{key:"addMaterialLibrary",value:function(e){for(var t in e.materials)if(t in this.materialIndices){var r=e.materials[t],a=this.materialIndices[r.name];this.materialsByIndex[a]=r}}}]),e}();exports.default=s},function(e,exports,t){"use strict";function r(e){return Array.isArray(e)?e:Array.from(e)}function a(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(exports,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var a=t[r];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}return function(t,r,a){return r&&e(t.prototype,r),a&&e(t,a),t}}(),n=exports.Material=function e(t){a(this,e),this.name=t,this.ambient=[0,0,0],this.diffuse=[0,0,0],this.specular=[0,0,0],this.emissive=[0,0,0],this.transmissionFilter=[0,0,0],this.dissolve=0,this.specularExponent=0,this.transparency=0,this.illumination=0,this.refractionIndex=1,this.sharpness=0,this.mapDiffuse=null,this.mapAmbient=null,this.mapSpecular=null,this.mapSpecularExponent=null,this.mapDissolve=null,this.antiAliasing=!1,this.mapBump=null,this.mapDisplacement=null,this.mapDecal=null,this.mapEmissive=null,this.mapReflections=[]};exports.MaterialLibrary=function(){function e(t){a(this,e),this.data=t,this.currentMaterial=null,this.materials={},this.parse()}return i(e,[{key:"parse_newmtl",value:function(e){var t=e[0];this.currentMaterial=new n(t),this.materials[t]=this.currentMaterial}},{key:"parseColor",value:function(e){if("spectral"!=e[0]&&"xyz"!=e[0]){if(3==e.length)return e.map(parseFloat);var t=parseFloat(e[0]);return[t,t,t]}}},{key:"parse_Ka",value:function(e){this.currentMaterial.ambient=this.parseColor(e)}},{key:"parse_Kd",value:function(e){this.currentMaterial.diffuse=this.parseColor(e)}},{key:"parse_Ks",value:function(e){this.currentMaterial.specular=this.parseColor(e)}},{key:"parse_Ke",value:function(e){this.currentMaterial.emissive=this.parseColor(e)}},{key:"parse_Tf",value:function(e){this.currentMaterial.transmissionFilter=this.parseColor(e)}},{key:"parse_d",value:function(e){this.currentMaterial.dissolve=parseFloat(e.pop())}},{key:"parse_illum",value:function(e){this.currentMaterial.illumination=parseInt(e[0])}},{key:"parse_Ni",value:function(e){this.currentMaterial.refractionIndex=parseFloat(e[0])}},{key:"parse_Ns",value:function(e){this.currentMaterial.specularExponent=parseInt(e[0])}},{key:"parse_sharpness",value:function(e){this.currentMaterial.sharpness=parseInt(e[0])}},{key:"parse_cc",value:function(e,t){t.colorCorrection="on"==e[0]}},{key:"parse_blendu",value:function(e,t){t.horizontalBlending="on"==e[0]}},{key:"parse_blendv",value:function(e,t){t.verticalBlending="on"==e[0]}},{key:"parse_boost",value:function(e,t){t.boostMipMapSharpness=parseFloat(e[0])}},{key:"parse_mm",value:function(e,t){t.modifyTextureMap.brightness=parseFloat(e[0]),t.modifyTextureMap.contrast=parseFloat(e[1])}},{key:"parse_ost",value:function(e,t,r){for(;e.length<3;)e.push(r);t.u=parseFloat(e[0]),t.v=parseFloat(e[1]),t.w=parseFloat(e[2])}},{key:"parse_o",value:function(e,t){this.parse_ost(e,t.offset,0)}},{key:"parse_s",value:function(e,t){this.parse_ost(e,t.scale,1)}},{key:"parse_t",value:function(e,t){this.parse_ost(e,t.turbulence,0)}},{key:"parse_texres",value:function(e,t){t.textureResolution=parseFloat(e[0])}},{key:"parse_clamp",value:function(e,t){t.clamp="on"==e[0]}},{key:"parse_bm",value:function(e,t){t.bumpMultiplier=parseFloat(e[0])}},{key:"parse_imfchan",value:function(e,t){t.imfChan=e[0]}},{key:"parse_type",value:function(e,t){t.reflectionType=e[0]}},{key:"parseOptions",value:function(e){var t={colorCorrection:!1,horizontalBlending:!0,verticalBlending:!0,boostMipMapSharpness:0,modifyTextureMap:{brightness:0,contrast:1},offset:{u:0,v:0,w:0},scale:{u:1,v:1,w:1},turbulence:{u:0,v:0,w:0},clamp:!1,textureResolution:null,bumpMultiplier:1,imfChan:null},r=void 0,a=void 0,i={};for(e.reverse();e.length;){var n=e.pop();n.startsWith("-")?(r=n.substr(1),i[r]=[]):i[r].push(n)}for(r in i)if(i.hasOwnProperty(r)){a=i[r];var s=this["parse_"+r];s&&s.bind(this)(a,t)}return t}},{key:"parseMap",value:function(e){var t=void 0,a=void 0;if(e[0].startsWith("-"))t=e.pop(),a=e;else{var i=r(e);t=i[0],a=i.slice(1)}return a=this.parseOptions(a),a.filename=t,a}},{key:"parse_map_Ka",value:function(e){this.currentMaterial.mapAmbient=this.parseMap(e)}},{key:"parse_map_Kd",value:function(e){this.currentMaterial.mapDiffuse=this.parseMap(e)}},{key:"parse_map_Ks",value:function(e){this.currentMaterial.mapSpecular=this.parseMap(e)}},{key:"parse_map_Ke",value:function(e){this.currentMaterial.mapEmissive=this.parseMap(e)}},{key:"parse_map_Ns",value:function(e){this.currentMaterial.mapSpecularExponent=this.parseMap(e)}},{key:"parse_map_d",value:function(e){this.currentMaterial.mapDissolve=this.parseMap(e)}},{key:"parse_map_aat",value:function(e){this.currentMaterial.antiAliasing="on"==e[0]}},{key:"parse_map_bump",value:function(e){this.currentMaterial.mapBump=this.parseMap(e)}},{key:"parse_bump",value:function(e){this.parse_map_bump(e)}},{key:"parse_disp",value:function(e){this.currentMaterial.mapDisplacement=this.parseMap(e)}},{key:"parse_decal",value:function(e){this.currentMaterial.mapDecal=this.parseMap(e)}},{key:"parse_refl",value:function(e){this.currentMaterial.mapReflections.push(this.parseMap(e))}},{key:"parse",value:function(){var e=this.data.split(/\r?\n/),t=!0,a=!1,i=void 0;try{for(var n,s=e[Symbol.iterator]();!(t=(n=s.next()).done);t=!0){var l=n.value;if((l=l.trim())&&!l.startsWith("#")){var o=l.split(/\s/),u=void 0,f=o,c=r(f);u=c[0],o=c.slice(1);var p=this["parse_"+u];p&&p.bind(this)(o)}}}catch(e){a=!0,i=e}finally{try{!t&&s.return&&s.return()}finally{if(a)throw i}}delete this.data,this.currentMaterial=null}}]),e}()},function(e,exports,t){e.exports=t(4)},function(e,exports,t){"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.deleteMeshBuffers=exports.initMeshBuffers=exports.downloadMeshes=exports.downloadModels=exports.Layout=exports.MaterialLibrary=exports.Material=exports.Mesh=void 0;var r=t(1),a=function(e){return e&&e.__esModule?e:{default:e}}(r),i=t(2),n=t(0),s=t(5);exports.Mesh=a.default,exports.Material=i.Material,exports.MaterialLibrary=i.MaterialLibrary,exports.Layout=n.Layout,exports.downloadModels=s.downloadModels,exports.downloadMeshes=s.downloadMeshes,exports.initMeshBuffers=s.initMeshBuffers,exports.deleteMeshBuffers=s.deleteMeshBuffers},function(e,exports,t){"use strict";function r(e,t){var r=["mapDiffuse","mapAmbient","mapSpecular","mapDissolve","mapBump","mapDisplacement","mapDecal","mapEmissive"];t.endsWith("/")||(t+="/");var a=[];for(var i in e.materials)if(e.materials.hasOwnProperty(i)){i=e.materials[i];var n=!0,s=!1,l=void 0;try{for(var o,u=r[Symbol.iterator]();!(n=(o=u.next()).done);n=!0){var f=o.value;(function(e){var r=i[e];if(!r)return"continue";var n=t+r.filename;a.push(fetch(n).then(function(e){if(!e.ok)throw new Error;return e.blob()}).then(function(e){var t=new Image;t.src=URL.createObjectURL(e),r.texture=t}).catch(function(){}))})(f)}}catch(e){s=!0,l=e}finally{try{!n&&u.return&&u.return()}finally{if(s)throw l}}}return Promise.all(a)}function a(e){var t=[],a=!0,i=!1,n=void 0;try{for(var s,o=e[Symbol.iterator]();!(a=(s=o.next()).done);a=!0){var c=s.value;!function(e){var a=[];if(!e.obj)throw new Error('"obj" attribute of model object not set. The .obj file is required to be set in order to use downloadModels()');var i=e.name;if(!i){var n=e.obj.split("/");i=n[n.length-1].replace(".obj","")}if(a.push(Promise.resolve(i)),a.push(fetch(e.obj).then(function(e){return e.text()}).then(function(e){return new u.default(e)})),e.mtl){var s=e.mtl;"boolean"==typeof s&&(s=e.obj.replace(/\.obj$/,".mtl")),a.push(fetch(s).then(function(e){return e.text()}).then(function(t){var a=new f.MaterialLibrary(t);if(!1!==e.downloadMtlTextures){var i=e.mtlTextureRoot;return i||(i=s.substr(0,s.lastIndexOf("/"))),Promise.all([Promise.resolve(a),r(a,i)])}return Promise.all(Promise.resolve(a))}).then(function(e){return e[0]}))}t.push(Promise.all(a))}(c)}}catch(e){i=!0,n=e}finally{try{!a&&o.return&&o.return()}finally{if(i)throw n}}return Promise.all(t).then(function(e){var t={},r=!0,a=!1,i=void 0;try{for(var n,s=e[Symbol.iterator]();!(r=(n=s.next()).done);r=!0){var o=n.value,u=l(o,3),f=u[0],c=u[1],p=u[2];c.name=f,p&&c.addMaterialLibrary(p),t[f]=c}}catch(e){a=!0,i=e}finally{try{!r&&s.return&&s.return()}finally{if(a)throw i}}return t})}function i(e,t,r){void 0===r&&(r={});var a=[];for(var i in e){(function(t){if(!e.hasOwnProperty(t))return"continue";var r=e[t];a.push(fetch(r).then(function(e){return e.text()}).then(function(e){return[t,new u.default(e)]}))})(i)}Promise.all(a).then(function(e){var a=!0,i=!1,n=void 0;try{for(var s,o=e[Symbol.iterator]();!(a=(s=o.next()).done);a=!0){var u=s.value,f=l(u,2),c=f[0],p=f[1];r[c]=p}}catch(e){i=!0,n=e}finally{try{!a&&o.return&&o.return()}finally{if(i)throw n}}return t(r)})}function n(e,t){t.normalBuffer=c(e,e.ARRAY_BUFFER,t.vertexNormals,3),t.textureBuffer=c(e,e.ARRAY_BUFFER,t.textures,2),t.vertexBuffer=c(e,e.ARRAY_BUFFER,t.vertices,3),t.indexBuffer=c(e,e.ELEMENT_ARRAY_BUFFER,t.indices,1)}function s(e,t){e.deleteBuffer(t.normalBuffer),e.deleteBuffer(t.textureBuffer),e.deleteBuffer(t.vertexBuffer),e.deleteBuffer(t.indexBuffer)}Object.defineProperty(exports,"__esModule",{value:!0});var l=function(){function e(e,t){var r=[],a=!0,i=!1,n=void 0;try{for(var s,l=e[Symbol.iterator]();!(a=(s=l.next()).done)&&(r.push(s.value),!t||r.length!==t);a=!0);}catch(e){i=!0,n=e}finally{try{!a&&l.return&&l.return()}finally{if(i)throw n}}return r}return function(t,r){if(Array.isArray(t))return t;if(Symbol.iterator in Object(t))return e(t,r);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}();exports.downloadModels=a,exports.downloadMeshes=i,exports.initMeshBuffers=n,exports.deleteMeshBuffers=s;var o=t(1),u=function(e){return e&&e.__esModule?e:{default:e}}(o),f=t(2),c=(t(0),function(e,t,r,a){var i=e.createBuffer(),n=t===e.ARRAY_BUFFER?Float32Array:Uint16Array;return e.bindBuffer(t,i),e.bufferData(t,new n(r),e.STATIC_DRAW),i.itemSize=a,i.numItems=r.length/a,i})}])});
 
 /***/ }),
-/* 73 */
+/* 77 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Turtle__ = __webpack_require__(74);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LSymbol__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Turtle__ = __webpack_require__(78);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LSymbol__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__geometry_Plant__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__LString__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__LString__ = __webpack_require__(79);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__LRandom__ = __webpack_require__(7);
 
 
@@ -16995,7 +17445,7 @@ class LSystem {
 
 
 /***/ }),
-/* 74 */
+/* 78 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17058,7 +17508,7 @@ class Turtle {
 
 
 /***/ }),
-/* 75 */
+/* 79 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17146,61 +17596,61 @@ class LString {
 
 
 /***/ }),
-/* 76 */
+/* 80 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\r\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\r\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\r\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\r\n//This simultaneous transformation allows your program to run much faster, especially when rendering\r\n//geometry with millions of vertices.\r\n\r\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\r\n                            // object we're rendering. In this assignment,\r\n                            // this will be the result of traversing your scene graph.\r\n\r\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\r\n                            // This allows us to transform the object's normals properly\r\n                            // if the object has been non-uniformly scaled.\r\n\r\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\r\n                            // We've written a static matrix for you to use for HW2,\r\n                            // but in HW3 you'll have to generate one yourself\r\n\r\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\r\n\r\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\r\n\r\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\r\n\r\nin vec2 vs_UV;\r\n\r\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\r\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\r\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\r\nout vec2 fs_UV;\r\n\r\nconst vec4 lightPos = vec4(100, 100, 100, 1); //The position of our virtual light, which is used to compute the shading of\r\n                                        //the geometry in the fragment shader.\r\n\r\nvoid main()\r\n{\r\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\r\n    fs_UV = vs_UV;\r\n\r\n    mat3 invTranspose = mat3(u_ModelInvTr);\r\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\r\n                                                            // Transform the geometry's normals by the inverse transpose of the\r\n                                                            // model matrix. This is necessary to ensure the normals remain\r\n                                                            // perpendicular to the surface after the surface is transformed by\r\n                                                            // the model matrix.\r\n\r\n\r\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\r\n\r\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\r\n\r\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\r\n                                             // used to render the final positions of the geometry's vertices\r\n}\r\n"
 
 /***/ }),
-/* 77 */
+/* 81 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n// This is a fragment shader. If you've opened this file first, please\r\n// open and read lambert.vert.glsl before reading on.\r\n// Unlike the vertex shader, the fragment shader actually does compute\r\n// the shading of geometry. For every pixel in your program's output\r\n// screen, the fragment shader is run for every bit of geometry that\r\n// particular pixel overlaps. By implicitly interpolating the position\r\n// data passed into the fragment shader by the vertex shader, the fragment shader\r\n// can compute what color to apply to its pixel based on things like vertex\r\n// position, light position, and vertex color.\r\nprecision highp float;\r\n\r\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\r\n\r\nuniform sampler2D u_Sampler0;\r\n\r\nuniform vec3 u_LightPos;\r\n\r\n// These are the interpolated values out of the rasterizer, so you can't know\r\n// their specific values without knowing the vertices that contributed to them\r\nin vec4 fs_Nor;\r\nin vec4 fs_LightVec;\r\nin vec4 fs_Col;\r\nin vec2 fs_UV;\r\n\r\nout vec4 out_Col; // This is the final output color that you will see on your\r\n                  // screen for the pixel that is currently being processed.\r\n\r\nvoid main()\r\n{\r\n    // Material base color (before shading)\r\n        vec4 diffuseColor = fs_Col;\r\n        // read texture\r\n        if (fs_UV.x >= 0.0) {\r\n            diffuseColor = texture(u_Sampler0, fs_UV);\r\n            //diffuseColor = vec4(fs_UV, 0.0, 1.0);\r\n        }\r\n\r\n        // Calculate the diffuse term for Lambert shading\r\n        float diffuseTerm = dot(normalize(fs_Nor.xyz), normalize(u_LightPos));\r\n        // Avoid negative lighting values\r\n        diffuseTerm = clamp(diffuseTerm, 0.0, 1.0);\r\n\r\n        float ambientTerm = 0.4;\r\n\r\n        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\r\n                                                            //to simulate ambient lighting. This ensures that faces that are not\r\n                                                            //lit by our point light are not completely black.\r\n\r\n        // Compute final shaded color\r\n        out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);\r\n        //out_Col = vec4(fs_Nor.xyz * 0.5 + vec3(0.5), 1.0);\r\n}\r\n"
 
 /***/ }),
-/* 78 */
+/* 82 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\r\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\r\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\r\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\r\n//This simultaneous transformation allows your program to run much faster, especially when rendering\r\n//geometry with millions of vertices.\r\n\r\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\r\n                            // object we're rendering. In this assignment,\r\n                            // this will be the result of traversing your scene graph.\r\n\r\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\r\n                            // This allows us to transform the object's normals properly\r\n                            // if the object has been non-uniformly scaled.\r\n\r\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\r\n                            // We've written a static matrix for you to use for HW2,\r\n                            // but in HW3 you'll have to generate one yourself\r\n\r\nuniform float u_Time;\r\nuniform float u_TimeXZ;\r\nuniform float u_TimeY;\r\nuniform float u_Speed;\r\n\r\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\r\n\r\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\r\n\r\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\r\n\r\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\r\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\r\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\r\n\r\nconst vec4 lightPos = vec4(5, 5, 3, 1); //The position of our virtual light, which is used to compute the shading of\r\n                                        //the geometry in the fragment shader.\r\n\r\nvoid main()\r\n{\r\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\r\n\r\n    mat3 invTranspose = mat3(u_ModelInvTr);\r\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\r\n                                                            // Transform the geometry's normals by the inverse transpose of the\r\n                                                            // model matrix. This is necessary to ensure the normals remain\r\n                                                            // perpendicular to the surface after the surface is transformed by\r\n                                                            // the model matrix.\r\n\r\n    const float PI = 3.14159265;\r\n    const float EPSILON = 0.0001;\r\n    float time = u_Speed * u_Time;\r\n    float timeXZ = u_Speed * u_TimeXZ;\r\n    float timeY = u_Speed * u_TimeY;\r\n    float cleanX = abs(vs_Pos.x) < EPSILON ? (EPSILON * sign(vs_Pos.x)) : vs_Pos.x;\r\n    float xzAngle = atan(vs_Pos.z, cleanX) * (6.0 - smoothstep(0.0, 1.0, (sin(timeXZ * 0.000314 * 2.0) * 0.5 + 0.5)) * 12.0);\r\n    float y = vs_Pos.y * (10.0 + smoothstep(0.0, 1.0, (sin(timeY * 0.000314) * 0.5 + 0.5)) * 40.0);\r\n    float t = cos(time * 0.002 + y + xzAngle) * 0.25 + 1.0;\r\n\r\n    vec4 modelposition = u_Model * (vec4(t, t, t, 1.0) * vs_Pos);   // Temporarily store the transformed vertex positions for use below\r\n\r\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\r\n\r\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\r\n                                             // used to render the final positions of the geometry's vertices\r\n}\r\n"
 
 /***/ }),
-/* 79 */
+/* 83 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n// This is a fragment shader. If you've opened this file first, please\r\n// open and read lambert.vert.glsl before reading on.\r\n// Unlike the vertex shader, the fragment shader actually does compute\r\n// the shading of geometry. For every pixel in your program's output\r\n// screen, the fragment shader is run for every bit of geometry that\r\n// particular pixel overlaps. By implicitly interpolating the position\r\n// data passed into the fragment shader by the vertex shader, the fragment shader\r\n// can compute what color to apply to its pixel based on things like vertex\r\n// position, light position, and vertex color.\r\nprecision highp float;\r\n\r\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\r\n\r\nuniform float u_Time;\r\nuniform float u_Speed;\r\n\r\n// These are the interpolated values out of the rasterizer, so you can't know\r\n// their specific values without knowing the vertices that contributed to them\r\nin vec4 fs_Nor;\r\nin vec4 fs_LightVec;\r\nin vec4 fs_Col;\r\n\r\nout vec4 out_Col; // This is the final output color that you will see on your\r\n                  // screen for the pixel that is currently being processed.\r\n\r\nvoid main()\r\n{\r\n        // Material base color (before shading)\r\n        // IQ's iridescent palette...\r\n        vec3 bias = abs(fs_Nor.xyz);\r\n        vec3 scale = vec3(1.0) - bias;\r\n        vec3 freq = vec3(1.5, 0.5, 1.1);\r\n        vec3 phase = vec3(0.0, 0.5, 0.33);\r\n        float t = u_Speed * u_Time * 0.0001;\r\n        vec3 iridescent = bias + scale * cos(freq * t + phase);\r\n        // With alternating between the color and its RGB->GBR shifted version\r\n        float tShift = smoothstep(0.0, 1.0, (sin(u_Time * 0.000314) * 0.5 + 0.5));\r\n        vec4 baseColor = vec4(iridescent, 1.0);\r\n        vec4 altColor = baseColor.yzxw;\r\n        vec4 diffuseColor = mix(baseColor, altColor, tShift);\r\n\r\n        // Calculate the diffuse term for Lambert shading\r\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\r\n        // Avoid negative lighting values\r\n        diffuseTerm = clamp(diffuseTerm, 0.0, 1.0);\r\n\r\n        float ambientTerm = 0.2;\r\n\r\n        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\r\n                                                            //to simulate ambient lighting. This ensures that faces that are not\r\n                                                            //lit by our point light are not completely black.\r\n\r\n        // Compute final shaded color\r\n        out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);\r\n}\r\n"
 
 /***/ }),
-/* 80 */
+/* 84 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\r\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\r\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\r\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\r\n//This simultaneous transformation allows your program to run much faster, especially when rendering\r\n//geometry with millions of vertices.\r\n\r\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\r\n                            // object we're rendering. In this assignment,\r\n                            // this will be the result of traversing your scene graph.\r\n\r\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\r\n                            // This allows us to transform the object's normals properly\r\n                            // if the object has been non-uniformly scaled.\r\n\r\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\r\n                            // We've written a static matrix for you to use for HW2,\r\n                            // but in HW3 you'll have to generate one yourself\r\n\r\nuniform float u_Time;\r\nuniform float u_Speed;\r\n\r\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\r\n\r\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\r\n\r\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\r\n\r\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\r\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\r\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\r\n\r\nconst vec4 lightPos = vec4(5, 5, 3, 1); //The position of our virtual light, which is used to compute the shading of\r\n                                        //the geometry in the fragment shader.\r\n\r\nvoid main()\r\n{\r\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\r\n\r\n    mat3 invTranspose = mat3(u_ModelInvTr);\r\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\r\n                                                            // Transform the geometry's normals by the inverse transpose of the\r\n                                                            // model matrix. This is necessary to ensure the normals remain\r\n                                                            // perpendicular to the surface after the surface is transformed by\r\n                                                            // the model matrix.\r\n\r\n    const float PI = 3.14159265;\r\n\r\n    // factor that multiplies Y affects gap between waves (higher value, smaller gap)\r\n    // factor that multiplies u_Time affects speed of waves (higher value, higher speed)\r\n    float angle = vs_Pos.y * 0.75 + u_Speed * u_Time * 0.0015f;\r\n    float t = sin(angle);\r\n\r\n    if (t > 0.0) {\r\n        t = cos(angle) > 0.0 ? t : sin(angle - 0.5 * PI);\r\n    }\r\n    else {\r\n        t = cos(angle) > 0.0 ? abs(sin(angle - 0.5 * PI)) : abs(t);\r\n    }\r\n\r\n    // of the form: t < X ? sin(PI * t / X) : 0\r\n    // X must be < 1, and controls how large each wave is (higher value, larger wave)\r\n    t = t < 0.4 ? sin(PI * t * 2.5) : 0.0;\r\n    vec3 flatDirection = normalize(vec3(vs_Pos.x, 0.0, vs_Pos.z));\r\n\r\n    vec3 target = vec3(0.0, vs_Pos.y, 0.0) + flatDirection * 1.7;\r\n    t = smoothstep(0.0, 1.0, t);\r\n    vec4 objPos = mix(vs_Pos, vec4(target, 1.0), t);\r\n\r\n    vec4 modelposition = u_Model * objPos;   // Temporarily store the transformed vertex positions for use below\r\n\r\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\r\n\r\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\r\n                                             // used to render the final positions of the geometry's vertices\r\n}\r\n"
 
 /***/ }),
-/* 81 */
+/* 85 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n// This is a fragment shader. If you've opened this file first, please\r\n// open and read lambert.vert.glsl before reading on.\r\n// Unlike the vertex shader, the fragment shader actually does compute\r\n// the shading of geometry. For every pixel in your program's output\r\n// screen, the fragment shader is run for every bit of geometry that\r\n// particular pixel overlaps. By implicitly interpolating the position\r\n// data passed into the fragment shader by the vertex shader, the fragment shader\r\n// can compute what color to apply to its pixel based on things like vertex\r\n// position, light position, and vertex color.\r\nprecision highp float;\r\n\r\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\r\n\r\nuniform float u_Time;\r\nuniform float u_Speed;\r\n\r\n// These are the interpolated values out of the rasterizer, so you can't know\r\n// their specific values without knowing the vertices that contributed to them\r\nin vec4 fs_Nor;\r\nin vec4 fs_LightVec;\r\nin vec4 fs_Col;\r\n\r\nout vec4 out_Col; // This is the final output color that you will see on your\r\n                  // screen for the pixel that is currently being processed.\r\n\r\nvoid main()\r\n{\r\n        // Material base color (before shading)\r\n        float time = u_Speed * u_Time;\r\n        float tX = cos(time * 0.001) * 0.5 + 0.5;\r\n        float tY = cos(time * 0.00176) * 0.5 + 0.5;\r\n        float tZ = cos(time * 0.00287) * 0.5 + 0.5;\r\n        vec3 col = abs(fs_Nor.xyz) + vec3(tX, tY, tZ);\r\n        col.x = col.x > 1.0 ? col.x - 1.0 : col.x;\r\n        col.y = col.y > 1.0 ? col.y - 1.0 : col.y;\r\n        col.z = col.z > 1.0 ? col.z - 1.0 : col.z;\r\n        out_Col = vec4(col, 1.0);\r\n}\r\n"
 
 /***/ }),
-/* 82 */
+/* 86 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n// This is a fragment shader. If you've opened this file first, please\r\n// open and read lambert.vert.glsl before reading on.\r\n// Unlike the vertex shader, the fragment shader actually does compute\r\n// the shading of geometry. For every pixel in your program's output\r\n// screen, the fragment shader is run for every bit of geometry that\r\n// particular pixel overlaps. By implicitly interpolating the position\r\n// data passed into the fragment shader by the vertex shader, the fragment shader\r\n// can compute what color to apply to its pixel based on things like vertex\r\n// position, light position, and vertex color.\r\nprecision highp float;\r\n\r\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\r\n\r\nuniform float u_Time;\r\nuniform float u_Speed;\r\nuniform float u_PlumeBias;\r\nuniform float u_EdgeClarity;\r\n\r\nuniform vec3 u_EyePos;\r\n\r\n// These are the interpolated values out of the rasterizer, so you can't know\r\n// their specific values without knowing the vertices that contributed to them\r\nin vec3 fs_Pos;\r\nin vec4 fs_Nor;\r\nin vec4 fs_LightVec;\r\nin vec4 fs_Col;\r\nin float fs_Shininess;\r\n\r\nconst float PI = 3.14159265;\r\n\r\n// https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83\r\nvec3 random3(vec3 c) {\r\n    float j = 4096.0*sin(dot(c, vec3(17.0, 59.4, 15.0)));\r\n    vec3 r;\r\n    r.z = fract(512.0*j);\r\n    j *= .125;\r\n    r.x = fract(512.0*j);\r\n    j *= .125;\r\n    r.y = fract(512.0*j);\r\n    return r;\r\n}\r\n\r\nstruct worleyResult {\r\n    vec3 closest0;\r\n    float closestDist0;\r\n    vec3 closest1;\r\n    float closestDist1;\r\n    vec3 normClosest0;\r\n    vec3 normClosest1;\r\n    vec3 normal;\r\n};\r\n\r\nconst float WORLEY_BIG_FLOAT = 1.0e10;\r\nconst float WORLEY_EPSILON = 0.001;\r\n\r\nworleyResult getWorley(vec3 pt, float gridSize, float timeFactor) {\r\n    vec3 gridOrigin;\r\n    if (gridSize >= 1.0) {\r\n        gridOrigin.x = pt.x > 0.0 ? 0.0 : -gridSize;\r\n        gridOrigin.y = pt.y > 0.0 ? 0.0 : -gridSize;\r\n        gridOrigin.z = pt.z > 0.0 ? 0.0 : -gridSize;\r\n    }\r\n    else {\r\n        gridOrigin = pt - mod(pt, gridSize);\r\n    }\r\n    worleyResult result;\r\n    result.closest0 = vec3(0.0);\r\n    result.closest1 = vec3(0.0);\r\n    result.closestDist0 = WORLEY_BIG_FLOAT;\r\n    result.closestDist1 = WORLEY_BIG_FLOAT;\r\n    for (float i = -gridSize; i < gridSize + WORLEY_EPSILON; i += gridSize) {\r\n        for (float j = -gridSize; j < gridSize + WORLEY_EPSILON; j += gridSize) {\r\n            for (float k = -gridSize; k < gridSize + WORLEY_EPSILON; k += gridSize) {\r\n                vec3 gridPt = gridOrigin + vec3(i, j, k);\r\n                // compute random point\r\n                //vec3 randPt = gridPt + (random3(gridPt) * 0.5 + vec3(cos(u_Time * 0.0001), sin(u_Time * 0.0001), sin(u_Time * 0.0002)) * 0.25 + 0.25) * gridSize;\r\n                vec3 randPt;\r\n                if (timeFactor < 0.0) {\r\n                    randPt = gridPt + random3(gridPt) * gridSize;\r\n                }\r\n                else {\r\n                    randPt = gridPt + (random3(gridPt) * 0.5 + vec3(cos(u_Time * 0.0001), sin(u_Time * 0.0001), sin(u_Time * 0.0002)) * 0.25 + 0.25) * gridSize;\r\n                }\r\n                // find distance\r\n                float dist = distance(randPt, pt);\r\n                // store if closest\r\n                if (dist < result.closestDist0) {\r\n                    // check if closest0 is already set\r\n                    // if it is, store it in closest1 (and distance too)\r\n                    // we don't want to overwrite and lose them\r\n                    if (result.closestDist0 < WORLEY_BIG_FLOAT) {\r\n                        result.closestDist1 = result.closestDist0;\r\n                        result.closest1 = result.closest0;\r\n                    }\r\n                    result.closestDist0 = dist;\r\n                    result.closest0 = randPt;\r\n                }\r\n                else if (dist < result.closestDist1) {\r\n                    result.closestDist1 = dist;\r\n                    result.closest1 = randPt;\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    result.normClosest0 = normalize(result.closest0);\r\n    result.normClosest1 = normalize(result.closest1);\r\n\r\n    return result;\r\n}\r\n\r\n\r\n/* Buildings -- with Worley */\r\nconst float streetRadius = 0.12;\r\n\r\nvec3 getBldgDisp(vec3 pt, inout worleyResult worley) {\r\n    vec3 bldgDir = worley.normClosest0;\r\n    // compute distance from border\r\n    // 1 - 0 makes it point in the direction we want for normal\r\n    vec3 diff = worley.normClosest1 - worley.normClosest0;\r\n    vec3 borderNormal = normalize(diff);\r\n    vec3 toClosest = pt - worley.normClosest0;\r\n    float distFromClosest = abs(dot(toClosest, borderNormal));\r\n    float distToBorder = 0.5 * length(diff) - distFromClosest;\r\n    float dist = distToBorder;// distance(pt, bldgDir);\r\n    float projLen = dot(bldgDir, pt);\r\n    // determines whether we are \"on\" the building\r\n    float s = (dist > streetRadius ? 1.0 : 0.0);\r\n    worley.normal = abs(dist - streetRadius) < (0.05 * streetRadius) ? borderNormal : bldgDir;\r\n    // (bldgHeight - projLen) + bldgHeight\r\n    float bldgHeight = random3(worley.closest0).x * 0.35 + 0.65;\r\n    s *= (2.0 * bldgHeight - projLen);\r\n    return s * bldgDir;\r\n}\r\n\r\nconst float lavaRadius = 0.01;\r\n\r\nconst vec3 LAVA_ORANGE = vec3(255.0, 110.0, 0.0) / 255.0;\r\nconst vec3 LAVA_BRIGHT_ORANGE = vec3(255.0, 142.0, 56.0) / 255.0;\r\n\r\nconst vec3 LAVA_RED = vec3(183.0, 21.0, 0.0) / 255.0;\r\nconst vec3 LAVA_BRIGHT_RED = vec3(209.0, 24.0, 0.0) / 255.0;\r\n\r\nvec3 getLavaColor(vec3 pt, worleyResult worley) {\r\n    vec3 bldgDir = worley.normClosest0;\r\n    // compute distance from border\r\n    // 1 - 0 makes it point in the direction we want for normal\r\n    vec3 diff = worley.normClosest1 - worley.normClosest0;\r\n    vec3 borderNormal = normalize(diff);\r\n    vec3 toClosest = pt - worley.normClosest0;\r\n    float distFromClosest = abs(dot(toClosest, borderNormal));\r\n    float distToBorder = 0.5 * length(diff) - distFromClosest;\r\n    float dist = distToBorder;// distance(pt, bldgDir);\r\n    float projLen = dot(bldgDir, pt);\r\n    // determines whether we are \"on\" the building\r\n    //float s = (dist > lavaRadius ? 1.0 : 0.0);\r\n    float edgeClarity = mix(40.0, 2.0, u_EdgeClarity);\r\n    float s = smoothstep(0.0, edgeClarity * lavaRadius, dist - lavaRadius);\r\n    vec3 faceColor = mix(LAVA_ORANGE, LAVA_BRIGHT_ORANGE, cos(u_Time * 0.001) * 0.5 + 0.5);\r\n    vec3 edgeColor = mix(LAVA_BRIGHT_RED, LAVA_RED, cos(u_Time * 0.001) * 0.5 + 0.5);\r\n\r\n    return mix(edgeColor, faceColor, s);\r\n}\r\n\r\nfloat surflet(vec3 P, vec3 gridPoint)\r\n{\r\n    // Compute falloff function by converting linear distance to a polynomial\r\n    float distX = abs(P.x - gridPoint.x);\r\n    float distY = abs(P.y - gridPoint.y);\r\n    float distZ = abs(P.z - gridPoint.z);\r\n    float tX = 1.0 - 6.0 * pow(distX, 5.0) + 15.0 * pow(distX, 4.0) - 10.0 * pow(distX, 3.0);\r\n    float tY = 1.0 - 6.0 * pow(distY, 5.0) + 15.0 * pow(distY, 4.0) - 10.0 * pow(distY, 3.0);\r\n    float tZ = 1.0 - 6.0 * pow(distZ, 5.0) + 15.0 * pow(distZ, 4.0) - 10.0 * pow(distZ, 3.0);\r\n\r\n    // Get the random vector for the grid point\r\n    vec3 gradient = random3(gridPoint);\r\n    // Get the vector from the grid point to P\r\n    vec3 diff = P - gridPoint;\r\n    // Get the value of our height field by dotting grid->P with our gradient\r\n    float height = dot(diff, gradient);\r\n    // Scale our height field (i.e. reduce it) by our polynomial falloff function\r\n    return height * tX * tY * tZ;\r\n}\r\n\r\nfloat PerlinNoise(vec3 v)\r\n{\r\n    // Tile the space\r\n    vec3 vXLYLZL = floor(v);\r\n    vec3 vXHYLZL = vXLYLZL + vec3(1.0, 0.0, 0.0);\r\n    vec3 vXHYHZL = vXLYLZL + vec3(1.0, 1.0, 0.0);\r\n    vec3 vXLYHZL = vXLYLZL + vec3(0.0, 1.0, 0.0);\r\n    vec3 vXLYLZH = vXLYLZL + vec3(0.0, 0.0, 1.0);\r\n    vec3 vXHYLZH = vXLYLZH + vec3(1.0, 0.0, 0.0);\r\n    vec3 vXHYHZH = vXLYLZH + vec3(1.0, 1.0, 0.0);\r\n    vec3 vXLYHZH = vXLYLZH + vec3(0.0, 1.0, 0.0);\r\n\r\n    return surflet(v, vXLYLZL) + surflet(v, vXHYLZL) + surflet(v, vXHYHZL) + surflet(v, vXLYHZL) +\r\n        surflet(v, vXLYLZH) + surflet(v, vXHYLZH) + surflet(v, vXHYHZH) + surflet(v, vXLYHZH);\r\n}\r\n\r\nfloat normalizedPerlinNoise(vec3 v) {\r\n    return clamp(0.0, 1.0, PerlinNoise(v) * 0.5 + 0.5);\r\n}\r\n\r\nvec3 sphereToGrid(vec3 pt, float size) {\r\n    vec3 v = pt * 0.5 + 0.5;\r\n    return size * v;\r\n}\r\n\r\n/* Recursive Perlin Noise */\r\nfloat getRecursivePerlin(vec3 pt, float freq) {\r\n    vec3 gridPt = sphereToGrid(pt, 6.0 * freq);\r\n    // we recursive now boys\r\n    float t0 = normalizedPerlinNoise(gridPt);\r\n    return normalizedPerlinNoise(gridPt + sphereToGrid(vec3(t0) * 2.0 - vec3(1.0), 4.0 * freq));\r\n}\r\n\r\n/* FBM (uses Recursive Perlin) */\r\nfloat getFBM(vec3 pt, float startFreq) {\r\n    float noiseSum = 0.0;\r\n    float amplitudeSum = 0.0;\r\n    float amplitude = 0.5;\r\n    float frequency = startFreq;\r\n    for (int i = 0; i < 5; i++) {\r\n        float perlin = getRecursivePerlin(pt, frequency);\r\n        //uv = vec2(cos(3.14159/3.0 * i) * uv.x - sin(3.14159/3.0 * i) * uv.y, sin(3.14159/3.0 * i) * uv.x + cos(3.14159/3.0 * i) * uv.y);\r\n        noiseSum += perlin * amplitude;\r\n        amplitudeSum += amplitude;\r\n        amplitude *= 0.5;\r\n        frequency *= 2.0;\r\n    }\r\n    return noiseSum / amplitudeSum;\r\n}\r\n\r\nvec4 getFBMNormal(vec3 pt) {\r\n    vec3 adjPt = pt + vec3(sin(u_Time * 0.00001), cos(u_Time * 0.000034), cos(cos(u_Time * 0.000002) * PI));\r\n    float t = getFBM(adjPt, 0.5);\r\n    // estimate normal\r\n    const float GRADIENT_EPSILON = 0.05;\r\n    float fbmXL = getFBM(adjPt - vec3(GRADIENT_EPSILON, 0.0, 0.0), 0.5);\r\n    float fbmXH = getFBM(adjPt + vec3(GRADIENT_EPSILON, 0.0, 0.0), 0.5);\r\n    float fbmYL = getFBM(adjPt - vec3(0.0, GRADIENT_EPSILON, 0.0), 0.5);\r\n    float fbmYH = getFBM(adjPt + vec3(0.0, GRADIENT_EPSILON, 0.0), 0.5);\r\n    float fbmZL = getFBM(adjPt - vec3(0.0, 0.0, GRADIENT_EPSILON), 0.5);\r\n    float fbmZH = getFBM(adjPt + vec3(0.0, 0.0, GRADIENT_EPSILON), 0.5);\r\n    return vec4(normalize(vec3(fbmXL - fbmXH, fbmYL - fbmYH, fbmZL - fbmZH)), 0.0);\r\n}\r\n\r\n\r\n\r\nout vec4 out_Col; // This is the final output color that you will see on your\r\n                  // screen for the pixel that is currently being processed.\r\n\r\nvoid main()\r\n{\r\n        vec4 diffuseColor = vec4(1.0);\r\n        diffuseColor.xyz = vec3(0.89);\r\n        diffuseColor.xyz = fs_Col.xyz;\r\n\r\n        // Calculate the diffuse term for Lambert shading\r\n        float adjShininess = fs_Shininess;\r\n        vec4 adjNor = adjShininess <= 5.0 ? getFBMNormal(fs_Pos) : fs_Nor;\r\n        /*\r\n        vec3 tbnNormal = normalize(fs_Pos);\r\n        vec3 tbnTangent = normalize(cross(vec3(0.0, 1.0, 0.0), tbnNormal));\r\n        vec3 tbnBitangent = normalize(cross(tbnNormal, tbnTangent));\r\n        mat3 tbn;// = mat3(tbnTangent, tbnBitangent, tbnNormal);\r\n        tbn[0] = tbnBitangent;\r\n        tbn[1] = tbnNormal;\r\n        tbn[2] = tbnTangent;\r\n        adjNor.xyz = tbn * adjNor.xyz;// vec3(0.0, 1.0, 0.0);\r\n        */\r\n\r\n        float diffuseTerm = dot(normalize(adjNor), normalize(fs_LightVec));\r\n        // pretend we know how to shade things\r\n        diffuseTerm *= mix(0.3, 1.0, smoothstep(-0.7, 0.3, dot(normalize(fs_Pos), normalize(fs_LightVec.xyz))));\r\n        // Avoid negative lighting values\r\n        diffuseTerm = (adjShininess <= 5.0 ? 1.0 : clamp(diffuseTerm, 0.0, 1.0)) * 0.9;\r\n        float plumeWorleySize = mix(0.85, 0.35, u_PlumeBias);\r\n        worleyResult worley = getWorley(normalize(fs_Pos), plumeWorleySize, 1.0);\r\n        vec3 lavaColor = getLavaColor(normalize(fs_Pos), worley);\r\n        diffuseColor.xyz = adjShininess <= 5.0 ? lavaColor : diffuseColor.xyz;\r\n        diffuseColor.xyz = mix(lavaColor, diffuseColor.xyz, smoothstep(4.0, 50.0, adjShininess));\r\n\r\n\r\n        float ambientTerm = 0.1;\r\n\r\n        vec3 halfVec = normalize(fs_LightVec.xyz + normalize(u_EyePos - fs_Pos));\r\n        float specularTerm = pow(max(0.0, dot(halfVec, adjNor.xyz)), adjShininess);\r\n        specularTerm = adjShininess > 5.5 ? 0.0 : (0.0, 0.5, specularTerm);\r\n\r\n        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\r\n                                                            //to simulate ambient lighting. This ensures that faces that are not\r\n                                                            //lit by our point light are not completely black.\r\n\r\n        // Compute final shaded color\r\n        out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);\r\n        out_Col.xyz += vec3(specularTerm);\r\n}\r\n"
 
 /***/ }),
-/* 83 */
+/* 87 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n// This is a fragment shader. If you've opened this file first, please\r\n// open and read lambert.vert.glsl before reading on.\r\n// Unlike the vertex shader, the fragment shader actually does compute\r\n// the shading of geometry. For every pixel in your program's output\r\n// screen, the fragment shader is run for every bit of geometry that\r\n// particular pixel overlaps. By implicitly interpolating the position\r\n// data passed into the fragment shader by the vertex shader, the fragment shader\r\n// can compute what color to apply to its pixel based on things like vertex\r\n// position, light position, and vertex color.\r\nprecision highp float;\r\n\r\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\r\n\r\nuniform float u_Time;\r\nuniform float u_Speed;\r\n\r\nuniform vec3 u_EyePos;\r\n\r\n// These are the interpolated values out of the rasterizer, so you can't know\r\n// their specific values without knowing the vertices that contributed to them\r\nin vec3 fs_Pos;\r\nin vec4 fs_Nor;\r\nin vec4 fs_LightVec;\r\nin vec4 fs_Col;\r\n in float fs_Shininess;\r\nflat in vec3 fs_FlatPos;\r\n\r\nconst float PI = 3.14159265;\r\n\r\n// https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83\r\nvec3 random3(vec3 c) {\r\n    float j = 4096.0*sin(dot(c, vec3(17.0, 59.4, 15.0)));\r\n    vec3 r;\r\n    r.z = fract(512.0*j);\r\n    j *= .125;\r\n    r.x = fract(512.0*j);\r\n    j *= .125;\r\n    r.y = fract(512.0*j);\r\n    return r;\r\n}\r\n\r\nstruct worleyResult {\r\n    vec3 closest0;\r\n    float closestDist0;\r\n    vec3 closest1;\r\n    float closestDist1;\r\n    vec3 normClosest0;\r\n    vec3 normClosest1;\r\n    vec3 normal;\r\n};\r\n\r\nconst float WORLEY_BIG_FLOAT = 1.0e10;\r\nconst float WORLEY_EPSILON = 0.001;\r\n\r\nworleyResult getWorley(vec3 pt, float gridSize, float timeFactor) {\r\n    vec3 gridOrigin;\r\n    if (gridSize >= 1.0) {\r\n        gridOrigin.x = pt.x > 0.0 ? 0.0 : -gridSize;\r\n        gridOrigin.y = pt.y > 0.0 ? 0.0 : -gridSize;\r\n        gridOrigin.z = pt.z > 0.0 ? 0.0 : -gridSize;\r\n    }\r\n    else {\r\n        gridOrigin = pt - mod(pt, gridSize);\r\n    }\r\n    worleyResult result;\r\n    result.closest0 = vec3(0.0);\r\n    result.closest1 = vec3(0.0);\r\n    result.closestDist0 = WORLEY_BIG_FLOAT;\r\n    result.closestDist1 = WORLEY_BIG_FLOAT;\r\n    for (float i = -gridSize; i < gridSize + WORLEY_EPSILON; i += gridSize) {\r\n        for (float j = -gridSize; j < gridSize + WORLEY_EPSILON; j += gridSize) {\r\n            for (float k = -gridSize; k < gridSize + WORLEY_EPSILON; k += gridSize) {\r\n                vec3 gridPt = gridOrigin + vec3(i, j, k);\r\n                // compute random point\r\n                //vec3 randPt = gridPt + (random3(gridPt) * 0.5 + vec3(cos(u_Time * 0.0001), sin(u_Time * 0.0001), sin(u_Time * 0.0002)) * 0.25 + 0.25) * gridSize;\r\n                vec3 randPt;\r\n                if (timeFactor < 0.0) {\r\n                    randPt = gridPt + random3(gridPt) * gridSize;\r\n                }\r\n                else {\r\n                    randPt = gridPt + (random3(gridPt) * 0.5 + vec3(cos(u_Time * 0.0001), sin(u_Time * 0.0001), sin(u_Time * 0.0002)) * 0.25 + 0.25) * gridSize;\r\n                }\r\n                // find distance\r\n                float dist = distance(randPt, pt);\r\n                // store if closest\r\n                if (dist < result.closestDist0) {\r\n                    // check if closest0 is already set\r\n                    // if it is, store it in closest1 (and distance too)\r\n                    // we don't want to overwrite and lose them\r\n                    if (result.closestDist0 < WORLEY_BIG_FLOAT) {\r\n                        result.closestDist1 = result.closestDist0;\r\n                        result.closest1 = result.closest0;\r\n                    }\r\n                    result.closestDist0 = dist;\r\n                    result.closest0 = randPt;\r\n                }\r\n                else if (dist < result.closestDist1) {\r\n                    result.closestDist1 = dist;\r\n                    result.closest1 = randPt;\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    result.normClosest0 = normalize(result.closest0);\r\n    result.normClosest1 = normalize(result.closest1);\r\n\r\n    return result;\r\n}\r\n\r\n\r\n/* Buildings -- with Worley */\r\nconst float streetRadius = 0.12;\r\n\r\nvec3 getBldgDisp(vec3 pt, inout worleyResult worley) {\r\n    vec3 bldgDir = worley.normClosest0;\r\n    // compute distance from border\r\n    // 1 - 0 makes it point in the direction we want for normal\r\n    vec3 diff = worley.normClosest1 - worley.normClosest0;\r\n    vec3 borderNormal = normalize(diff);\r\n    vec3 toClosest = pt - worley.normClosest0;\r\n    float distFromClosest = abs(dot(toClosest, borderNormal));\r\n    float distToBorder = 0.5 * length(diff) - distFromClosest;\r\n    float dist = distToBorder;// distance(pt, bldgDir);\r\n    float projLen = dot(bldgDir, pt);\r\n    // determines whether we are \"on\" the building\r\n    float s = (dist > streetRadius ? 1.0 : 0.0);\r\n    worley.normal = abs(dist - streetRadius) < (0.05 * streetRadius) ? borderNormal : bldgDir;\r\n    // (bldgHeight - projLen) + bldgHeight\r\n    float bldgHeight = random3(worley.closest0).x * 0.35 + 0.65;\r\n    s *= (2.0 * bldgHeight - projLen);\r\n    return s * bldgDir;\r\n}\r\n\r\nconst float lavaRadius = 0.01;\r\n\r\nconst vec3 LAVA_ORANGE = vec3(255.0, 110.0, 0.0) / 255.0;\r\nconst vec3 LAVA_BRIGHT_ORANGE = vec3(255.0, 142.0, 56.0) / 255.0;\r\n\r\nconst vec3 LAVA_RED = vec3(183.0, 21.0, 0.0) / 255.0;\r\nconst vec3 LAVA_BRIGHT_RED = vec3(209.0, 24.0, 0.0) / 255.0;\r\n\r\nvec3 getLavaColor(vec3 pt, worleyResult worley) {\r\n    vec3 bldgDir = worley.normClosest0;\r\n    // compute distance from border\r\n    // 1 - 0 makes it point in the direction we want for normal\r\n    vec3 diff = worley.normClosest1 - worley.normClosest0;\r\n    vec3 borderNormal = normalize(diff);\r\n    vec3 toClosest = pt - worley.normClosest0;\r\n    float distFromClosest = abs(dot(toClosest, borderNormal));\r\n    float distToBorder = 0.5 * length(diff) - distFromClosest;\r\n    float dist = distToBorder;// distance(pt, bldgDir);\r\n    float projLen = dot(bldgDir, pt);\r\n    // determines whether we are \"on\" the building\r\n    //float s = (dist > lavaRadius ? 1.0 : 0.0);\r\n    float s = smoothstep(0.0, 30.0 * lavaRadius, dist - lavaRadius);\r\n    vec3 faceColor = mix(LAVA_ORANGE, LAVA_BRIGHT_ORANGE, cos(u_Time * 0.001) * 0.5 + 0.5);\r\n    vec3 edgeColor = mix(LAVA_BRIGHT_RED, LAVA_RED, cos(u_Time * 0.001) * 0.5 + 0.5);\r\n\r\n    return mix(edgeColor, faceColor, s);\r\n}\r\n\r\nfloat surflet(vec3 P, vec3 gridPoint)\r\n{\r\n    // Compute falloff function by converting linear distance to a polynomial\r\n    float distX = abs(P.x - gridPoint.x);\r\n    float distY = abs(P.y - gridPoint.y);\r\n    float distZ = abs(P.z - gridPoint.z);\r\n    float tX = 1.0 - 6.0 * pow(distX, 5.0) + 15.0 * pow(distX, 4.0) - 10.0 * pow(distX, 3.0);\r\n    float tY = 1.0 - 6.0 * pow(distY, 5.0) + 15.0 * pow(distY, 4.0) - 10.0 * pow(distY, 3.0);\r\n    float tZ = 1.0 - 6.0 * pow(distZ, 5.0) + 15.0 * pow(distZ, 4.0) - 10.0 * pow(distZ, 3.0);\r\n\r\n    // Get the random vector for the grid point\r\n    vec3 gradient = random3(gridPoint);\r\n    // Get the vector from the grid point to P\r\n    vec3 diff = P - gridPoint;\r\n    // Get the value of our height field by dotting grid->P with our gradient\r\n    float height = dot(diff, gradient);\r\n    // Scale our height field (i.e. reduce it) by our polynomial falloff function\r\n    return height * tX * tY * tZ;\r\n}\r\n\r\nfloat PerlinNoise(vec3 v)\r\n{\r\n    // Tile the space\r\n    vec3 vXLYLZL = floor(v);\r\n    vec3 vXHYLZL = vXLYLZL + vec3(1.0, 0.0, 0.0);\r\n    vec3 vXHYHZL = vXLYLZL + vec3(1.0, 1.0, 0.0);\r\n    vec3 vXLYHZL = vXLYLZL + vec3(0.0, 1.0, 0.0);\r\n    vec3 vXLYLZH = vXLYLZL + vec3(0.0, 0.0, 1.0);\r\n    vec3 vXHYLZH = vXLYLZH + vec3(1.0, 0.0, 0.0);\r\n    vec3 vXHYHZH = vXLYLZH + vec3(1.0, 1.0, 0.0);\r\n    vec3 vXLYHZH = vXLYLZH + vec3(0.0, 1.0, 0.0);\r\n\r\n    return surflet(v, vXLYLZL) + surflet(v, vXHYLZL) + surflet(v, vXHYHZL) + surflet(v, vXLYHZL) +\r\n        surflet(v, vXLYLZH) + surflet(v, vXHYLZH) + surflet(v, vXHYHZH) + surflet(v, vXLYHZH);\r\n}\r\n\r\nfloat normalizedPerlinNoise(vec3 v) {\r\n    return clamp(0.0, 1.0, PerlinNoise(v) * 0.5 + 0.5);\r\n}\r\n\r\nvec3 sphereToGrid(vec3 pt, float size) {\r\n    vec3 v = pt * 0.5 + 0.5;\r\n    return size * v;\r\n}\r\n\r\n/* Recursive Perlin Noise */\r\nfloat getRecursivePerlin(vec3 pt, float freq) {\r\n    vec3 gridPt = sphereToGrid(pt, 6.0 * freq);\r\n    // we recursive now boys\r\n    float t0 = normalizedPerlinNoise(gridPt);\r\n    return normalizedPerlinNoise(gridPt + sphereToGrid(vec3(t0) * 2.0 - vec3(1.0), 4.0 * freq));\r\n}\r\n\r\n/* FBM (uses Recursive Perlin) */\r\nfloat getFBM(vec3 pt, float startFreq) {\r\n    float noiseSum = 0.0;\r\n    float amplitudeSum = 0.0;\r\n    float amplitude = 0.5;\r\n    float frequency = startFreq;\r\n    for (int i = 0; i < 5; i++) {\r\n        float perlin = getRecursivePerlin(pt, frequency);\r\n        //uv = vec2(cos(3.14159/3.0 * i) * uv.x - sin(3.14159/3.0 * i) * uv.y, sin(3.14159/3.0 * i) * uv.x + cos(3.14159/3.0 * i) * uv.y);\r\n        noiseSum += perlin * amplitude;\r\n        amplitudeSum += amplitude;\r\n        amplitude *= 0.5;\r\n        frequency *= 2.0;\r\n    }\r\n    return noiseSum / amplitudeSum;\r\n}\r\n\r\nvec4 getFBMNormal(vec3 pt) {\r\n    vec3 adjPt = pt + vec3(sin(u_Time * 0.00001), cos(u_Time * 0.000034), cos(cos(u_Time * 0.000002) * PI));\r\n    float t = getFBM(adjPt, 0.5);\r\n    // estimate normal\r\n    const float GRADIENT_EPSILON = 0.05;\r\n    float fbmXL = getFBM(adjPt - vec3(GRADIENT_EPSILON, 0.0, 0.0), 0.5);\r\n    float fbmXH = getFBM(adjPt + vec3(GRADIENT_EPSILON, 0.0, 0.0), 0.5);\r\n    float fbmYL = getFBM(adjPt - vec3(0.0, GRADIENT_EPSILON, 0.0), 0.5);\r\n    float fbmYH = getFBM(adjPt + vec3(0.0, GRADIENT_EPSILON, 0.0), 0.5);\r\n    float fbmZL = getFBM(adjPt - vec3(0.0, 0.0, GRADIENT_EPSILON), 0.5);\r\n    float fbmZH = getFBM(adjPt + vec3(0.0, 0.0, GRADIENT_EPSILON), 0.5);\r\n    return vec4(normalize(vec3(fbmXL - fbmXH, fbmYL - fbmYH, fbmZL - fbmZH)), 0.0);\r\n}\r\n\r\n\r\nfloat getRealShininess() {\r\n    return distance(fs_FlatPos, fs_Pos) > 0.2 ? 5.0 : fs_Shininess;\r\n}\r\n\r\n\r\nout vec4 out_Col; // This is the final output color that you will see on your\r\n                  // screen for the pixel that is currently being processed.\r\n\r\nvoid main()\r\n{\r\n        out_Col = fs_Col;\r\n        //return;\r\n        vec4 diffuseColor = vec4(1.0);\r\n        diffuseColor.xyz = vec3(0.89);\r\n        diffuseColor.xyz = fs_Col.xyz;\r\n\r\n        // Calculate the diffuse term for Lambert shading\r\n        float adjShininess = fs_Shininess;// <= 5.0 ? fs_Shininess : getRealShininess();\r\n        vec4 adjNor = adjShininess <= 5.0 ? getFBMNormal(fs_Pos) : fs_Nor;\r\n        /*\r\n        vec3 tbnNormal = normalize(fs_Pos);\r\n        vec3 tbnTangent = normalize(cross(vec3(0.0, 1.0, 0.0), tbnNormal));\r\n        vec3 tbnBitangent = normalize(cross(tbnNormal, tbnTangent));\r\n        mat3 tbn;// = mat3(tbnTangent, tbnBitangent, tbnNormal);\r\n        tbn[0] = tbnBitangent;\r\n        tbn[1] = tbnNormal;\r\n        tbn[2] = tbnTangent;\r\n        adjNor.xyz = tbn * adjNor.xyz;// vec3(0.0, 1.0, 0.0);\r\n        */\r\n\r\n        float diffuseTerm = dot(normalize(adjNor), normalize(fs_LightVec));\r\n        // pretend we know how to shade things\r\n        diffuseTerm *= mix(0.3, 1.0, smoothstep(-0.7, 0.3, dot(normalize(fs_Pos), normalize(fs_LightVec.xyz))));\r\n        // Avoid negative lighting values\r\n        diffuseTerm = (adjShininess <= 5.0 ? 1.0 : clamp(diffuseTerm, 0.0, 1.0)) * 0.9;\r\n        worleyResult worley = getWorley(fs_Pos, 0.65, 1.0);\r\n        vec3 lavaColor = adjNor.xyz * 0.5 + vec3(0.5);\r\n        diffuseColor.xyz = adjShininess <= 5.0 ? lavaColor : diffuseColor.xyz;\r\n        diffuseColor.xyz = mix(lavaColor, diffuseColor.xyz, smoothstep(4.0, 50.0, adjShininess));\r\n\r\n\r\n        float ambientTerm = 0.1;\r\n\r\n        vec3 halfVec = normalize(fs_LightVec.xyz + normalize(u_EyePos - fs_Pos));\r\n        float specularTerm = pow(max(0.0, dot(halfVec, adjNor.xyz)), adjShininess);\r\n        specularTerm = adjShininess > 5.5 ? 0.0 : (0.0, 0.5, specularTerm);\r\n\r\n        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\r\n                                                            //to simulate ambient lighting. This ensures that faces that are not\r\n                                                            //lit by our point light are not completely black.\r\n\r\n        // Compute final shaded color\r\n        out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);\r\n        out_Col.xyz += vec3(specularTerm);\r\n        //out_Col.xyz = adjNor.xyz * 0.5 + vec3(0.5);\r\n\r\n        /*\r\n        if (dot(fs_Pos, fs_FlatPos) > 0.999 && abs(length(fs_Pos) - length(fs_FlatPos)) > 0.1) {\r\n            out_Col.xyz = vec3(1.0, 0.0, 1.0);\r\n        }\r\n        */\r\n}\r\n"
 
 /***/ }),
-/* 84 */
+/* 88 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\r\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\r\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\r\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\r\n//This simultaneous transformation allows your program to run much faster, especially when rendering\r\n//geometry with millions of vertices.\r\n\r\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\r\n                            // object we're rendering. In this assignment,\r\n                            // this will be the result of traversing your scene graph.\r\n\r\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\r\n                            // This allows us to transform the object's normals properly\r\n                            // if the object has been non-uniformly scaled.\r\n\r\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\r\n                            // We've written a static matrix for you to use for HW2,\r\n                            // but in HW3 you'll have to generate one yourself\r\n\r\nuniform float u_Time;\r\nuniform float u_TimeXZ;\r\nuniform float u_TimeY;\r\nuniform float u_Speed;\r\n\r\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\r\n\r\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\r\n\r\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\r\n\r\nflat out float fs_Shininess;\r\nout vec3 fs_Pos;\r\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\r\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\r\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\r\n\r\nconst vec4 lightPos = vec4(5 + 1, 5, 3, 1); //The position of our virtual light, which is used to compute the shading of\r\n                                            //the geometry in the fragment shader.\r\n\r\n\r\nconst vec3 a = vec3(0.4, 0.5, 0.8);\r\nconst vec3 b = vec3(0.2, 0.4, 0.2);\r\nconst vec3 c = vec3(1.0, 1.0, 2.0);\r\nconst vec3 d = vec3(0.25, 0.25, 0.0);\r\n\r\nconst vec3 e = vec3(0.2, 0.5, 0.8);\r\nconst vec3 f = vec3(0.2, 0.25, 0.5);\r\nconst vec3 g = vec3(1.0, 1.0, 0.1);\r\nconst vec3 h = vec3(0.0, 0.8, 0.2);\r\n\r\n// Return a random direction in a circle\r\nvec2 random2(vec2 p) {\r\n    return normalize(2.0 * fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3))))*43758.5453) - 1.0);\r\n}\r\n// https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83\r\nvec3 random3(vec3 c) {\r\n    float j = 4096.0*sin(dot(c, vec3(17.0, 59.4, 15.0)));\r\n    vec3 r;\r\n    r.z = fract(512.0*j);\r\n    j *= .125;\r\n    r.x = fract(512.0*j);\r\n    j *= .125;\r\n    r.y = fract(512.0*j);\r\n    return r;\r\n}\r\n\r\nfloat rand1(float n) {\r\n    return fract(sin(n) * 43758.5453123);\r\n}\r\n\r\nfloat noise1(float p) {\r\n    float fl = floor(p);\r\n    float fc = fract(p);\r\n    return mix(rand1(fl), rand1(fl + 1.0), fc);\r\n}\r\n\r\nvec3 getSmoothRandom3(vec3 pt) {\r\n    vec3 noiseSum = vec3(0.0);\r\n    float amplitudeSum = 0.0;\r\n    float amplitude = 0.5;\r\n    float frequency = 1.0;\r\n    for (int i = 0; i < 8; i++) {\r\n        vec3 freqPt = frequency * pt;\r\n        vec3 noise = random3(freqPt);\r\n        //vec3 noise = vec3(random2(freqPt.xy), 0.0) * 0.5 + 0.5;\r\n        //vec3 noise = vec3(noise1(pt.x), noise1(pt.y), noise1(pt.z));\r\n        noiseSum += noise * amplitude;\r\n        amplitudeSum += amplitude;\r\n        amplitude *= 0.5;\r\n        frequency *= 2.0;\r\n    }\r\n    return noiseSum / amplitudeSum;\r\n}\r\n\r\n/*\r\nvec3 Gradient(float t)\r\n{\r\nreturn a + b * cos(6.2831 * (c * t + d));\r\n}\r\n\r\nvec3 Gradient2(float t)\r\n{\r\nreturn e + f * cos(6.2831 * (g * t + h));\r\n}\r\n*/\r\n\r\nfloat surflet(vec2 P, vec2 gridPoint)\r\n{\r\n    // Compute falloff function by converting linear distance to a polynomial\r\n    float distX = abs(P.x - gridPoint.x);\r\n    float distY = abs(P.y - gridPoint.y);\r\n    float tX = 1.0 - 6.0 * pow(distX, 5.0) + 15.0 * pow(distX, 4.0) - 10.0 * pow(distX, 3.0);\r\n    float tY = 1.0 - 6.0 * pow(distY, 5.0) + 15.0 * pow(distY, 4.0) - 10.0 * pow(distY, 3.0);\r\n\r\n    // Get the random vector for the grid point\r\n    vec2 gradient = random2(gridPoint);\r\n    // Get the vector from the grid point to P\r\n    vec2 diff = P - gridPoint;\r\n    // Get the value of our height field by dotting grid->P with our gradient\r\n    float height = dot(diff, gradient);\r\n    // Scale our height field (i.e. reduce it) by our polynomial falloff function\r\n    return height * tX * tY;\r\n}\r\n\r\nfloat surflet(vec3 P, vec3 gridPoint)\r\n{\r\n    // Compute falloff function by converting linear distance to a polynomial\r\n    float distX = abs(P.x - gridPoint.x);\r\n    float distY = abs(P.y - gridPoint.y);\r\n    float distZ = abs(P.z - gridPoint.z);\r\n    float tX = 1.0 - 6.0 * pow(distX, 5.0) + 15.0 * pow(distX, 4.0) - 10.0 * pow(distX, 3.0);\r\n    float tY = 1.0 - 6.0 * pow(distY, 5.0) + 15.0 * pow(distY, 4.0) - 10.0 * pow(distY, 3.0);\r\n    float tZ = 1.0 - 6.0 * pow(distZ, 5.0) + 15.0 * pow(distZ, 4.0) - 10.0 * pow(distZ, 3.0);\r\n\r\n    // Get the random vector for the grid point\r\n    vec3 gradient = random3(gridPoint);\r\n    //vec3 gradient = vec3(random2(gridPoint.xy), random2(gridPoint.zz).x);\r\n    //vec3 gradient = random3(gridPoint);\r\n    // Get the vector from the grid point to P\r\n    vec3 diff = P - gridPoint;\r\n    // Get the value of our height field by dotting grid->P with our gradient\r\n    float height = dot(diff, gradient);\r\n    // Scale our height field (i.e. reduce it) by our polynomial falloff function\r\n    return height * tX * tY * tZ;\r\n}\r\n\r\nfloat PerlinNoise(vec2 uv)\r\n{\r\n    // Tile the space\r\n    vec2 uvXLYL = floor(uv);\r\n    vec2 uvXHYL = uvXLYL + vec2(1, 0);\r\n    vec2 uvXHYH = uvXLYL + vec2(1, 1);\r\n    vec2 uvXLYH = uvXLYL + vec2(0, 1);\r\n\r\n    return surflet(uv, uvXLYL) + surflet(uv, uvXHYL) + surflet(uv, uvXHYH) + surflet(uv, uvXLYH);\r\n}\r\n\r\nfloat PerlinNoise(vec3 v)\r\n{\r\n    // Tile the space\r\n    vec3 vXLYLZL = floor(v);\r\n    vec3 vXHYLZL = vXLYLZL + vec3(1.0, 0.0, 0.0);\r\n    vec3 vXHYHZL = vXLYLZL + vec3(1.0, 1.0, 0.0);\r\n    vec3 vXLYHZL = vXLYLZL + vec3(0.0, 1.0, 0.0);\r\n    vec3 vXLYLZH = vXLYLZL + vec3(0.0, 0.0, 1.0);\r\n    vec3 vXHYLZH = vXLYLZH + vec3(1.0, 0.0, 0.0);\r\n    vec3 vXHYHZH = vXLYLZH + vec3(1.0, 1.0, 0.0);\r\n    vec3 vXLYHZH = vXLYLZH + vec3(0.0, 1.0, 0.0);\r\n\r\n    return surflet(v, vXLYLZL) + surflet(v, vXHYLZL) + surflet(v, vXHYHZL) + surflet(v, vXLYHZL) +\r\n        surflet(v, vXLYLZH) + surflet(v, vXHYLZH) + surflet(v, vXHYHZH) + surflet(v, vXLYHZH);\r\n}\r\n\r\nfloat normalizedPerlinNoise(vec3 v) {\r\n    return clamp(0.0, 1.0, PerlinNoise(v) * 0.5 + 0.5);\r\n}\r\n\r\n/*\r\nvec2 PixelToGrid(vec2 pixel, float size)\r\n{\r\nvec2 uv = pixel.xy / u_Dimensions.xy;\r\n// Account for aspect ratio\r\nuv.x = uv.x * float(u_Dimensions.x) / float(u_Dimensions.y);\r\n// Determine number of cells (NxN)\r\nuv *= size;\r\n\r\nreturn uv;\r\n}\r\n*/\r\n\r\nvec3 sphereToGrid(vec3 pt, float size) {\r\n    vec3 v = pt * 0.5 + 0.5;\r\n    return size * v;\r\n}\r\n\r\nstruct worleyResult {\r\n    vec3 closest0;\r\n    float closestDist0;\r\n    vec3 closest1;\r\n    float closestDist1;\r\n    vec3 normClosest0;\r\n    vec3 normClosest1;\r\n    vec3 normal;\r\n};\r\n\r\nconst float WORLEY_BIG_FLOAT = 1.0e10;\r\nconst float WORLEY_EPSILON = 0.001;\r\n\r\nworleyResult getWorley(vec3 pt, float gridSize, float timeFactor) {\r\n    vec3 gridOrigin;\r\n    if (gridSize >= 1.0) {\r\n        gridOrigin.x = pt.x > 0.0 ? 0.0 : -gridSize;\r\n        gridOrigin.y = pt.y > 0.0 ? 0.0 : -gridSize;\r\n        gridOrigin.z = pt.z > 0.0 ? 0.0 : -gridSize;\r\n    }\r\n    else {\r\n        gridOrigin = pt - mod(pt, gridSize);\r\n    }\r\n    worleyResult result;\r\n    result.closest0 = vec3(0.0);\r\n    result.closest1 = vec3(0.0);\r\n    result.closestDist0 = WORLEY_BIG_FLOAT;\r\n    result.closestDist1 = WORLEY_BIG_FLOAT;\r\n    for (float i = -gridSize; i < gridSize + WORLEY_EPSILON; i += gridSize) {\r\n        for (float j = -gridSize; j < gridSize + WORLEY_EPSILON; j += gridSize) {\r\n            for (float k = -gridSize; k < gridSize + WORLEY_EPSILON; k += gridSize) {\r\n                vec3 gridPt = gridOrigin + vec3(i, j, k);\r\n                // compute random point\r\n                //vec3 randPt = gridPt + (random3(gridPt) * 0.5 + vec3(cos(u_Time * 0.0001), sin(u_Time * 0.0001), sin(u_Time * 0.0002)) * 0.25 + 0.25) * gridSize;\r\n                vec3 randPt;\r\n                if (timeFactor < 0.0) {\r\n                    randPt = gridPt + random3(gridPt) * gridSize;\r\n                }\r\n                else {\r\n                    randPt = gridPt + (random3(gridPt) * 0.5 + vec3(cos(u_Time * 0.0001), sin(u_Time * 0.0001), sin(u_Time * 0.0002)) * 0.25 + 0.25) * gridSize;\r\n                }\r\n                // find distance\r\n                float dist = distance(randPt, pt);\r\n                // store if closest\r\n                if (dist < result.closestDist0) {\r\n                    // check if closest0 is already set\r\n                    // if it is, store it in closest1 (and distance too)\r\n                    // we don't want to overwrite and lose them\r\n                    if (result.closestDist0 < WORLEY_BIG_FLOAT) {\r\n                        result.closestDist1 = result.closestDist0;\r\n                        result.closest1 = result.closest0;\r\n                    }\r\n                    result.closestDist0 = dist;\r\n                    result.closest0 = randPt;\r\n                }\r\n                else if (dist < result.closestDist1) {\r\n                    result.closestDist1 = dist;\r\n                    result.closest1 = randPt;\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    result.normClosest0 = normalize(result.closest0);\r\n    result.normClosest1 = normalize(result.closest1);\r\n\r\n    return result;\r\n}\r\n\r\n\r\n/* Buildings -- with Worley */\r\nconst float streetRadius = 0.12;\r\n\r\nvec3 getBldgDisp(vec3 pt, inout worleyResult worley) {\r\n    vec3 bldgDir = worley.normClosest0;\r\n    // compute distance from border\r\n    // 1 - 0 makes it point in the direction we want for normal\r\n    vec3 diff = worley.normClosest1 - worley.normClosest0;\r\n    vec3 borderNormal = normalize(diff);\r\n    vec3 toClosest = pt - worley.normClosest0;\r\n    float distFromClosest = abs(dot(toClosest, borderNormal));\r\n    float distToBorder = 0.5 * length(diff) - distFromClosest;\r\n    float dist = distToBorder;// distance(pt, bldgDir);\r\n    float projLen = dot(bldgDir, pt);\r\n    // determines whether we are \"on\" the building\r\n    float s = (dist > streetRadius ? 1.0 : 0.0);\r\n    worley.normal = abs(dist - streetRadius) < (0.05 * streetRadius) ? borderNormal : bldgDir;\r\n    // (bldgHeight - projLen) + bldgHeight\r\n    float bldgHeight = random3(worley.closest0).x * 0.55 + 0.75;\r\n    s *= (2.0 * bldgHeight - projLen);\r\n    return s * bldgDir;\r\n}\r\n\r\n/* Recursive Perlin Noise */\r\nfloat getRecursivePerlin(vec3 pt, float freq) {\r\n    vec3 gridPt = sphereToGrid(pt, 6.0 * freq);\r\n    // we recursive now boys\r\n    float t0 = normalizedPerlinNoise(gridPt);\r\n    return normalizedPerlinNoise(gridPt + sphereToGrid(vec3(t0) * 2.0 - vec3(1.0), 4.0 * freq));\r\n}\r\n\r\n/* FBM (uses Recursive Perlin) */\r\nfloat getFBM(vec3 pt, float startFreq) {\r\n    float noiseSum = 0.0;\r\n    float amplitudeSum = 0.0;\r\n    float amplitude = 0.5;\r\n    float frequency = startFreq;\r\n    for (int i = 0; i < 5; i++) {\r\n        float perlin = getRecursivePerlin(pt, frequency);\r\n        //uv = vec2(cos(3.14159/3.0 * i) * uv.x - sin(3.14159/3.0 * i) * uv.y, sin(3.14159/3.0 * i) * uv.x + cos(3.14159/3.0 * i) * uv.y);\r\n        noiseSum += perlin * amplitude;\r\n        amplitudeSum += amplitude;\r\n        amplitude *= 0.5;\r\n        frequency *= 2.0;\r\n    }\r\n    return noiseSum / amplitudeSum;\r\n    /*\r\n    float rawFBM = noiseSum / amplitudeSum;\r\n    float t = cos(u_Time * 0.001);\r\n    bool eroded = t > 0.0;\r\n    return pow(rawFBM, eroded ? 1.0 : 3.0) * (eroded ? 0.8 : 1.87) + (eroded ? 0.0 : 0.2);\r\n    */\r\n}\r\n\r\nvoid main()\r\n{\r\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\r\n\r\n    mat3 invTranspose = mat3(u_ModelInvTr);\r\n\r\n    const float PI = 3.14159265;\r\n    const float EPSILON = 0.001;\r\n    const float BLDG_EPSILON = 0.1;\r\n    float time = u_Speed * u_Time * 0.0001;\r\n    worleyResult worley = getWorley(vs_Pos.xyz, 0.65, -1.0);\r\n    worleyResult worleyTime = getWorley(vs_Pos.xyz, 0.9, 1.0);\r\n    vec4 bldgDisp = vec4(getBldgDisp(vs_Pos.xyz, worley), 0.0);\r\n    if (length(bldgDisp) < EPSILON) {\r\n        worley.normal = vs_Nor.xyz;\r\n    }\r\n    fs_Col = vec4(getSmoothRandom3(worley.closest0), 1.0);\r\n    float f = getFBM(worleyTime.closest0, 0.15);\r\n    f = smoothstep(0.35, 0.6, f);\r\n    //f = pow(f, 3.0) * 1.5;\r\n    //f = f > 0.3 ? (f * 1.5) : f;\r\n    //f = clamp(0.25, 0.75, f) * 2.0 - 0.5;\r\n    fs_Col = vec4(f, 0.33, 0.33, 1.0);\r\n    if (distance(normalize(vs_Pos.xyz), worleyTime.normClosest0) < 0.04) {\r\n        fs_Col.xyz = vec3(1.0) - fs_Col.xyz;\r\n    }\r\n    //fs_Col.xyz = getSmoothRandom3(vs_Pos.xyz);\r\n\r\n    //fs_Nor = vec4(invTranspose * vec3(worley.normal), 0);\r\n    // fs_Nor = vec4(invTranspose * bldgNormal, 0.0);          // Pass the vertex normals to the fragment shader for interpolation.\r\n    // Transform the geometry's normals by the inverse transpose of the\r\n    // model matrix. This is necessary to ensure the normals remain\r\n    // perpendicular to the surface after the surface is transformed by\r\n    // the model matrix.\r\n    // problem with buildings: normals???\r\n    // nature\r\n    /*\r\n    float timeXZ = u_Speed * u_TimeXZ;\r\n    float timeY = u_Speed * u_TimeY;\r\n    float cleanX = abs(vs_Pos.x) < EPSILON ? (EPSILON * sign(vs_Pos.x)) : vs_Pos.x;\r\n    float xzAngle = atan(vs_Pos.z, cleanX) * (6.0 - smoothstep(0.0, 1.0, (sin(timeXZ * 0.000314 * 2.0) * 0.5 + 0.5)) * 12.0);\r\n    float y = vs_Pos.y * (10.0 + smoothstep(0.0, 1.0, (sin(timeY * 0.000314) * 0.5 + 0.5)) * 40.0);\r\n    float t = cos(time * 0.002 + y + xzAngle) * 0.25 + 1.0;\r\n\r\n    vec4 modelposition = u_Model * (vec4(t, t, t, 1.0) * vs_Pos);   // Temporarily store the transformed vertex positions for use below\r\n    */\r\n    float t = getFBM(vs_Pos.xyz, 0.5);\r\n    // estimate normal\r\n    const float GRADIENT_EPSILON = 0.05;\r\n    float fbmXL = getFBM(vs_Pos.xyz - vec3(GRADIENT_EPSILON, 0.0, 0.0), 0.5);\r\n    float fbmXH = getFBM(vs_Pos.xyz + vec3(GRADIENT_EPSILON, 0.0, 0.0), 0.5);\r\n    float fbmYL = getFBM(vs_Pos.xyz - vec3(0.0, GRADIENT_EPSILON, 0.0), 0.5);\r\n    float fbmYH = getFBM(vs_Pos.xyz + vec3(0.0, GRADIENT_EPSILON, 0.0), 0.5);\r\n    float fbmZL = getFBM(vs_Pos.xyz - vec3(0.0, 0.0, GRADIENT_EPSILON), 0.5);\r\n    float fbmZH = getFBM(vs_Pos.xyz + vec3(0.0, 0.0, GRADIENT_EPSILON), 0.5);\r\n    vec3 fbmNormal = normalize(vec3(fbmXL - fbmXH, fbmYL - fbmYH, fbmZL - fbmZH));\r\n    //float t = normalizedPerlinNoise(vec3(t0, t1, t2));\r\n    /*\r\n    float dist = distance(normalize(vs_Pos.xyz), bldgDir);\r\n    const float RADIUS = 0.75;\r\n    float s = 0.1 + smoothstep(0.0, RADIUS, RADIUS - dist);\r\n    */\r\n    //float erosion = cos(u_Time * 0.001) * 0.5 + 0.5;\r\n    float xzAngle = cos(atan(vs_Pos.z, vs_Pos.x) + u_Time * 0.001) * 0.5 + 0.5;\r\n    xzAngle = f;\r\n    float erosion = f * smoothstep(0.33, 1.0, xzAngle);\r\n    t = pow(t, mix(0.77, 3.0, erosion)) * mix(0.8, 3.27, erosion) + mix(0.0, 0.0, erosion);\r\n    t = 0.5 + 1.5 * t;\r\n    //fs_Col.xyz = vec3(t - 1.0);\r\n    //t = pow(t, mix(1.0, 1.44, cos(time * 10.0) * 0.5 + 0.5));\r\n    vec4 naturePos = u_Model * (vec4(t, t, t, 1.0) * vs_Pos);   // Temporarily store the transformed vertex positions for use below\r\n    vec4 bldgPos = u_Model * (bldgDisp + vs_Pos);   // Temporarily store the transformed vertex positions for use below\r\n    vec4 modelposition = mix(bldgPos, naturePos, smoothstep(0.1667, 0.33, xzAngle));\r\n    fs_Pos = modelposition.xyz;\r\n\r\n    const vec3 erodedColor = vec3(124.0, 87.0, 0.0) / 255.0;\r\n    const vec3 nonErodedColor = vec3(35.0, 94.0, 18.0) / 255.0;\r\n    vec3 natureCol = mix(erodedColor, nonErodedColor, smoothstep(0.33, 1.0, xzAngle));\r\n    vec3 bldgCol = vec3(0.8, 0.8, 0.8);\r\n    fs_Col.xyz = mix(bldgCol, natureCol, smoothstep(0.1667, 0.47, xzAngle));\r\n\r\n    //vec3 localNor = fbmNormal;\r\n    //vec3 localNor = vs_Nor.xyz;\r\n    vec3 localNor = mix(worley.normal, fbmNormal, smoothstep(0.1667, 0.33, xzAngle));\r\n    fs_Nor = vec4(invTranspose * localNor, 0);\r\n\r\n    fs_Shininess = mix(5.0, 50.0, smoothstep(0.29, 0.33, xzAngle));\r\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\r\n\r\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\r\n                                             // used to render the final positions of the geometry's vertices\r\n}"
 
 /***/ }),
-/* 85 */
+/* 89 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\r\n\r\n// This is a fragment shader. If you've opened this file first, please\r\n// open and read lambert.vert.glsl before reading on.\r\n// Unlike the vertex shader, the fragment shader actually does compute\r\n// the shading of geometry. For every pixel in your program's output\r\n// screen, the fragment shader is run for every bit of geometry that\r\n// particular pixel overlaps. By implicitly interpolating the position\r\n// data passed into the fragment shader by the vertex shader, the fragment shader\r\n// can compute what color to apply to its pixel based on things like vertex\r\n// position, light position, and vertex color.\r\nprecision highp float;\r\n\r\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\r\n\r\nuniform float u_Time;\r\nuniform float u_Speed;\r\n\r\nuniform vec3 u_EyePos;\r\n\r\n// These are the interpolated values out of the rasterizer, so you can't know\r\n// their specific values without knowing the vertices that contributed to them\r\nin vec3 fs_Pos;\r\nin vec4 fs_Nor;\r\nin vec4 fs_LightVec;\r\nin vec4 fs_Col;\r\nflat in float fs_Shininess;\r\n\r\nout vec4 out_Col; // This is the final output color that you will see on your\r\n                  // screen for the pixel that is currently being processed.\r\n\r\nvoid main()\r\n{\r\n    out_Col = fs_Col;\r\n    //return;\r\n    // Material base color (before shading)\r\n    // IQ's iridescent palette...\r\n    vec3 bias = abs(fs_Nor.xyz);\r\n    vec3 scale = vec3(1.0) - bias;\r\n    vec3 freq = vec3(1.5, 0.5, 1.1);\r\n    vec3 phase = vec3(0.0, 0.5, 0.33);\r\n    float t = u_Speed * u_Time * 0.0001;\r\n    vec3 iridescent = bias + scale * cos(freq * t + phase);\r\n    // With alternating between the color and its RGB->GBR shifted version\r\n    float tShift = smoothstep(0.0, 1.0, (sin(u_Time * 0.000314) * 0.5 + 0.5));\r\n    vec4 baseColor = vec4(iridescent, 1.0);\r\n    vec4 altColor = baseColor.yzxw;\r\n    vec4 diffuseColor = mix(baseColor, altColor, tShift);\r\n    diffuseColor.xyz = vec3(0.89);\r\n    diffuseColor.xyz = fs_Col.xyz;\r\n\r\n    // Calculate the diffuse term for Lambert shading\r\n    float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\r\n    // Avoid negative lighting values\r\n    diffuseTerm = clamp(diffuseTerm, 0.0, 1.0) * 0.7;\r\n\r\n    float ambientTerm = 0.3;\r\n\r\n    vec3 halfVec = normalize(fs_LightVec.xyz + normalize(u_EyePos - fs_Pos));\r\n    float specularTerm = pow(max(0.0, dot(halfVec, fs_Nor.xyz)), fs_Shininess);\r\n    specularTerm = fs_Shininess > 5.5 ? 0.0 : (0.0, 0.5, specularTerm);\r\n\r\n    float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\r\n                                                        //to simulate ambient lighting. This ensures that faces that are not\r\n                                                        //lit by our point light are not completely black.\r\n\r\n                                                        // Compute final shaded color\r\n    out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);\r\n    out_Col.xyz += vec3(specularTerm);\r\n}"
