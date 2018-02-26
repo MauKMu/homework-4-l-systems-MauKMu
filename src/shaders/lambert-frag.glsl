@@ -15,6 +15,8 @@ uniform vec4 u_Color; // The color with which to render this instance of geometr
 
 uniform sampler2D u_Sampler0;
 
+uniform vec3 u_LightPos;
+
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
 in vec4 fs_Nor;
@@ -36,7 +38,7 @@ void main()
         }
 
         // Calculate the diffuse term for Lambert shading
-        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
+        float diffuseTerm = dot(normalize(fs_Nor.xyz), normalize(u_LightPos));
         // Avoid negative lighting values
         diffuseTerm = clamp(diffuseTerm, 0.0, 1.0);
 

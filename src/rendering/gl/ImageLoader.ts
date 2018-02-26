@@ -1,4 +1,4 @@
-//import {gl} from '../../globals';
+import {gl} from '../../globals';
 
 
 // Based on:
@@ -8,7 +8,8 @@
 // Initialize a texture and load an image.
 // When the image finished loading copy it into the texture.
 //
-export function loadTexture(gl: WebGLRenderingContext, url: string): WebGLTexture {
+//export function loadTexture(gl: WebGLRenderingContext, url: string): WebGLTexture {
+export function loadTexture(url: string): WebGLTexture {
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
 

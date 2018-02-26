@@ -1,3 +1,4 @@
+// models from https://www.models-resource.com/wii/kirbysreturntodreamland/model/4572/
 import {vec3, vec4, mat3, mat4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
@@ -28,6 +29,14 @@ enum ShaderEnum {
     MAGIC,
 }
 
+enum FruitEnum {
+    BANANA = 1,
+    PINEAPPLE,
+    RAMEN,
+    PIZZA,
+    CAKE,
+}
+
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
@@ -39,7 +48,7 @@ const controls = {
     'Toggle tilting': toggleAnimXZ,
     'Toggle squishing': toggleAnimY,
     lightX: 10,
-    lightY: 1,
+    lightY: 10,
     lightZ: 1,
     lavaBias: 50,
     plumeBias: 0,
@@ -49,9 +58,11 @@ const controls = {
     randomSeed: 0,
     woodColor: [BRANCH_COLOR[0] * 255, BRANCH_COLOR[1] * 255, BRANCH_COLOR[2] * 255],
     leafColor: [TIP_COLOR[0] * 255, TIP_COLOR[1] * 255, TIP_COLOR[2] * 255],
+    fruit: FruitEnum.BANANA,
     'Show Alphabet': showAlphabet,
-    'Regenerate Plant': remakePlant,
-    'Recolor Plant': recolorPlant,
+    'Show String': showCurrentString,
+    'Regenerate String and Plant': remakePlant,
+    'Redraw Plant': redrawPlant,
 };
 
 let icosphere: Icosphere;
@@ -73,17 +84,29 @@ function showAlphabet() {
     alert(strBuilder.join("\n"));
 }
 
+function showCurrentString() {
+    alert(lsys.lstring.toString());
+}
+
 function remakePlant() {
+    updateFruit(controls.fruit);
+    lRandom.setSeed(controls.randomSeed);
     lsys.resetSystem();
     runIterations(controls.iterations);
+    // expanding string also consumes RNG, so
+    // we reset seed again to make this output consistent
+    // with redrawPlant()
+    lRandom.setSeed(controls.randomSeed);
     lsys.createPlant();
     //if (!lsys.plant.wasSafe) {
         //alert("Plant grew too much!");
     //}
 }
 
-function recolorPlant() {
-    // reset plant only
+function redrawPlant() {
+    // reset plant only, so we keep current string
+    updateFruit(controls.fruit);
+    lRandom.setSeed(controls.randomSeed);
     lsys.resetPlant();
     lsys.createPlant();
 }
@@ -107,8 +130,27 @@ function toggleAnimY() {
     renderer.toggleAnimY();
 }
 
+// as it turns out, Maps keyed by Enums and dat.GUI don't play well,
+// since dat.GUI mysteriously returns Enum values as strings...???
+// so these have to be plain objects...
+// well, TypeScript typed objects
+let objFilenames: { [id: number]: string } = {};
+objFilenames[FruitEnum.BANANA] = "models/banana.obj";
+objFilenames[FruitEnum.PINEAPPLE] = "models/pineapple.obj";
+objFilenames[FruitEnum.RAMEN] = "models/ramen.obj";
+objFilenames[FruitEnum.PIZZA] = "models/pizza.obj";
+objFilenames[FruitEnum.CAKE] = "models/cake.obj";
+let texFilenames: { [id: number]: string } = {};
+texFilenames[FruitEnum.BANANA] = "textures/banana.png";
+texFilenames[FruitEnum.PINEAPPLE] = "textures/pineapple.png";
+texFilenames[FruitEnum.RAMEN] = "textures/ramen.png";
+texFilenames[FruitEnum.PIZZA] = "textures/pizza.png";
+texFilenames[FruitEnum.CAKE] = "textures/cake.png";
 let objString: string;
 let isObjLoaded: boolean;
+let lastLoaded: number;
+let mesh: any;
+let texture: WebGLTexture;
 
 function readTextFile(file: string) {
     var rawFile = new XMLHttpRequest();
@@ -117,6 +159,7 @@ function readTextFile(file: string) {
         if (rawFile.readyState === 4) {
             if (rawFile.status === 200 || rawFile.status == 0) {
                 objString = rawFile.responseText;
+                mesh = new OBJ.Mesh(objString);
                 isObjLoaded = true;
                 //alert(objString);
             }
@@ -126,16 +169,56 @@ function readTextFile(file: string) {
     rawFile.send(null);
 }
 
+function loadMesh(filename: string) {
+    objString = "";
+    readTextFile(filename);
+}
+
+function loadFruit(fruit: FruitEnum) {
+    loadMesh(objFilenames[fruit]);
+    texture = loadTexture(texFilenames[fruit]);
+}
+
+let cakeCount: number = 0;
+
+function updateFruit(fruit: FruitEnum) {
+    if (fruit == FruitEnum.CAKE) {
+        // print "funny" message
+        if (cakeCount <= 0) {
+            alert("the cake is a lie.");
+        }
+        else if (cakeCount == 1) {
+            alert("Well... if you insist.");
+        }
+        else if (cakeCount == 4) {
+            alert("Delicious and moist.");
+        }
+
+        cakeCount++;
+
+        if (cakeCount <= 1) {
+            return;
+        }
+    }
+    if (fruit != lastLoaded) {
+        loadFruit(fruit);
+        lastLoaded = fruit;
+    }
+}
+
 function blah() {
     //lRandom.setMode(LRANDOM_DETERMINISTIC);
     //lRandom.setSeed(10);
-    objString = "";
-    isObjLoaded = false;
+    //objString = "";
+    //isObjLoaded = false;
     //readTextFile("models/fg_pear.obj");
-    readTextFile("models/banana.obj");
-    console.log(isObjLoaded);
-    let mesh = new OBJ.Mesh(objString);
-    debugger;
+    //readTextFile("models/banana.obj");
+    //console.log(isObjLoaded);
+    //let mesh = new OBJ.Mesh(objString);
+
+    loadFruit(controls.fruit);
+    lastLoaded = controls.fruit;
+
     // define alphabet
     alphabet = new Map<string, LSymbol>();
 
@@ -638,18 +721,20 @@ function main() {
     //gui.add(controls, 'lavaBias', 0, 100);
     //gui.add(controls, 'plumeBias', 0, 100);
     //gui.add(controls, 'edgeClarity', 0, 100);
-    //let lightFolder = gui.addFolder('Light Position');
-    //lightFolder.add(controls, 'lightX');
-    //lightFolder.add(controls, 'lightY');
-    //lightFolder.add(controls, 'lightZ');
+    let lightFolder = gui.addFolder('Light Position');
+    lightFolder.add(controls, 'lightX');
+    lightFolder.add(controls, 'lightY');
+    lightFolder.add(controls, 'lightZ');
     gui.add(controls, 'iterations').min(0).step(1);
     let randomModeController = gui.add(controls, 'randomMode', { "Math.random()": LRANDOM_MATH_RANDOM, "Seeded Noise": LRANDOM_DETERMINISTIC });
     let randomSeedController = gui.add(controls, 'randomSeed');
     let woodColorController = gui.addColor(controls, 'woodColor');
     let leafColorController = gui.addColor(controls, 'leafColor');
+    gui.add(controls, 'fruit', { "Banana": FruitEnum.BANANA, "Pineapple": FruitEnum.PINEAPPLE, '"Chinese Noodles"': FruitEnum.RAMEN, "Pizza": FruitEnum.PIZZA, "Cake": FruitEnum.CAKE });
     gui.add(controls, 'Show Alphabet');
-    gui.add(controls, 'Regenerate Plant');
-    gui.add(controls, 'Recolor Plant');
+    gui.add(controls, 'Show String');
+    gui.add(controls, 'Regenerate String and Plant');
+    gui.add(controls, 'Redraw Plant');
 
 
     // Set up L-system event listeners
@@ -685,9 +770,9 @@ function main() {
     blah();
 
     // load textures
-    let pearTex = loadTexture(gl, "textures/banana.png");
+    //let pearTex = loadTexture(gl, "textures/banana.png");
 
-    const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
+    const camera = new Camera(vec3.fromValues(0, 200, 450), vec3.fromValues(0, 200, 0));
 
     renderer = new OpenGLRenderer(canvas);
     renderer.setClearColor(0.2, 0.2, 0.2, 1);
@@ -748,13 +833,15 @@ function main() {
     shaders[ShaderEnum.MAGIC] = planetMagic;
     shaders[ShaderEnum.BLDGS] = bldgs;
 
+    // set shader to use texture
+    lambert.setSampler0(texture);
+
     // This function will be called every frame
     function tick() {
         camera.update();
         stats.begin();
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
-        lambert.setSampler0(pearTex);
         renderer.setLightPos(vec3.fromValues(controls.lightX, controls.lightY, controls.lightZ));
         renderer.setLavaBias(controls.lavaBias / 100);
         renderer.setPlumeBias(controls.plumeBias / 100);
