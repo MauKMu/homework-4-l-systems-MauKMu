@@ -12,6 +12,7 @@ import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import {loadTexture} from './rendering/gl/ImageLoader';
+import * as swal from 'sweetalert';
 
 var OBJ = require('webgl-obj-loader');
 
@@ -82,15 +83,15 @@ function showAlphabet() {
     alphabet.forEach(function (value: LSymbol, index: string, map: Map<string, LSymbol>) {
         strBuilder.push(index);
     });
-    alert(strBuilder.join("\n"));
+    swal(strBuilder.join("\n"));
 }
 
 function showCurrentString() {
-    alert(lsys.lstring.toString());
+    swal(lsys.lstring.toString());
 }
 
 function showHelp() {
-    alert([
+    swal(
         "Light Position: controls the light position for shading\n\n" +
         "iterations: number of times to expand the string\n\n" + 
         "randomMode: pick between using Math.random() or a deterministic seeded noise function\n\n" +
@@ -104,7 +105,7 @@ function showHelp() {
         "Regenerate String and Plant: resets L-system string to axiom, re-expands it, then re-draws plant\n\n" +
         "Redraw Plant: re-draws plant without modifying L-system string\n\n" +
         "Show Help: shows this help message\n\n"
-    ]);
+    );
 }
 
 function remakePlant() {
@@ -204,13 +205,13 @@ function updateFruit(fruit: FruitEnum) {
     if (fruit == FruitEnum.CAKE) {
         // print "funny" message
         if (cakeCount <= 0) {
-            alert("the cake is a lie.");
+            swal("the cake is a lie.");
         }
         else if (cakeCount == 1) {
-            alert("Well... if you insist.");
+            swal("Well... if you insist.");
         }
         else if (cakeCount == 3) {
-            alert("Delicious and moist.");
+            swal("Delicious and moist.");
         }
 
         cakeCount++;
