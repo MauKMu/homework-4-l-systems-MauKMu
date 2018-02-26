@@ -190,7 +190,7 @@ function updateFruit(fruit: FruitEnum) {
         else if (cakeCount == 1) {
             alert("Well... if you insist.");
         }
-        else if (cakeCount == 4) {
+        else if (cakeCount == 3) {
             alert("Delicious and moist.");
         }
 
@@ -713,9 +713,9 @@ function main() {
     const gui = new DAT.GUI();
     //gui.add(controls, 'tesselations', 0, 8).step(1);
     //gui.add(controls, 'Load Scene');
-    let colorController = gui.addColor(controls, 'geometryColor');
+    //let colorController = gui.addColor(controls, 'geometryColor');
     //gui.add(controls, 'shader', { "Lame Lambert": ShaderEnum.LAMBERT, "Cool Custom": ShaderEnum.CUSTOM, "Decent Disks": ShaderEnum.DISKS, "Plumous Planet": ShaderEnum.PLANET, "Urban Planet": ShaderEnum.BLDGS, "Magic Plumous Planet": ShaderEnum.MAGIC });
-    let speedController = gui.add(controls, 'shaderSpeed', 0, 10);
+    //let speedController = gui.add(controls, 'shaderSpeed', 0, 10);
     //gui.add(controls, 'Toggle tilting');
     //gui.add(controls, 'Toggle squishing');
     //gui.add(controls, 'lavaBias', 0, 100);
@@ -779,9 +779,9 @@ function main() {
     gl.enable(gl.DEPTH_TEST);
 
     // Set up event listener for color change
-    colorController.onChange(function (color: Int32Array) {
-        renderer.setGeometryColor(vec4.fromValues(color[0] / 255, color[1] / 255, color[2] / 255, 1));
-    });
+    //colorController.onChange(function (color: Int32Array) {
+        //renderer.setGeometryColor(vec4.fromValues(color[0] / 255, color[1] / 255, color[2] / 255, 1));
+    //});
 
     // Initialize color
     renderer.setGeometryColor(vec4.fromValues(controls.geometryColor[0] / 255,
@@ -791,9 +791,9 @@ function main() {
     ));
 
     // Set up event listener for shader speed
-    speedController.onChange(function (speed: number) {
-        renderer.setShaderSpeed(speed);
-    });
+    //speedController.onChange(function (speed: number) {
+        //renderer.setShaderSpeed(speed);
+    //});
 
     const lambert = new ShaderProgram([
         new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
