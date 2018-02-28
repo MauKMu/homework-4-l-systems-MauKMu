@@ -38,12 +38,14 @@ Below is an explanation of how to use the controls in the demo. A similar explan
 * The geometry is placed in one set of VBOs (including vertex positions, normals, and UV coordinates) so it can be rendered with just one draw call.
 * I wanted to make a not-so-generic tree. I took inspiration from *araucárias*, a type of tree found in Brazil (as well as Argentina, Chile, and Australia, according to Wikipedia). I wanted to reproduce the unique shape created by their branches that gradually curve upwards as they get farther from the main trunk (see image below).
 ![](images/real-araucaria.jpg)
+
 (Image taken from [here](http://www.mundohusqvarna.com.br/assunto/araucaria-e-possivel-combater-o-risco-de-extincao/))
 * My final trees differ from *araucárias* in two significant points:
+  * They have fruit. Sometimes, the fruit isn't very fruity. They are models from ["Kirby's Return to Dream Land"](https://www.models-resource.com/wii/kirbysreturntodreamland/model/4572/).
   * They have a base that twists around before righting itself up, instead of just going straight up from the base. This was the result of spending too much time Googling for "trees" and eventually finding "crooked trees", such as the one below. I wanted to reproduce these twisting trunks to give my L-system more variety.
 ![](images/crooked.jpg)
+
 (Image taken from [here](http://www.youramazingplaces.com/incredible-photo-shoots-of-13-cool-places/))
-  * They have fruit. Sometimes, the fruit isn't very fruity. They are models from ["Kirby's Return to Dream Land"](https://www.models-resource.com/wii/kirbysreturntodreamland/model/4572/).
 
 ### L-system Overview
 
