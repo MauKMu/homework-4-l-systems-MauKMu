@@ -9,9 +9,9 @@
 
 Click below to go to the demo!
 
-[![](images/example.png)](maukmu.github.io/homework-4-l-systems-MauKMu)
+[![](images/example.png)](https://maukmu.github.io/homework-4-l-systems-MauKMu)
 
-(Plant created with 11 iterations, seed 25, default colors, non-default fruit, on commit `6bea555`)
+(Plant created with 11 iterations, seed 25, default colors, non-default fruit, on commit `5dc9eb9`)
 
 ## Controls
 
