@@ -1,5 +1,54 @@
 # Homework 4: L-systems
 
+## Student Info
+
+* Name: Mauricio Mutai
+* PennKey: `mmutai`
+
+## Demo
+
+Click below to go to the demo!
+
+[![](images/example.png)](maukmu.github.io/homework-4-l-systems-MauKMu)
+
+(Plant created with 11 iterations, seed 25, default colors, non-default fruit, on commit `6bea555`)
+
+## Controls
+
+Below is an explanation of how to use the controls in the demo. A similar explanation of the controls can be accessed by clicking "Show Help" in the demo. Note that, unless otherwise specified, changes will only become visible if you redraw the plant using `Regenerate String and Plant` or `Redraw Plant`.
+
+* `Light Position`: Changes the light position for shading. Updates automatically (redrawing plant is not needed).
+* `iterations`: Changes number of times the string is expanded from its axiom.
+* `randomMode`: Changes how "random" numbers are generated. The options are `Math.random()` and a deterministic seeded noise function. Using the seeded noise function is recommended if you want to redraw the same plant while tweaking other parameters, such as colors and fruit.
+* `randomSeed`: Changes the seed for the deterministic seeded noise function.
+* `woodColor`: Changes the color used for the wood geometry.
+* `leafColor`: Changes the color for the leaf geometry.
+* `fruit`: Changes which decoration is placed on the branches (some non-fruity decorations may require more determination).
+* `Show Alphabet`: Shows L-system's alphabet.
+* `Show String`: Shows current expanded L-system string.
+* `Regenerate String and Plant`: Resets L-system string to axiom, re-expands it, then redraws plant.
+* `Redraw Plant`: Redraws plant without modifying L-system string. Note that if your `randomMode` is `Math.random()`, you will get different results, although the general structure of the plant will still be the same. Similarly, using the seeded noise function and changing the seed will lead to different results.
+* `Show Help`: Shows a help message.
+
+## Techniques Used
+
+### Overview
+
+* In this demo, I use an L-system in order to place geometry in such a way that it resembles a plant. This geometry is rasterized with a standard WebGL workflow.
+* The geometry is placed in one set of VBOs (including vertex positions, normals, and UV coordinates) so it can be rendered with just one draw call.
+* I wanted to make a not-so-generic tree. I took inspiration from *araucárias*, a type of tree found in Brazil (as well as Argentina, Chile, and Australia, according to Wikipedia). I wanted to reproduce the unique shape created by their branches that gradually curve upwards as they get farther from the main trunk (see image below).
+![](images/real-araucaria.jpg)
+(Image taken from [here](http://www.mundohusqvarna.com.br/assunto/araucaria-e-possivel-combater-o-risco-de-extincao/))
+* My final trees differ from *araucárias* in two significant points:
+  * They have a base that twists around before righting itself up, instead of just going straight up from the base. This was the result of spending too much time Googling for "trees" and eventually finding "crooked trees", such as the one below. I wanted to reproduce these twisting trunks to give my L-system more variety.
+![](images/crooked.jpg)
+(Image taken from [here](http://www.youramazingplaces.com/incredible-photo-shoots-of-13-cool-places/))
+  * They have fruit. Sometimes, the fruit isn't very fruity. They are models from ["Kirby's Return to Dream Land"](https://www.models-resource.com/wii/kirbysreturntodreamland/model/4572/).
+
+### L-system Overview
+
+Below is an explanation of what each symbol in the L-system does, and what they expand to (if they aren't terminal).
+
 For this assignment, you will design a set of formal grammar rules to create
 a plant life using an L-system program. Once again, you will work from a
 Typescript / WebGL 2.0 base code like the one you used in homework 0. You will
