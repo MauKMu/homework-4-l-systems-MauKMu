@@ -463,10 +463,11 @@ function blah() {
         turtle.scaleTop *= 0.8;
         // draw some prisms while increasing Y to move orientation up
         let ARAUCARIA_Y_INC = 0.2;
+        let length = 1.4 + lRandom.getNext() * 0.2;
         for (let i = 0; i < 5; i++) {
             // draw part of the branch
-            lsys.addScaledPrismAtTurtleNoShrink(turtle, 1.5);
-            turtle.moveForward(PRISM_HEIGHT * 1.5);
+            lsys.addScaledPrismAtTurtleNoShrink(turtle, length);
+            turtle.moveForward(PRISM_HEIGHT * length);
             // add to Y and normalize to nudge it upwards
             vec3.add(turtle.orientation, turtle.orientation, vec3.fromValues(0, ARAUCARIA_Y_INC, 0));
             vec3.normalize(turtle.orientation, turtle.orientation);

@@ -7,7 +7,7 @@ const PI = 3.14159265;
 const TWO_PI = 6.283185307;
 
 export const PRISM_HEIGHT = 10;
-export const BRANCH_COLOR = vec4.fromValues(1, 1, 1, 1);
+export const BRANCH_COLOR = vec4.fromValues(0.82353, 0.71764706, 0.60392157, 1);
 export const TIP_COLOR = vec4.fromValues(0.1, 0.5, 0.1, 1);
 export const PEAR_COLOR = vec4.fromValues(0.7, 0.9, 0.3, 1);
 
