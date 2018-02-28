@@ -279,21 +279,21 @@ function blah() {
     });
     alphabet.set(pop.stringRepr, pop);
     // "root"
-    let R = new LSymbol("R", function (lsys: LSystem) {
-        let turtle = lsys.getTopTurtle();
-        lsys.addPrismAtTurtle(turtle);
-        turtle.moveForward(PRISM_HEIGHT * 0.8);
-    });
+    //let R = new LSymbol("R", function (lsys: LSystem) {
+        //let turtle = lsys.getTopTurtle();
+        //lsys.addPrismAtTurtle(turtle);
+        //turtle.moveForward(PRISM_HEIGHT * 0.8);
+    //});
     let plusZ = new LSymbol("(+Z)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
         turtle.rotateZ(Math.PI * 0.1333333);
     });
     alphabet.set(plusZ.stringRepr, plusZ);
-    let minusZ = new LSymbol("(-Z)", function (lsys: LSystem) {
-        let turtle = lsys.getTopTurtle();
-        turtle.rotateZ(-Math.PI * 0.1333333);
-    });
-    alphabet.set(minusZ.stringRepr, minusZ);
+    //let minusZ = new LSymbol("(-Z)", function (lsys: LSystem) {
+        //let turtle = lsys.getTopTurtle();
+        //turtle.rotateZ(-Math.PI * 0.1333333);
+    //});
+    //alphabet.set(minusZ.stringRepr, minusZ);
     // decorations ============================================
     let decorationPear = new LSymbol("(pear)", function (lsys: LSystem) {
         let turtle = lsys.getTopTurtle();
